@@ -1,0 +1,47 @@
+.nav {
+  background: var(--bar);
+  border-bottom: 1px solid var(--stroke);
+}
+
+.navInner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 14px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.brandMark {
+  font-weight: 900;
+  font-size: 26px;
+}
+
+.links {
+  display: flex;
+  gap: 26px;
+  align-items: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.link { 
+    font-weight: 700; 
+    opacity: 0.8; 
+}
+
+.link.active { 
+    opacity: 1; 
+    text-decoration: underline; 
+}
+
+.profile {
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: 1px solid #aaa;
+  background: #eee;
+  cursor: pointer;
+}

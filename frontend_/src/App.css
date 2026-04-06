@@ -1,0 +1,611 @@
+:root {
+  --bg: #f2f2f2;
+  --bar: #d9d9d9;
+  --card: #ffffff;
+  --ink: #111;
+  --muted: #555;
+  --stroke: #cfcfcf;
+  --radius: 18px;
+}
+
+* { box-sizing: border-box; }
+body { 
+  margin: 0; 
+  font-family: system-ui, Segoe UI, Roboto, Arial; 
+  background: var(--bg); 
+  color: var(--ink); 
+}
+
+a { 
+  color: inherit; 
+  text-decoration: none; 
+}
+
+.app { 
+  min-height: 100vh; 
+  width: 100%;
+}
+
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 28px 22px 60px;
+}
+
+.greeting { 
+  margin: 22px 0 6px; 
+  font-size: 42px; 
+  font-weight: 800; 
+}
+
+.section { 
+  margin-top: 22px;
+}
+
+.sectionTitle { 
+  margin: 0 0 12px; 
+  font-size: 22px; 
+  font-weight: 800; }
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+@media (max-width: 900px) {
+  .grid2 { grid-template-columns: 1fr; }
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+
+.cardTitle {
+  font-weight: 800;
+  margin: 0 0 10px;
+}
+
+.muted { color: var(--muted); }
+
+.btn {
+  border: 1px solid #aaa;
+  background: #fff;
+  color: #111;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btnPrimary {
+  background: #fff;
+  border: 2px solid #777;
+}
+
+.btnStack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.hrRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.bigTime {
+  font-size: 44px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.statsRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 18px;
+}
+
+@media (max-width: 900px) {
+  .statsRow { grid-template-columns: 1fr; }
+}
+
+.statBlock {
+  text-align: center;
+  padding: 10px;
+  border-radius: 14px;
+  border: 1px solid var(--stroke);
+}
+
+.statTop {
+  text-decoration: underline;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.adviceBox {
+  border: 2px solid #222;
+  border-radius: 14px;
+  padding: 14px 16px;
+  background: #fff;
+  max-width: 900px;
+}
+
+
+/* =========================
+   Pauzesuggesties pagina
+========================= */
+
+.pause-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
+
+.pause-page h1 {
+  text-align: center;
+  font-size: 32px;
+  margin: 0 0 28px 0;
+}
+
+/* Tabs */
+.pause-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  margin-bottom: 46px;
+}
+
+.pause-tab {
+  padding: 12px 30px;
+  border-radius: 999px;
+  border: 1.5px solid #9a9a9a;
+  background: #ffffff;
+  cursor: pointer;
+  font-size: 15px;
+  color: #000;
+}
+
+.pause-tab.active {
+  background: #d9d9d9;
+  border-color: #d9d9d9;
+}
+
+/* Grid */
+.pause-grid {
+  display: grid;
+  gap: 34px;
+  justify-content: center;
+}
+
+.pause-grid.cols-3 {
+  grid-template-columns: repeat(3, minmax(260px, 1fr));
+}
+
+.pause-grid.cols-2 {
+  grid-template-columns: repeat(2, minmax(320px, 1fr));
+}
+
+/* Card */
+.pause-card {
+  position: relative;
+  display: flex;
+  border: 1.5px solid #2b2b2b;
+  border-radius: 18px;
+  overflow: hidden;
+  background: white;
+  min-height: 120px;
+}
+
+.pause-iconBox {
+  width: 120px;
+  background: #e1e1e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pause-iconBox img {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+}
+
+.pause-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+}
+
+.pause-content h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* Favorite button */
+.pause-favBtn {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1.5px solid #2b2b2b;
+  background: #e1e1e1;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pause-favBtn.active {
+  background: #d9d9d9;
+  color: #000;
+}
+
+/* Responsive */
+@media (max-width: 980px) {
+  .pause-grid.cols-3 {
+    grid-template-columns: repeat(2, minmax(260px, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .pause-grid.cols-3,
+  .pause-grid.cols-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* =========================
+   Breathing Exercises Page
+========================= */
+
+.breathing-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 24px 80px;
+  position: relative;
+}
+
+.breathing-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  color: #111;
+}
+
+.back-btn:hover {
+  opacity: 0.7;
+}
+
+/* Filters */
+.breathing-filters {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  margin-bottom: 46px;
+}
+
+.filter-btn {
+  padding: 12px 30px;
+  border-radius: 999px;
+  border: 1.5px solid #9a9a9a;
+  background: #ffffff;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  color: #000;
+}
+
+.filter-btn.active {
+  background: #d9d9d9;
+  border-color: #d9d9d9;
+}
+
+/* Breathing Grid */
+.breathing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Breathing Card */
+.breathing-card {
+  position: relative;
+  border: 1.5px solid #2b2b2b;
+  border-radius: 18px;
+  background: white;
+  padding: 48px 20px;
+  min-height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.breathing-card h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: pre-line;
+}
+
+/* Favorite button */
+.breathing-fav-btn {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1.5px solid #2b2b2b;
+  background: #e1e1e1;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.breathing-fav-btn.active {
+  background: #d9d9d9;
+  color: #000;
+}
+
+/* Help button */
+.help-btn {
+  position: fixed;
+  bottom: 40px;
+  left: 40px;
+  width: 60px;
+  height: 60px;
+  padding: 0;
+  border-radius: 999px;
+  border: 3px solid #2b2b2b;
+  background: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #111;
+  font-size: 32px;
+}
+
+.help-btn:hover {
+  background: #f5f5f5;
+}
+
+/* Clickable pause card */
+.pause-card.clickable {
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.pause-card.clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Clickable breathing card */
+.breathing-card.clickable {
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.breathing-card.clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .breathing-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .breathing-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* =========================
+  Breathing Exercise Detail
+========================= */
+
+.exercise-detail-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 24px 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.exercise-detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 40px;
+}
+
+.exercise-controls {
+  display: flex;
+  gap: 24px;
+}
+
+.control-btn {
+  padding: 12px 48px;
+  border-radius: 999px;
+  border: 1.5px solid #9a9a9a;
+  background: #ffffff;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  color: #000;
+  transition: all 0.2s;
+}
+
+.control-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.control-btn:not(:disabled):hover {
+  background: #f0f0f0;
+}
+
+.exercise-circle-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 40px 0;
+}
+
+.exercise-circle {
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: #d9d9d9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.exercise-circle.active {
+  animation: breathe 8s ease-in-out infinite;
+}
+
+.circle-text {
+  font-size: 24px;
+  font-weight: 600;
+  color: #2b2b2b;
+  text-align: center;
+  padding: 20px;
+  transition: transform 4s ease-in-out;
+}
+
+.exercise-circle.active {
+  animation: breathe 8s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+.exercise-info {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.exercise-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 16px 0;
+}
+
+.exercise-steps {
+  font-size: 16px;
+  color: #555;
+  margin: 0;
+}
+
+.exercise-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 24px;
+  margin-top: auto;
+}
+
+.change-method-btn {
+  padding: 12px 32px;
+  border-radius: 999px;
+  border: 1.5px solid #9a9a9a;
+  background: #ffffff;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.change-method-btn:hover {
+  background: #f0f0f0;
+}
+
+.exercise-indicators {
+  display: flex;
+  gap: 8px;
+}
+
+.indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #d9d9d9;
+}
+
+.indicator.active {
+  background: #6b6b6b;
+}
+
+@media (max-width: 768px) {
+  .exercise-detail-header {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .exercise-controls {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .control-btn {
+    flex: 1;
+    padding: 12px 24px;
+  }
+
+  .exercise-circle {
+    width: 240px;
+    height: 240px;
+  }
+
+  .exercise-footer {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .change-method-btn {
+    width: 100%;
+  }
+}
