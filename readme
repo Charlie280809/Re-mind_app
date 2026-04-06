@@ -1,0 +1,21 @@
+Opstarten
+
+! Check eerst of alle packages gedownload zijn !
+
+3 verschillende terminals
+--------------------------------
+
+1 Backend
+1. cd stress-app
+2. cd backend
+3. node index.js
+
+2 Frontend
+1. cd stress-app
+2. cd frontend
+3. npm run dev
+
+3 electron 
+1. cd stress-app
+2. cd electron
+3. npx electron main.js
