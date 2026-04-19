@@ -1,0 +1,227 @@
+:root {
+    /* Background */
+    --background-50: #fffffe;
+    --background-100: #fffffe;
+    --background-200: #fffefc;
+    --background-300: #fffcf5;
+    --background-400: #e6e3dd;
+    --background-500: #cccac4;
+    --background-600: #bfbdb8;
+    --background-700: #999793;
+    --background-800: #73716e;
+    --background-900: #595856;
+
+    /* Background-Card */
+    --background-card-50: #fefdfb;
+    --background-card-100: #fdfcf9;
+    --background-card-200: #fcf9f3;
+    --background-card-300: #f4edd9;
+    --background-card-400: #dcd5c3;
+    --background-card-500: #c3beae;
+    --background-card-600: #b7b2a3;
+    --background-card-700: #928e82;
+    --background-card-800: #6e6b62;
+    --background-card-900: #55534c;
+
+    /* Background-Section */
+    --background-section-50: #fdfcfa;
+    --background-section-100: #fcfaf7;
+    --background-section-200: #f8f5ee;
+    --background-section-300: #e9dec8;
+    --background-section-400: #d2c8b4;
+    --background-section-500: #bbaba0;
+    --background-section-600: #afa796;
+    --background-section-700: #8c8578;
+    --background-section-800: #69645a;
+    --background-section-900: #524e46;
+
+    /* Text-Primary */
+    --text-primary-50: #e8e8e8;
+    --text-primary-100: #dddddd;
+    --text-primary-200: #b8b8b8;
+    --text-primary-300: #1a1a1a;
+    --text-primary-400: #171717;
+    --text-primary-500: #151515;
+    --text-primary-600: #141414;
+    --text-primary-700: #101010;
+    --text-primary-800: #0c0c0c;
+    --text-primary-900: #090909;
+
+    /* Text-Secondary */
+    --text-secondary-50: #ececec;
+    --text-secondary-100: #e3e3e3;
+    --text-secondary-200: #4c4c4c;
+    --text-secondary-300: #414141;
+    --text-secondary-400: #3b3b3b;
+    --text-secondary-500: #343434;
+    --text-secondary-600: #313131;
+    --text-secondary-700: #272727;
+    --text-secondary-800: #1d1d1d;
+    --text-secondary-900: #171717;
+
+    /* Border */
+    --border-50: #bfbfba;
+    --border-100: #9f9f87;
+    --border-200: #f2f1ef;
+    --border-300: #d6d2ca;
+    --border-400: #c1bdb6;
+    --border-500: #aba8a2;
+    --border-600: #a19e98;
+    --border-700: #807e79;
+    --border-800: #605e5b;
+    --border-900: #4b4a47;
+
+    /* Primary */
+    --primary-50: #f1f4f3;
+    --primary-100: #eaecef;
+    --primary-200: #d5ded8;
+    --primary-300: #769382;
+    --primary-400: #6a8475;
+    --primary-500: #5e7668;
+    --primary-600: #596e62;
+    --primary-700: #47584e;
+    --primary-800: #35423a;
+    --primary-900: #29332e;
+
+    /* Highlight */
+    --highlight-50: #f6f9f7;
+    --highlight-100: #f2f5f3;
+    --highlight-200: #e4ebe6;
+    --highlight-300: #a8bfaf;
+    --highlight-400: #97ac9e;
+    --highlight-500: #86998c;
+    --highlight-600: #7e8f83;
+    --highlight-700: #657369;
+    --highlight-800: #4c564f;
+    --highlight-900: #3b433d;
+
+    /* Border-Green */
+    --border-green-50: #f9f9f8;
+    --border-green-100: #f6f6f4;
+    --border-green-200: #ebece9;
+    --border-green-300: #c0c3b8;
+    --border-green-400: #adb0a6;
+    --border-green-500: #9a9c93;
+    --border-green-600: #90928a;
+    --border-green-700: #73756e;
+    --border-green-800: #565853;
+    --border-green-900: #434440;
+
+    /* Success */
+    --success-50: #f0f7f4;
+    --success-100: #e9f3ee;
+    --success-200: #d1e6dc;
+    --success-300: #6baf8e;
+    --success-400: #609e80;
+    --success-500: #568c72;
+    --success-600: #50836b;
+    --success-700: #406955;
+    --success-800: #304f40;
+    --success-900: #253d32;
+
+    /* Warning */
+    --warning-50: #fffaF4;
+    --warning-100: #fbf7ef;
+    --warning-200: #fff6ed;
+    --warning-300: #e3cb91;
+    --warning-400: #ccb783;
+    --warning-500: #b6a274;
+    --warning-600: #a98c67;
+    --warning-700: #887a57;
+    --warning-800: #665b41;
+    --warning-900: #4f4733;
+
+    /* Error */
+    --error-50: #fbf3f3;
+    --error-100: #f9ecec;
+    --error-200: #f4d9d9;
+    --error-300: #da8383;
+    --error-400: #c47676;
+    --error-500: #ae6969;
+    --error-600: #a46262;
+    --error-700: #834f4f;
+    --error-800: #623b3b;
+    --error-900: #4c2e2e;
+
+    /* Info */
+    --info-50: #f4f7fa;
+    --info-100: #eef3f7;
+    --info-200: #dde5ee;
+    --info-300: #8cb2c8;
+    --info-400: #7ea0b4;
+    --info-500: #708ea0;
+    --info-600: #698696;
+    --info-700: #546b78;
+    --info-800: #3f505a;
+    --info-900: #313e46;
+
+    /* ================================================= */
+    /* COLOR TOKENS - SEMANTIC */
+    /* ================================================= */
+
+    /* Text */
+    --text-primary: var(--text-primary-300);
+    --text-secondary: var(--text-secondary-300);
+    --text-brand: var(--primary-300);
+
+    --text-disabled: var(--border-50);
+    --text-placeholder: var(--border-600);
+
+    --text-on-light: var(--text-primary-300);
+    --text-on-dark: var(--background-200);
+
+    --text-success: var(--success-300);
+    --text-warning: var(--warning-300);
+    --text-error: var(--error-300);
+    --text-info: var(--info-300);
+
+    /* Background */
+    --surface-background: var(--background-300);
+    --surface-card: var(--background-card-300);
+    --surface-section: var(--background-section-300);
+
+    /* Border */
+    --border-color-default: var(--border-300);
+    --border-color-green: var(--border-green-300);
+    --border-color-brand: var(--primary-300);
+    --border-color-success: var(--success-300);
+    --border-color-warning: var(--warning-300);
+    --border-color-error: var(--error-300);
+    --border-color-info: var(--info-300);
+
+
+    /* Brand */
+    --brand-primary: var(--primary-300);
+    --brand-highlight: var(--highlight-300);
+
+    /* ================================================= */
+    /* GRADIENT TOKENS */
+    /* ================================================= */
+
+    /* Section gradient - subtiel van pagina achtergrond naar card */
+    --gradient-section: linear-gradient(180deg,
+            var(--background-300) 0%,
+            var(--highlight-200) 100%);
+
+
+
+    /* Voordelen sectie gradient - zachte groene fade */
+    --gradient-benefits-section: linear-gradient(180deg,
+            var(--highlight-200) 0%,
+            var(--highlight-100) 20%,
+            var(--primary-100) 40%,
+            var(--primary-50) 60%,
+            var(--primary-50) 80%,
+            var(--primary-50) 100%);
+
+    /* Pricing card gradient - zacht groen → warm beige */
+    --gradient-pricing-card: linear-gradient(150deg,
+            var(--highlight-200) 0%,
+            var(--highlight-100) 30%,
+            var(--background-card-300) 80%);
+
+    /* Footer gradient - diepe brand groen */
+    --gradient-footer-brand: linear-gradient(180deg,
+            var(--primary-300) 0%,
+            var(--primary-600) 100%);
+}

@@ -1,0 +1,149 @@
+:root {
+
+    /* ================================= */
+    /* FONT FAMILY */
+    /* ================================= */
+
+    --font-family-heading: "Lora", serif;
+    --font-family-body: "Nunito", sans-serif;
+
+    /* ================================= */
+    /* FONT SIZES */
+    /* ================================= */
+
+    --font-size-xxxs: 12px;
+    --font-size-xxs: 14px;
+    --font-size-xs: 16px;
+    --font-size-sm: 20px;
+    --font-size-md: 24px;
+    --font-size-lg: 28px;
+    --font-size-xl: 32px;
+    --font-size-2xl: 36px;
+
+    /* ================================= */
+    /* FONT WEIGHTS */
+    /* ================================= */
+
+    --font-weight-regular: 400;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-weight-extrabold: 800;
+
+    /* ================================= */
+    /* LINE HEIGHTS */
+    /* ================================= */
+
+    --line-height-xs: 22px;
+    --line-height-sm: 28px;
+    --line-height-md: 36px;
+    --line-height-lg: 42px;
+    --line-height-xl: 46px;
+
+    /* ================================= */
+    /* LETTER SPACING */
+    /* ================================= */
+
+    --letter-spacing-default: 0px;
+
+    /* ================================= */
+    /* TEXT STYLES */
+    /* ================================= */
+
+    /* Heading 1 */
+    --text-heading-1-font-family: var(--font-family-heading);
+    --text-heading-1-font-weight: var(--font-weight-bold);
+    --text-heading-1-font-size: var(--font-size-2xl);
+    --text-heading-1-line-height: var(--line-height-xl);
+    --text-heading-1-letter-spacing: var(--letter-spacing-default);
+
+    /* Heading 2 */
+    --text-heading-2-font-family: var(--font-family-heading);
+    --text-heading-2-font-weight: var(--font-weight-semibold);
+    --text-heading-2-font-size: var(--font-size-xl);
+    --text-heading-2-line-height: var(--line-height-lg);
+    --text-heading-2-letter-spacing: var(--letter-spacing-default);
+
+    /* Heading 3 */
+    --text-heading-3-font-family: var(--font-family-heading);
+    --text-heading-3-font-weight: var(--font-weight-regular);
+    --text-heading-3-font-size: var(--font-size-lg);
+    --text-heading-3-line-height: var(--line-height-md);
+    --text-heading-3-letter-spacing: var(--letter-spacing-default);
+
+    /* Body */
+    --text-body-regular-font-family: var(--font-family-body);
+    --text-body-regular-font-weight: var(--font-weight-regular);
+    /* --text-body-regular-font-size: var(--font-size-sm); */
+    --text-body-regular-font-size: 18px;
+    --text-body-regular-line-height: var(--line-height-sm);
+
+    --text-body-bold-font-family: var(--font-family-body);
+    --text-body-bold-font-weight: var(--font-weight-bold);
+    --text-body-bold-font-size: var(--font-size-sm);
+    --text-body-bold-line-height: var(--line-height-sm);
+
+    --text-body-small-font-family: var(--font-family-body);
+    --text-body-small-font-weight: var(--font-weight-regular);
+    --text-body-small-font-size: var(--font-size-xs);
+    --text-body-small-line-height: var(--line-height-xs);
+
+    /* ================================================= */
+    /* TEXT COMPONENT TOKENS */
+    /* ================================================= */
+
+    /* Navigation */
+    --text-navigation-default-font-family: var(--font-family-body);
+    --text-navigation-default-font-weight: var(--font-weight-regular);
+    --text-navigation-default-font-size: var(--font-size-sm);
+    --text-navigation-default-line-height: var(--line-height-sm);
+    --text-navigation-default-color: var(--text-primary);
+
+    --text-navigation-hover-font-family: var(--font-family-body);
+    --text-navigation-hover-font-weight: var(--font-weight-bold);
+    --text-navigation-hover-font-size: var(--font-size-sm);
+    --text-navigation-hover-line-height: var(--line-height-sm);
+    --text-navigation-hover-color: var(--text-brand);
+
+    --text-navigation-active-font-family: var(--font-family-body);
+    --text-navigation-active-font-weight: var(--font-weight-extrabold);
+    --text-navigation-active-font-size: var(--font-size-md);
+    --text-navigation-active-line-height: var(--line-height-sm);
+    --text-navigation-active-color: var(--text-brand);
+
+    /* Text link */
+    --text-link-default-font-family: var(--font-family-body);
+    --text-link-default-font-weight: var(--font-weight-regular);
+    --text-link-default-font-size: var(--font-size-sm);
+    --text-link-default-line-height: var(--line-height-sm);
+    --text-link-default-color: var(--text-brand);
+    --text-link-default-decoration: underline;
+
+    --text-link-hover-color: var(--primary-400);
+    --text-link-active-color: var(--primary-500);
+
+    /* Button text */
+    --text-button-label-font-family: var(--font-family-heading);
+    --text-button-label-font-weight: var(--font-weight-bold);
+    --text-button-label-font-size: var(--font-size-sm);
+    --text-button-label-line-height: var(--line-height-sm);
+    --text-button-label-color: var(--text-on-light);
+
+    /* Input text */
+    --text-input-value-font-family: var(--font-family-body);
+    --text-input-value-font-weight: var(--font-weight-regular);
+    --text-input-value-font-size: var(--font-size-sm);
+    --text-input-value-line-height: var(--line-height-sm);
+    --text-input-value-color: var(--text-primary);
+
+    --text-input-placeholder-font-family: var(--font-family-body);
+    --text-input-placeholder-font-weight: var(--font-weight-regular);
+    --text-input-placeholder-font-size: var(--font-size-sm);
+    --text-input-placeholder-line-height: var(--line-height-sm);
+    --text-input-placeholder-color: var(--text-placeholder);
+
+    --text-input-disabled-font-family: var(--font-family-body);
+    --text-input-disabled-font-weight: var(--font-weight-regular);
+    --text-input-disabled-font-size: var(--font-size-sm);
+    --text-input-disabled-line-height: var(--line-height-sm);
+    --text-input-disabled-color: var(--text-disabled);
+}

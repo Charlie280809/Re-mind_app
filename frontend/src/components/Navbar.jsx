@@ -1,4 +1,4 @@
-import "./navbar.css";
+import "../css/Navbar.css";
 
 export default function Navbar({ currentPage, setCurrentPage }) {
   return (
