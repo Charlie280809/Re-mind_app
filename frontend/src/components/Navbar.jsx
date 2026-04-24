@@ -1,41 +1,66 @@
 import "../css/Navbar.css";
 
 export default function Navbar({ currentPage, setCurrentPage }) {
+  const navItems = [
+    {
+      key: "home",
+      label: "Home",
+      // icon: (),
+      onClick: () => setCurrentPage("home"),
+    },
+    {
+      key: "report",
+      label: "Dagrapport",
+      // icon: (),
+      onClick: () => setCurrentPage("home"),
+    },
+    {
+      key: "pause",
+      label: "Pauzes",
+      // icon: (),
+      onClick: () => setCurrentPage("pause"),
+    },
+    {
+      key: "profile",
+      label: "Profiel",
+      // icon: (),
+      onClick: () => setCurrentPage("home"),
+    },
+  ];
+
   return (
-    <header className="nav">
-      <div className="navInner">
+    <aside className="sideNav">
+      <div className="sideNavTop">
         <div className="brand">
-          <span className="brandMark">Logo</span>
+          {/* logo */}
         </div>
 
-        <nav className="links">
-          <button
-            className={`link ${currentPage === "home" ? "active" : ""}`}
-            onClick={() => setCurrentPage("home")}
-            type="button"
-          >
-            Home
-          </button>
-
-          <button className="link" type="button">
-            Dagrapport
-          </button>
-
-          <button className="link" type="button">
-            Weekrapport
-          </button>
-
-          <button
-            className={`link ${currentPage === "pause" ? "active" : ""}`}
-            onClick={() => setCurrentPage("pause")}
-            type="button"
-          >
-            Pauzesuggesties
-          </button>
+        <nav className="sideNavLinks" aria-label="Hoofdnavigatie">
+          {navItems.map((item) => (
+            <button
+              key={item.key}
+              className={`sideNavLink ${currentPage === item.key ? "active" : ""}`}
+              onClick={item.onClick}
+              type="button"
+            >
+              <span className="sideNavIcon">{item.icon}</span>
+              <span>{item.label}</span>
+            </button>
+          ))}
         </nav>
-
-        <button className="profile" aria-label="Profiel" type="button"></button>
       </div>
-    </header>
+
+      <div className="sideNavBottom">
+        <button className="premiumButton" type="button">
+          {/* icon */}
+          <span>Premium</span>
+        </button>
+
+        <button className="settingsLink" type="button">
+          {/* icon */}
+          <span>Instellingen</span>
+        </button>
+      </div>
+    </aside>
   );
 }
