@@ -1,5 +1,8 @@
+@import "../css/design_tokens/color_tokens.css";
+
 .nav {
-  background: var(--bar);
+  background-color: var(--background-section-300);
+  /* background-color: red; */
   border-bottom: 1px solid var(--stroke);
 }
 

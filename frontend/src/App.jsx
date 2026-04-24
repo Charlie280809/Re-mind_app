@@ -36,7 +36,7 @@ export default function App() {
         <PauseSuggestions onNavigateToBreathing={() => setCurrentPage("breathing")} />
       ) : (
         <main className="page">
-          <h1 className="greeting">Hallo,</h1>
+          <h1 className="greeting">Hallo {name}</h1>
 
           <section className="section">
             <WorkTimerCard />
