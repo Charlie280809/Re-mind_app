@@ -1,50 +1,163 @@
 @import "../css/design_tokens/color_tokens.css";
+@import "../css/design_tokens/spacing_tokens.css";
+@import "../css/design_tokens/typography_tokens.css";
 
-.nav {
-  background-color: var(--background-section-300);
-  /* background-color: red; */
-  border-bottom: 1px solid var(--stroke);
-}
-
-.navInner {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 14px 22px;
+.sideNav {
+  width: 230px;
+  /*aanpassen naar fit-content?*/
+  min-height: 100vh;
+  background: var(--surface-card);
+  border-radius: 0 20px 20px 0;
+  padding: var(--space-6) var(--space-8) var(--space-7) var(--space-3);
+  /* padding: 24px 36px 32px 12px; */
   display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: space-between;
-  gap: 18px;
+  position: fixed;
+  top: 0;
 }
 
-.brandMark {
-  font-weight: 900;
-  font-size: 26px;
-}
-
-.links {
+.sideNavTop {
   display: flex;
-  gap: 26px;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-8);
+}
+
+.brand {
+  padding: 0 10px;
+}
+
+.brandText {
+  font-size: 48px;
+  line-height: 1;
+  color: #739685;
+  font-family: "Segoe Script", "Lucida Handwriting", cursive;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+.sideNavLinks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-7);
+}
+
+.sideNavLink {
+  /* width: 100%; */
+  border: 0;
   background: transparent;
-  border: none;
+  color: #232320;
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var( --text-navigation-default-font-family);
+  font-size: 24px;
+  /* font-weight: var(--font-weight-semibold); */
+  /* text-align: left; */
   cursor: pointer;
 }
 
-.link { 
-    font-weight: 700; 
-    opacity: 0.8; 
+.sideNavLink.active {
+  font-weight: 700;
 }
 
-.link.active { 
-    opacity: 1; 
-    text-decoration: underline; 
+.sideNavIcon {
+  width: 36px;
+  height: 36px;
+  /* 28px, 30px? */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.profile {
-  width: 38px;
-  height: 38px;
-  border-radius: 999px;
-  border: 1px solid #aaa;
-  background: #eee;
-  cursor: pointer;
+.sideNavIcon svg {
+  width: 100%;
+  height: 100%;
 }
+
+.sideNavBottom {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-7);
+  /* padding: 0 6px; */
+}
+
+.premiumButton {
+  width: 100%;
+  border: 1px solid #7f998a;
+  background: #789685;
+  color: #f3f0e3;
+  border-radius: 12px;
+  font-size: 24px;
+  /* font-weight: 600; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: 11px 12px;
+}
+
+.settingsLink {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: #2b2a28;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 24px;
+  font-weight: 500;
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.settingsLink svg {
+  width: 34px;
+  height: 34px;
+}
+
+/* @media (max-width: 900px) {
+  .sideNav {
+    width: 100%;
+    min-height: auto;
+    position: static;
+    border-radius: 0;
+    border-right: 0;
+    border-bottom: 1px solid #d3cbb6;
+    padding: 14px;
+    gap: 14px;
+  }
+
+  .sideNavTop,
+  .sideNavLinks {
+    gap: 10px;
+  }
+
+  .brandText {
+    font-size: 40px;
+  }
+
+  .sideNavLinks {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .sideNavLink {
+    width: auto;
+    font-size: 24px;
+  }
+
+  .sideNavBottom {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .premiumButton,
+  .settingsLink {
+    font-size: 24px;
+    width: auto;
+  }
+} */
