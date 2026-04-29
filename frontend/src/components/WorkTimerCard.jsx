@@ -1,3 +1,4 @@
+import "../css/worktimercard.css";
 import { useEffect, useMemo, useState } from "react";
 
 function formatTime(totalSeconds) {
@@ -12,7 +13,7 @@ function CircleProgress({ progress = 0 }) {
   const stroke = 70;
   const r = (size - stroke) / 2; // radius van de cirkel, rekening houdend met stroke
   const c = 2 * Math.PI * r; // omtrek van de cirkel
-  const dash = c * (1 - Math.max(0, Math.min(1, progress))); 
+  const dash = c * (1 - Math.max(0, Math.min(1, progress)));
 
   return (
     <svg width={size} height={size} aria-label="Timer progress">
@@ -98,13 +99,11 @@ export default function WorkTimerCard() {
   const endBreak = () => setOnBreak(false);
 
   return (
-    <div className="card" style={{ borderRadius: 22, padding: 22 }}>
+    <div className="card">
       <div className="hrRow">
         <CircleProgress progress={progress} />
 
-        <div style={{ minWidth: 140, display: "flex", justifyContent: "center" }}>
-          <div className="bigTime">{workStarted ? mainTime : "--:--"}</div>
-        </div>
+        <div className="bigTime">{workStarted ? mainTime : "--:--"}</div>
 
         <div className="btnStack">
           {!workStarted && !finished && (
@@ -112,7 +111,7 @@ export default function WorkTimerCard() {
               <button className="btn btnPrimary" onClick={startDay}>
                 Start werkdag
               </button>
-              <div className="muted" style={{ fontWeight: 700, fontSize: 12 }}>
+              <div className="muted">
                 Je kan op elk moment pauzeren
               </div>
             </>
