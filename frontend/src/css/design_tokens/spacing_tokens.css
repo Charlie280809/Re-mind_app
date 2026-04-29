@@ -1,52 +1,30 @@
 :root {
-    /* ================================= */
     /* SPACING TOKENS */
-    /* ================================= */
-
     --space-0: 0px;
-    --space-1: 4px;
-    --space-2: 8px;
-    --space-3: 12px;
-    --space-4: 16px;
-    --space-5: 20px;
-    --space-6: 24px;
-    --space-7: 32px;
-    --space-8: 40px;
-    --space-9: 48px;
-    --space-10: 64px;
-    --space-11: 80px;
-    --space-12: 96px;
-    --space-13: 120px;
-    --space-14: 240px;
+    --space-4: 4px;
+    --space-8: 8px;
+    --space-12: 12px;
+    --space-16: 16px;
+    --space-20: 20px;
+    --space-24: 24px;
+    --space-32: 32px;
+    --space-40: 40px;
+    --space-48: 48px;
+    --space-64: 64px;
+    --space-80: 80px;
+    --space-96: 96px;
+    --space-120: 120px;
+    --space-240: 240px;
 
-    /* ================================= */
-    /* GRID TOKENS */
-    /* ================================= */
-
-    /* Desktop small */
-
-    --grid-desktop-small-columns: 10;
-    --grid-desktop-small-margin: var(--space-7);
-    --grid-desktop-small-gutter: var(--space-5);
-
-    /* Desktop large */
-
-    --grid-desktop-large-columns: 10;
-    --grid-desktop-large-margin: var(--space-8);
-    --grid-desktop-large-gutter: var(--space-6);
-
-    /* ================================= */
     /* LAYOUT SPACING TOKENS */
-    /* ================================= */
+    --layout-section: var(--space-120);
+    --layout-container-padding: var(--space-32);
+    --layout-card-padding: var(--space-24);
+    --layout-component-gap: var(--space-16);
 
-    --layout-section: var(--space-10);
-    --layout-container-padding: var(--space-7);
-    --layout-card-padding: var(--space-6);
-    --layout-component-gap: var(--space-4);
+    --layout-input-padding-x: var(--space-16);
+    --layout-input-padding-y: var(--space-12);
 
-    --layout-input-padding-x: var(--space-4);
-    --layout-input-padding-y: var(--space-3);
-
-    --layout-button-padding-x: var(--space-5);
-    --layout-button-padding-y: var(--space-3);
+    --layout-button-padding-x: var(--space-20);
+    --layout-button-padding-y: var(--space-12);
 }

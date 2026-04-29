@@ -1,4 +1,7 @@
+@import url("https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=Nunito:wght@400;600;700;800&display=swap");
 @import "../css/design_tokens/color_tokens.css";
+@import "../css/design_tokens/typography_tokens.css";
+@import "../css/design_tokens/spacing_tokens.css";
 
 * {
     box-sizing: border-box;
@@ -7,7 +10,7 @@
 .appShell {
     min-height: 100vh;
     width: 100%;
-    background: var(--page-bg);
+    background: var(--surface-background);
     color: var(--text);
     display: flex;
     align-items: stretch;
@@ -15,7 +18,8 @@
 
 .homePage {
     flex: 1;
-    padding: 34px 20px 44px;
+    /* padding: 34px 20px 44px; */
+    padding: var(--layout-container-padding) var(--layout-container-padding) var(--space-32);
     max-width: 100%;
 }
 
@@ -23,24 +27,24 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 16px;
-    margin-bottom: 14px;
+    gap: var(--space-16);
+    margin-bottom: var(--space-12);
 }
 
 .homeGreeting {
     margin: 0;
-    font-size: 66px;
-    line-height: 1.1;
-    font-weight: 700;
-    font-family: Georgia, "Times New Roman", serif;
+    font-size: var(--text-heading-1-font-size);
+    line-height: var(--text-heading-1-line-height);
+    font-weight: var(--text-heading-1-font-weight);
+    font-family: var(--text-heading-1-font-family);
 }
 
 .homeSubtitle {
-    margin: 12px 0 0;
-    font-size: 60px;
-    line-height: 1.15;
-    font-weight: 700;
-    font-family: Georgia, "Times New Roman", serif;
+    margin: var(--space-12) 0 0;
+    font-size: var(--text-heading-2-font-size);
+    line-height: var(--text-heading-2-line-height);
+    font-weight: var(--text-heading-2-font-weight);
+    font-family: var(--text-heading-2-font-family);
 }
 
 .statusButton {
@@ -51,65 +55,15 @@
     cursor: default;
 }
 
-.homeCard {
-    border-radius: 20px;
-    border: 1px solid #e3decc;
-    background: var(--card-bg);
-}
-
-.timerCardWrap {
-    padding: 18px 18px;
-}
-
-.timerCardWrap .card {
-    border: 0;
-    background: transparent;
-    padding: 0;
-}
-
-.timerCardWrap .hrRow {
-    min-height: 266px;
-    padding: 0 12px;
-}
-
-.timerCardWrap .bigTime {
-    font-size: 72px;
-    font-family: Georgia, "Times New Roman", serif;
-    font-weight: 700;
-    letter-spacing: 0;
-}
-
-.timerCardWrap .btn {
-    min-width: 292px;
-    min-height: 58px;
-    border-radius: 14px;
-    font-size: 44px;
-    font-family: Georgia, "Times New Roman", serif;
-    font-weight: 500;
-    border: 2px solid #688677;
-}
-
-.timerCardWrap .btnPrimary {
-    background: #789685;
-    color: #edf2ed;
-}
-
-.timerCardWrap .muted {
-    margin-top: 8px;
-    font-size: 16px;
-    color: #4e5550;
-    font-weight: 500;
-}
-
 .homeSection {
     margin-top: 28px;
 }
 
 .homeSectionTitle {
     margin: 0 0 12px;
-    font-size: 56px;
-    line-height: 1.1;
-    font-weight: 500;
+    font-size: var(--text-heading-3-font-size);
+    line-height: var(--text-heading-3-line-height);
+    font-weight: var(--text-heading-3-font-weight);
     font-family: Georgia, "Times New Roman", serif;
 }
 
@@ -127,9 +81,10 @@
 }
 
 .pauseSummaryLabel {
-    width: 420px;
-    font-size: 45px;
-    font-weight: 700;
+    /* width: 420px; */
+    font-size: var(--font-size-sm);
+    /* font-weight: 700; */
+    font-family: var(--font-family-body);
 }
 
 .pauseSummaryDots {
@@ -139,32 +94,26 @@
 }
 
 .dot {
-    width: 34px;
-    height: 34px;
-    border-radius: 6px;
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
 }
 
 .dotGood {
-    background: var(--ok);
+    background: var(--success-300);
 }
 
 .dotBad {
-    background: var(--bad);
+    background: var(--error-300);
 }
 
 .adviceCard {
-    border: 3px solid #b9c2bb;
+    border: 2px solid #b9c2bb;
     border-radius: 20px;
-    background: var(--advice-bg);
     padding: 18px 28px;
-    font-size: 42px;
+    font-size: var(--font-size-md);
     color: #3d4340;
     line-height: 1.35;
-}
-
-.btnStack {
-    align-items: center;
 }
 
 .pause-page,
@@ -173,7 +122,7 @@
     width: 100%;
 }
 
-@media (max-width: 900px) {
+/* @media (max-width: 900px) {
     .appShell {
         flex-direction: column;
     }
@@ -226,7 +175,7 @@
         font-size: 26px;
         padding: 14px 16px;
     }
-}
+} */
 
 /* =========================
    Pauzesuggesties pagina
@@ -339,7 +288,7 @@
     color: #000;
 }
 
-@media (max-width: 980px) {
+/* @media (max-width: 980px) {
     .pause-grid.cols-3 {
         grid-template-columns: repeat(2, minmax(260px, 1fr));
     }
@@ -351,129 +300,4 @@
     .pause-grid.cols-2 {
         grid-template-columns: 1fr;
     }
-}
-
-/* =========================
-   Breathing Exercises Page
-========================= */
-
-.breathing-page {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px 24px 80px;
-    position: relative;
-}
-
-.breathing-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 24px;
-}
-
-.back-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-    color: #111;
-}
-
-.back-btn:hover {
-    opacity: 0.7;
-}
-
-.breathing-filters {
-    display: flex;
-    justify-content: center;
-    gap: 18px;
-    margin-bottom: 46px;
-}
-
-.filter-btn {
-    padding: 12px 30px;
-    border-radius: 999px;
-    border: 1.5px solid #9a9a9a;
-    background: #ffffff;
-    cursor: pointer;
-    font-size: 15px;
-    font-weight: 500;
-    color: #000;
-}
-
-.filter-btn.active {
-    background: #d9d9d9;
-    border-color: #d9d9d9;
-}
-
-.breathing-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 28px;
-    max-width: 900px;
-    margin: 0 auto;
-}
-
-.breathing-card {
-    position: relative;
-    border: 1.5px solid #2b2b2b;
-    border-radius: 18px;
-    background: white;
-    padding: 48px 20px;
-    min-height: 140px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
-
-.breathing-card h3 {
-    margin: 0;
-    font-size: 17px;
-    font-weight: 600;
-    line-height: 1.4;
-    white-space: pre-line;
-}
-
-.breathing-fav-btn {
-    position: absolute;
-    top: -14px;
-    right: -14px;
-    width: 40px;
-    height: 40px;
-    border-radius: 999px;
-    border: 1.5px solid #2b2b2b;
-    background: #e1e1e1;
-    cursor: pointer;
-    font-size: 18px;
-    line-height: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.breathing-fav-btn.active {
-    background: #d9d9d9;
-    color: #000;
-}
-
-.help-btn {
-    position: fixed;
-    bottom: 40px;
-    left: 40px;
-    width: 60px;
-    height: 60px;
-    padding: 0;
-    border-radius: 999px;
-    border: 3px solid #2b2b2b;
-    background: white;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #111;
-    font-size: 32px;
-}
+} */

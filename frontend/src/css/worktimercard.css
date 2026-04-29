@@ -1,0 +1,69 @@
+@import url("https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=Nunito:wght@400;600;700;800&display=swap");
+@import "../css/design_tokens/color_tokens.css";
+@import "../css/design_tokens/typography_tokens.css";
+@import "../css/design_tokens/spacing_tokens.css";
+
+.homeCard {
+    border-radius: 20px;
+    border: 1px solid var(--border-color-default);
+    background: var(--card-bg);
+}
+
+.timerCardWrap {
+    /* padding: 18px 18px; */
+    padding: var(--layout-card-padding);
+}
+
+.timerCardWrap .card {
+    border: 0;
+    background: transparent;
+    padding: 0;
+}
+
+.timerCardWrap .hrRow {
+    height: fit-content;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    /* gap: var(--space-64); */
+    /* min-height: 266px; */
+    /* padding: 0 12px; */
+}
+
+.timerCardWrap .bigTime {
+    width: 100px;
+    text-align: center;
+    font-size: var(--text-heading-1-font-size);
+    font-family: var(--text-heading-1-font-family);
+    font-weight: var(--text-heading-1-font-weight);
+}
+
+.timerCardWrap .btn {
+    min-width: fit-content;
+    min-height: fit-content;
+    border-radius: 14px;
+    /* padding: var(--layout-button-padding-y) var(--layout-button-padding-x); */
+    font-size: var(--button-font-size);
+    font-family: var(--text-button-label-font-family);
+    font-weight: var(--text-button-label-font-weight);
+    border: 2px solid #688677;
+}
+
+.timerCardWrap .btnPrimary {
+    background: #789685;
+    color: #edf2ed;
+}
+
+.timerCardWrap .muted {
+    margin-top: 8px;
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.btnStack{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-12);
+}

@@ -155,10 +155,7 @@
         --info-800: #3f505a;
         --info-900: #313e46;
 
-        /* ================================================= */
         /* COLOR TOKENS - SEMANTIC */
-        /* ================================================= */
-
         /* Text */
         --text-primary: var(--text-primary-300);
         --text-secondary: var(--text-secondary-300);
@@ -189,39 +186,7 @@
         --border-color-error: var(--error-300);
         --border-color-info: var(--info-300);
 
-
         /* Brand */
         --brand-primary: var(--primary-300);
         --brand-highlight: var(--highlight-300);
-
-        /* ================================================= */
-        /* GRADIENT TOKENS */
-        /* ================================================= */
-
-        /* Section gradient - subtiel van pagina achtergrond naar card */
-        --gradient-section: linear-gradient(180deg,
-                        var(--background-300) 0%,
-                        var(--highlight-200) 100%);
-
-
-
-        /* Voordelen sectie gradient - zachte groene fade */
-        --gradient-benefits-section: linear-gradient(180deg,
-                        var(--highlight-200) 0%,
-                        var(--highlight-100) 20%,
-                        var(--primary-100) 40%,
-                        var(--primary-50) 60%,
-                        var(--primary-50) 80%,
-                        var(--primary-50) 100%);
-
-        /* Pricing card gradient - zacht groen → warm beige */
-        --gradient-pricing-card: linear-gradient(150deg,
-                        var(--highlight-200) 0%,
-                        var(--highlight-100) 30%,
-                        var(--background-card-300) 80%);
-
-        /* Footer gradient - diepe brand groen */
-        --gradient-footer-brand: linear-gradient(180deg,
-                        var(--primary-300) 0%,
-                        var(--primary-600) 100%);
 }
