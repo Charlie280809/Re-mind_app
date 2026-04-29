@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
 import "./css/App.css";
+import { useMemo, useState } from "react";
 
 import Navbar from "./components/Navbar";
 import WorkTimerCard from "./components/WorkTimerCard";
@@ -34,6 +34,7 @@ export default function App() {
       ) : currentPage === "pause" ? (
         <PauseSuggestions onNavigateToBreathing={() => setCurrentPage("breathing")} />
       ) : (
+
         <main className="homePage">
           <header className="homeHeader">
             <div>
@@ -41,7 +42,7 @@ export default function App() {
               <h2 className="homeSubtitle">Klaar om je werkdag te starten?</h2>
             </div>
 
-            <button className="statusButton" type="button" aria-label="Meldingen">
+            <button className="statusButton" type="button" aria-label="Meldingen"> {/* aanpassen --> afsluitroutine van voorgaande dag */}
               <svg width="56" height="56" viewBox="0 0 56 56" fill="none" aria-hidden="true">
                 <rect x="6" y="4" width="40" height="48" rx="10" stroke="currentColor" strokeWidth="2.8" />
                 <path d="M17 18H35" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" />
@@ -65,15 +66,12 @@ export default function App() {
                 <span className="pauseSummaryLabel">Pauzes genomen:</span>
                 <div className="pauseSummaryDots">
                   <span className="dot dotGood"></span>
-                  <span className="dot dotGood"></span>
-                  <span className="dot dotGood"></span>
                 </div>
               </div>
 
               <div className="pauseSummaryRow">
                 <span className="pauseSummaryLabel">Pauzes overgeslagen:</span>
                 <div className="pauseSummaryDots">
-                  <span className="dot dotBad"></span>
                   <span className="dot dotBad"></span>
                 </div>
               </div>
