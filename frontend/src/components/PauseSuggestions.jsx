@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import PauseCard from "./PauseCard";
 
-import lungs from "../assets/ademhaling.png";
+import lungs from "../assets/icons/ademhaling.png";
 
 const DATA = [
   { id: "breath", type: "lang", title: "Ademhaling", icon: lungs },
