@@ -2,9 +2,21 @@ import { useMemo, useState } from "react";
 import PauseCard from "./PauseCard";
 
 import lungs from "../assets/icons/ademhaling.png";
+import posture from "../assets/icons/houdingCheck.png";
+import trophy from "../assets/icons/nameOneWin.png";
+import handStretch from "../assets/icons/handstretch.png";
+import chest from "../assets/icons/handToChestReset.png";
+import drink from "../assets/icons/drinkPauze.png";
+import eye from "../assets/icons/oogReset.png";
 
 const DATA = [
   { id: "breath", type: "lang", title: "Ademhaling", icon: lungs },
+  { id: "posture", type: "kort", title: "Houding check", icon: posture },
+  { id: "win", type: "kort", title: "Name one win", icon: trophy },
+  { id: "handStretch", type: "kort", title: "Hand stretch", icon: handStretch },
+  { id: "chest", type: "kort", title: "Hand to chest reset", icon: chest },
+  { id: "drink2", type: "kort", title: "Drink pauze", icon: drink },
+  { id: "eye", type: "kort", title: "Oog reset", icon: eye },
 ];
 
 export default function PauseSuggestions({ onNavigateToBreathing }) {
