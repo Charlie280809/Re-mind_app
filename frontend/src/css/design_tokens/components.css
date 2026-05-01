@@ -1,0 +1,167 @@
+:root {
+
+/* ================================================= */
+/* BUTTON BASE */
+/* ================================================= */
+
+--button-radius: var(--radius-sm);
+--button-border-width: var(--border-width-sm);
+--button-border-style: var(--border-style-solid);
+--button-gap: var(--space-4);
+--button-icon-size: var(--space-4);
+
+/* ================================================= */
+/* BUTTON SIZE */
+/* ================================================= */
+
+--button-sm-padding-y: var(--space-2);
+--button-sm-padding-x: var(--space-3);
+--button-sm-min-height: var(--space-8);
+--button-sm-font: var(--text-body-small);
+
+--button-md-padding-y: var(--space-3);
+--button-md-padding-x: var(--space-4);
+--button-md-min-height: var(--space-10);
+--button-md-font: var(--text-button);
+
+--button-lg-padding-y: var(--space-4);
+--button-lg-padding-x: var(--space-5);
+--button-lg-min-height: var(--space-12);
+--button-lg-font: var(--text-button);
+
+
+/* ================================================= */
+/* BUTTON SHAPE */
+/* ================================================= */
+
+--button-shape-default-radius: var(--radius-sm);
+--button-shape-pill-radius: var(--radius-full);
+--button-shape-min-width: var(--space-10);
+
+
+/* ================================================= */
+/* BUTTON VARIANTS */
+/* ================================================= */
+
+/* Primary */
+--button-primary-default-bg: var(--primary-300);
+--button-primary-default-text: var(--text-on-dark);
+--button-primary-default-border: var(--primary-700);
+
+--button-primary-hover-bg: var(--primary-200);
+--button-primary-hover-border: var(--primary-400);
+--button-primary-hover-text: var(--text-on-light);
+
+--button-primary-active-bg: var(--primary-300);
+--button-primary-active-border: var(--primary-700);
+--button-primary-active-text: var(--text-on-light);
+
+--button-primary-disabled-bg: var(--background-200);
+--button-primary-disabled-text: var(--text-disabled);
+--button-primary-disabled-border: var(--border-200);
+
+/* Neutral */
+--button-neutral-default-bg: var(--background-card-50);
+--button-neutral-default-text: var(--text-on-light);
+--button-neutral-default-border: var(--background-400);
+
+--button-neutral-hover-bg: var(--background-200);
+--button-neutral-hover-border: var(--background-500);
+
+--button-neutral-active-bg: var(--background-400);
+--button-neutral-active-border: var(--background-400);
+
+--button-neutral-disabled-bg: var(--background-200);
+--button-neutral-disabled-text: var(--text-disabled);
+--button-neutral-disabled-border: var(--border-200);
+
+/* Accent / Highlight */
+--button-accent-default-bg: var(--highlight-50);
+--button-accent-default-text: var(--text-on-light);
+--button-accent-default-border: var(--highlight-300);
+
+--button-accent-hover-bg: var(--highlight-300);
+--button-accent-hover-border: var(--highlight-600);
+
+--button-accent-active-bg: var(--highlight-500);
+--button-accent-active-border: var(--highlight-800);
+
+--button-accent-disabled-bg: var(--background-200);
+--button-accent-disabled-text: var(--text-disabled);
+--button-accent-disabled-border: var(--border-200);
+
+/* SELECTION CONTROLS */
+/* Checkbox */
+--checkbox-size: 20px;
+--checkbox-radius: var(--radius-xs);
+--checkbox-border-width: var(--border-width-md);
+--checkbox-border-style: var(--border-style-solid);
+--checkbox-icon-size: 12px;
+--checkbox-icon-color: var(--text-on-dark);
+--checkbox-gap: var(--space-3);
+
+--checkbox-default-bg: transparent;
+--checkbox-default-border: var(--border-control-color);
+
+--checkbox-hover-bg: var(--primary-50);
+--checkbox-hover-border: var(--border-state-hover);
+
+--checkbox-selected-bg: var(--primary-300);
+--checkbox-selected-border: var(--primary-300);
+
+--checkbox-error-bg: var(--error-50);
+--checkbox-error-border: var(--border-state-error);
+
+--checkbox-disabled-bg: var(--background-200);
+--checkbox-disabled-border: var(--border-state-disabled);
+
+--checkbox-focus-ring-color: var(--primary-200);
+--checkbox-focus-ring-width: 2px;
+
+/* Radio */
+--radio-size: 20px;
+--radio-radius: var(--radius-circle);
+--radio-border-width: var(--border-width-md);
+--radio-border-style: var(--border-style-solid);
+
+--radio-dot-size: 10px;
+--radio-dot-color: var(--primary-300);
+
+--radio-default-bg: transparent;
+--radio-default-border: var(--border-control-color);
+
+--radio-hover-border: var(--border-state-hover);
+--radio-selected-border: var(--primary-300);
+--radio-error-border: var(--border-state-error);
+--radio-disabled-border: var(--border-state-disabled);
+
+--radio-focus-ring-color: var(--primary-200);
+--radio-focus-ring-width: 2px;
+
+/* Toggle */
+--toggle-track-width: 40px;
+--toggle-track-height: 22px;
+--toggle-track-radius: var(--radius-full);
+--toggle-track-border-width: var(--border-width-md);
+--toggle-track-border-style: var(--border-style-solid);
+
+--toggle-thumb-size: 18px;
+--toggle-thumb-radius: var(--radius-circle);
+
+--toggle-off-bg: var(--background-300);
+--toggle-off-border: var(--border-control-color);
+
+--toggle-hover-bg: var(--primary-100);
+
+--toggle-on-bg: var(--primary-300);
+--toggle-on-border: var(--primary-300);
+
+--toggle-disabled-bg: var(--background-200);
+--toggle-disabled-border: var(--border-state-disabled);
+
+--toggle-focus-ring-color: var(--primary-200);
+--toggle-focus-ring-width: 2px;
+
+--toggle-animation-duration: 150ms;
+--toggle-animation-easing: ease-in-out;
+}

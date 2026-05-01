@@ -11,9 +11,9 @@
     /* FONT SIZES */
     /* ================================= */
 
-    --font-size-xxxs: 12px;
     --font-size-xxs: 14px;
     --font-size-xs: 16px;
+    --font-size-s: 18px;
     --font-size-sm: 20px;
     --font-size-md: 24px;
     --font-size-lg: 28px;
@@ -73,8 +73,7 @@
     /* Body */
     --text-body-regular-font-family: var(--font-family-body);
     --text-body-regular-font-weight: var(--font-weight-regular);
-    /* --text-body-regular-font-size: var(--font-size-sm); */
-    --text-body-regular-font-size: 18px;
+    --text-body-regular-font-size: var(--font-size-s);
     --text-body-regular-line-height: var(--line-height-sm);
 
     --text-body-bold-font-family: var(--font-family-body);
@@ -123,7 +122,7 @@
 
     /* Button text */
     --text-button-label-font-family: var(--font-family-heading);
-    --text-button-label-font-weight: var(--font-weight-bold);
+    --text-button-label-font-weight: var(--font-weight-semibold);
     --text-button-label-font-size: var(--font-size-sm);
     --text-button-label-line-height: var(--line-height-sm);
     --text-button-label-color: var(--text-on-light);
