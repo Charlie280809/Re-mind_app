@@ -21,15 +21,15 @@ function CircleProgress({ progress = 0 }) {
         cx={size / 2}
         cy={size / 2}
         r={r}
-        stroke="#eee"
+        stroke="#e6e3dd"
         strokeWidth={stroke}
-        fill="#eee"
+        fill="#eaecef"
       />
       <circle // dunne groene cirkel die de voortgang toont
         cx={size / 2}
         cy={size / 2}
         r={r}
-        stroke="#ccc"
+        stroke="#769382"
         strokeWidth={stroke}
         fill="transparent"
         strokeDasharray={c}
@@ -103,26 +103,24 @@ export default function WorkTimerCard() {
       <div className="hrRow">
         <CircleProgress progress={progress} />
 
-        <div className="bigTime">{workStarted ? mainTime : "--:--"}</div>
+        <div className="bigTime">{workStarted ? mainTime : "00:00"}</div>
 
         <div className="btnStack">
           {!workStarted && !finished && (
             <>
-              <button className="btn btnPrimary" onClick={startDay}>
+              <button className="btn" onClick={startDay} type="button">
                 Start werkdag
               </button>
-              <div className="muted">
-                Je kan op elk moment pauzeren
-              </div>
+              <div className="muted">Je kan op elk moment pauzeren</div>
             </>
           )}
 
           {workStarted && !finished && !onBreak && (
             <>
-              <button className="btn btnPrimary" onClick={takeBreak}>
+              <button className="btn breakbtn" onClick={takeBreak} type="button">
                 Neem een pauze
               </button>
-              <button className="btn" onClick={endDay}>
+              <button className="btn endbtn" onClick={endDay} type="button">
                 Beëindig werkdag
               </button>
             </>
@@ -130,25 +128,22 @@ export default function WorkTimerCard() {
 
           {workStarted && !finished && onBreak && (
             <>
-              <button className="btn btnPrimary" onClick={endBreak}>
+              <button className="btn breakbtn" onClick={endBreak} type="button">
                 Beëindig pauze
               </button>
-              <button className="btn" onClick={endDay}>
+              <button className="btn endbtn" onClick={endDay} type="button">
                 Beëindig werkdag
               </button>
-              <div className="muted" style={{ fontSize: 12 }}>
-                Pauzetijd: {formatTime(breakSeconds)}
-              </div>
+              <div className="muted">Pauzetijd: {formatTime(breakSeconds)}</div>
             </>
           )}
 
           {finished && (
             <>
-              <div style={{ fontWeight: 900 }}>Je bent klaar voor vandaag!</div>
-              <button className="btn btnPrimary" onClick={() => alert("Reflectie (demo)")} >
-                Vul nu de reflectie in
+              <div className="finishedText">Je bent klaar voor vandaag!</div>
+              <button className="btn" onClick={() => alert("Reflectie (demo)")} type="button"> {/* afsluitnotitie */}
+                Afsluitnotitie invullen
               </button>
-              <button className="btn" onClick={startDay}>Start nieuwe werkdag</button>
             </>
           )}
         </div>

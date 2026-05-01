@@ -6,7 +6,7 @@
 .homeCard {
     border-radius: 20px;
     border: 1px solid var(--border-color-default);
-    background: var(--card-bg);
+    background: var(--background-card-300);
 }
 
 .timerCardWrap {
@@ -24,10 +24,7 @@
     height: fit-content;
     display: flex;
     align-items: center;
-    justify-content: space-evenly;
-    /* gap: var(--space-64); */
-    /* min-height: 266px; */
-    /* padding: 0 12px; */
+    justify-content: space-between;
 }
 
 .timerCardWrap .bigTime {
@@ -38,32 +35,55 @@
     font-weight: var(--text-heading-1-font-weight);
 }
 
-.timerCardWrap .btn {
+.btn {
+    width: 100%;
     min-width: fit-content;
     min-height: fit-content;
-    border-radius: 14px;
-    /* padding: var(--layout-button-padding-y) var(--layout-button-padding-x); */
-    font-size: var(--button-font-size);
+    border-radius: 10px;
+    padding: var(--layout-button-padding-y) var(--layout-button-padding-x);
+    font-size: var(--font-size-s);
     font-family: var(--text-button-label-font-family);
     font-weight: var(--text-button-label-font-weight);
-    border: 2px solid #688677;
+    border: 2px solid var(--primary-700);
+    background-color: var(--brand-primary);
+    color: var(--text-on-dark);
 }
 
-.timerCardWrap .btnPrimary {
-    background: #789685;
-    color: #edf2ed;
-}
-
-.timerCardWrap .muted {
-    margin-top: 8px;
-    font-size: var(--font-size-xs);
+.muted {
+    margin-top: 4px;
+    font-size: var(--text-body-small-font-size);
     color: var(--text-secondary);
     font-weight: 500;
 }
 
-.btnStack{
+.finishedText {
+    width: 80%;
+    margin: 0 auto;
+    font-family: var(--font-family-heading);
+    font-size: var(--font-size-md);
+    line-height: var(--line-height-sm);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    text-align: center;
+}
+
+.btnStack {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
+    /* align-items: flex-start; */
     gap: var(--space-12);
+    /* min-width: 260px; */
+}
+
+.breakbtn {
+    border: 2px solid var(--highlight-300);
+    background: var(--highlight-200);
+    color: var(--text-on-light);
+}
+
+.endbtn {
+    border: 2px solid transparent;
+    background: var(--background-300);
+    color: var(--text-on-light);
 }
