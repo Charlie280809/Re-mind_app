@@ -21,7 +21,7 @@ export default function PauseCard({ icon, title, isFavorite, onToggleFavorite, o
       </div>
 
       <div className="pause-content">
-        <h3>{title}</h3>
+        <p>{title}</p>
       </div>
 
       <button
