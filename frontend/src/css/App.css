@@ -10,7 +10,7 @@
 .appShell {
     min-height: 100vh;
     width: 100%;
-    background: var(--surface-background);
+    background-color: var(--surface-background);
     color: var(--text);
     display: flex;
     align-items: stretch;
@@ -18,7 +18,9 @@
 
 .homePage {
     flex: 1;
-    /* padding: 34px 20px 44px; */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
     padding: var(--layout-container-padding) var(--layout-container-padding) var(--space-32);
     max-width: 100%;
 }
@@ -27,8 +29,8 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: var(--space-16);
-    margin-bottom: var(--space-12);
+    /* gap: var(--space-16); */
+    margin-bottom: var(--space-8);
 }
 
 .homeGreeting {
@@ -49,18 +51,18 @@
 
 .statusButton {
     border: 0;
-    background: transparent;
+    background-color: transparent;
     color: #262522;
     padding: 0;
     cursor: default;
 }
 
 .homeSection {
-    margin-top: 28px;
+    margin-top: var(--space-24);
 }
 
 .homeSectionTitle {
-    margin: 0 0 12px;
+    margin: 0 0 var(--space-8);
     font-size: var(--text-heading-3-font-size);
     line-height: var(--text-heading-3-line-height);
     font-weight: var(--text-heading-3-font-weight);
@@ -71,7 +73,7 @@
     padding: 24px 28px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: var(--space-16);
 }
 
 .pauseSummaryRow {
@@ -82,9 +84,10 @@
 
 .pauseSummaryLabel {
     /* width: 420px; */
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-s);
     /* font-weight: 700; */
     font-family: var(--font-family-body);
+    font-weight: var(--text-body-bold-font-weight);
 }
 
 .pauseSummaryDots {
@@ -100,156 +103,97 @@
 }
 
 .dotGood {
-    background: var(--success-300);
+    background-color: var(--highlight-300);
 }
 
 .dotBad {
-    background: var(--error-300);
+    background-color: var(--error-300);
 }
 
 .adviceCard {
-    border: 2px solid #b9c2bb;
+    border: 2px solid var(--border-color-green);
     border-radius: 20px;
+    background-color: var(--highlight-200);
     padding: 18px 28px;
-    font-size: var(--font-size-md);
-    color: #3d4340;
-    line-height: 1.35;
+    font-size: var(--font-size-sm);
+    font-family: var(--font-family-body);
+    line-height: var(--text-body-regular-line-height);
 }
 
-.pause-page,
 .breathing-page,
 .exercise-detail-page {
     width: 100%;
 }
 
-/* @media (max-width: 900px) {
-    .appShell {
-        flex-direction: column;
-    }
-
-    .homePage {
-        padding: 20px 14px 26px;
-    }
-
-    .homeGreeting {
-        font-size: 42px;
-    }
-
-    .homeSubtitle {
-        font-size: 34px;
-    }
-
-    .timerCardWrap .hrRow {
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 14px 4px;
-        gap: 22px;
-    }
-
-    .timerCardWrap .bigTime {
-        font-size: 58px;
-    }
-
-    .timerCardWrap .btn {
-        min-width: 230px;
-        font-size: 32px;
-    }
-
-    .homeSectionTitle {
-        font-size: 38px;
-    }
-
-    .pauseSummaryRow {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-    }
-
-    .pauseSummaryLabel {
-        width: auto;
-        font-size: 30px;
-    }
-
-    .adviceCard {
-        font-size: 26px;
-        padding: 14px 16px;
-    }
-} */
-
 /* =========================
-   Pauzesuggesties pagina
+    Pauzesuggesties pagina
 ========================= */
 
 .pause-page {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 40px 24px;
-}
-
-.pause-page h1 {
-    text-align: center;
-    font-size: 32px;
-    margin: 0 0 28px 0;
+    max-width: 100%;
+    /* margin: 0 auto; */
+    flex: 1;
+    padding: var(--space-32);
 }
 
 .pause-tabs {
     display: flex;
-    justify-content: center;
-    gap: 18px;
-    margin-bottom: 46px;
+    gap: var(--space-16);
+    margin-bottom: var(--space-32);
 }
 
 .pause-tab {
-    padding: 12px 30px;
-    border-radius: 999px;
-    border: 1.5px solid #9a9a9a;
-    background: #ffffff;
+    padding: var(--space-8) var(--space-40);
+    font-family: var(--text-button-label-font-family);
+    font-size: var(--text-button-label-font-size);
+    line-height: var(--text-button-label-line-height);
     cursor: pointer;
-    font-size: 15px;
-    color: #000;
+    border: 2px solid var(--background-500);
+    border-radius: 10px;
+    background-color: var(--background-300);
+    color: var(--text-on-light);
 }
 
 .pause-tab.active {
-    background: #d9d9d9;
-    border-color: #d9d9d9;
+    border: 2px solid var(--highlight-300);
+    background-color: var(--highlight-200);
 }
 
 .pause-grid {
     display: grid;
-    gap: 34px;
+    gap: var(--space-32);
     justify-content: center;
-}
+    /* grid-template-columns: repeat(3, minmax(260px, 1fr)); */
+    /* grid-template-columns: repeat(3, 1fr); */
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 
-.pause-grid.cols-3 {
-    grid-template-columns: repeat(3, minmax(260px, 1fr));
-}
-
-.pause-grid.cols-2 {
-    grid-template-columns: repeat(2, minmax(320px, 1fr));
 }
 
 .pause-card {
     position: relative;
     display: flex;
-    border: 1.5px solid #2b2b2b;
-    border-radius: 18px;
-    overflow: hidden;
-    background: white;
-    min-height: 120px;
+    border: 2px solid var(--border-color-default);
+    border-radius: 20px;
+    overflow: visible;
+    background-color: var(--surface-card);
+    height: 120px;
+    /* width: ; */
 }
 
 .pause-iconBox {
-    width: 120px;
-    background: #e1e1e1;
+    /* width: 120px; */
+    width: 50%;
+    background-color: var(--surface-section);
     display: flex;
     align-items: center;
     justify-content: center;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
 }
 
 .pause-iconBox img {
-    width: 54px;
-    height: 54px;
+    width: 64px;
+    height: 64px;
     object-fit: contain;
 }
 
@@ -257,13 +201,18 @@
     flex: 1;
     display: flex;
     align-items: center;
-    padding: 0 24px;
+    justify-content: center;
+    text-align: center;
+    padding: 0 var(--space-8);
 }
 
-.pause-content h3 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 600;
+.pause-content p {
+    /* margin: 0; */
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--text-body-regular-font-size);
+    line-height: var(--text-body-regular-line-height);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
 }
 
 .pause-favBtn {
@@ -273,19 +222,20 @@
     width: 40px;
     height: 40px;
     border-radius: 999px;
-    border: 1.5px solid #2b2b2b;
-    background: #e1e1e1;
+    border: 1.5px solid var(--border-color-green);
+    background: var(--surface-section);
     cursor: pointer;
     font-size: 18px;
     line-height: 1;
     display: flex;
     align-items: center;
     justify-content: center;
+    color: var(--text-primary);
 }
 
 .pause-favBtn.active {
-    background: #d9d9d9;
-    color: #000;
+    background: var(--brand-highlight);
+    color: var(--text-primary);
 }
 
 /* @media (max-width: 980px) {
