@@ -6,7 +6,7 @@
 .homeCard {
     border-radius: 20px;
     border: 1px solid var(--border-color-default);
-    background: var(--background-card-300);
+    background-color: var(--background-card-300);
 }
 
 .timerCardWrap {
@@ -16,7 +16,7 @@
 
 .timerCardWrap .card {
     border: 0;
-    background: transparent;
+    background-color: transparent;
     padding: 0;
 }
 
@@ -50,10 +50,9 @@
 }
 
 .muted {
-    margin-top: 4px;
+    font-family: var(--text-body-small-font-family);
     font-size: var(--text-body-small-font-size);
     color: var(--text-secondary);
-    font-weight: 500;
 }
 
 .finishedText {
@@ -78,12 +77,12 @@
 
 .breakbtn {
     border: 2px solid var(--highlight-300);
-    background: var(--highlight-200);
+    background-color: var(--highlight-200);
     color: var(--text-on-light);
 }
 
 .endbtn {
     border: 2px solid transparent;
-    background: var(--background-300);
+    background-color: var(--background-300);
     color: var(--text-on-light);
 }
