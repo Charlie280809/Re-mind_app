@@ -15,40 +15,31 @@ const DATA = [
   { id: "win", type: "kort", title: "Name one win", icon: trophy },
   { id: "handStretch", type: "kort", title: "Hand stretch", icon: handStretch },
   { id: "chest", type: "kort", title: "Hand to chest reset", icon: chest },
-  { id: "drink2", type: "kort", title: "Drink pauze", icon: drink },
+  { id: "drink2", type: "kort", title: "Drinkpauze", icon: drink },
   { id: "eye", type: "kort", title: "Oog reset", icon: eye },
 ];
 
 export default function PauseSuggestions({ onNavigateToBreathing }) {
-  const [tab, setTab] = useState("kort"); // "kort" | "lang" | "fav"
+  const [tab, setTab] = useState("all"); // "all" | "fav"
   const [favorites, setFavorites] = useState(() => new Set());
 
   const filtered = useMemo(() => {
+    if (tab === "all") return DATA;
     if (tab === "fav") return DATA.filter((x) => favorites.has(x.id));
-    return DATA.filter((x) => x.type === tab);
+    return DATA;
   }, [tab, favorites]);
 
-  const columnsClass = tab === "lang" ? "cols-2" : "cols-3";
+  const columnsClass = "cols";
 
   return (
     <main className="pause-page">
-      <h1>Pauzesuggesties</h1>
-
       <div className="pause-tabs">
         <button
-          className={`pause-tab ${tab === "kort" ? "active" : ""}`}
-          onClick={() => setTab("kort")}
+          className={`pause-tab ${tab === "all" ? "active" : ""}`}
+          onClick={() => setTab("all")}
           type="button"
         >
-          Korte pauzes
-        </button>
-
-        <button
-          className={`pause-tab ${tab === "lang" ? "active" : ""}`}
-          onClick={() => setTab("lang")}
-          type="button"
-        >
-          Lange pauzes
+          Alle pauzes
         </button>
 
         <button
