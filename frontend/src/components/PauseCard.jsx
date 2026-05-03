@@ -1,3 +1,6 @@
+import { IoMdHeartEmpty } from "react-icons/io";
+import { IoMdHeart } from "react-icons/io";
+
 export default function PauseCard({ icon, title, isFavorite, onToggleFavorite, onClick }) {
   const handleCardClick = (e) => {
     if (onClick) {
@@ -30,7 +33,7 @@ export default function PauseCard({ icon, title, isFavorite, onToggleFavorite, o
         aria-label={isFavorite ? "Verwijder uit favorieten" : "Voeg toe aan favorieten"}
         type="button"
       >
-        {isFavorite ? "♥" : "♡"}
+        {isFavorite ? <IoMdHeart /> : <IoMdHeartEmpty />}
       </button>
     </article>
   );
