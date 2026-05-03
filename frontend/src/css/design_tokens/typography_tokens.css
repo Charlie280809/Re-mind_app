@@ -92,7 +92,7 @@
 
     /* Navigation */
     --text-navigation-default-font-family: var(--font-family-body);
-    --text-navigation-default-font-weight: var(--font-weight-regular);
+    --text-navigation-default-font-weight: var(--font-weight-semibold);
     --text-navigation-default-font-size: var(--font-size-sm);
     --text-navigation-default-line-height: var(--line-height-sm);
     --text-navigation-default-color: var(--text-primary);
@@ -105,9 +105,10 @@
 
     --text-navigation-active-font-family: var(--font-family-body);
     --text-navigation-active-font-weight: var(--font-weight-extrabold);
-    --text-navigation-active-font-size: var(--font-size-md);
+    --text-navigation-active-font-size: var(--font-size-sm);
     --text-navigation-active-line-height: var(--line-height-sm);
-    --text-navigation-active-color: var(--text-brand);
+    --text-navigation-active-color: var(--primary-600);
+
 
     /* Text link */
     --text-link-default-font-family: var(--font-family-body);
