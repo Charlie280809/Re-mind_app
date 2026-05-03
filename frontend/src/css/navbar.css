@@ -140,7 +140,6 @@
   transition: all 0.2s ease-in-out;
 }
 
-.premiumButton:hover,
 .settingsLink:hover {
   font-family: var(--text-navigation-hover-font-family);
   font-weight: var(--text-navigation-hover-font-weight);
@@ -148,15 +147,23 @@
   line-height: var(--text-navigation-hover-line-height);
 }
 
+.premiumButton:hover {
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-navigation-active-font-size);
+  line-height: var(--text-navigation-active-line-height);
+  gap: var(--space-8);
+}
+
 .premiumButton:hover svg {
-  color: var(--highlight-900);
+  width: 36px;
+  height: 36px;
 }
 
 .settingsLink:hover svg {
   color: var(--text-navigation-hover-color);
 }
 
-.premiumButton:active,
+/* .premiumButton:active, */
 .settingsLink:active {
   font-weight: var(--text-navigation-active-font-weight);
   font-size: var(--text-navigation-active-font-size);
@@ -164,7 +171,11 @@
   gap: var(--space-8);
 }
 
-.premiumButton:active svg,
+.premiumButton:active svg {
+  width: 36px;
+  height: 36px;
+}
+
 .settingsLink:active svg {
   color: var(--text-navigation-active-color);
   width: 36px;
