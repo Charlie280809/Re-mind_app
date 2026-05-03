@@ -1,22 +1,28 @@
 import { useMemo, useState } from "react";
 import PauseCard from "./PauseCard";
 
-import lungs from "../assets/icons/ademhaling.png";
-import posture from "../assets/icons/houdingCheck.png";
-import trophy from "../assets/icons/nameOneWin.png";
-import handStretch from "../assets/icons/handstretch.png";
-import chest from "../assets/icons/handToChestReset.png";
-import drink from "../assets/icons/drinkPauze.png";
-import eye from "../assets/icons/oogReset.png";
+import lungs from "../assets/icons/ademhaling.svg";
+import drink from "../assets/icons/drinkPauze.svg";
+import handStretch from "../assets/icons/handstretch.svg";
+import chest from "../assets/icons/handToChestReset.svg";
+import posture from "../assets/icons/houdingCheck.svg";
+import headphones from "../assets/icons/koptelefoon.svg";
+import walk from "../assets/icons/korteWandeling.svg";
+import trophy from "../assets/icons/nameOneWin.svg";
+import eye from "../assets/icons/oogReset.svg";
+import stretch from "../assets/icons/stretchen.svg";
 
 const DATA = [
-  { id: "breath", type: "lang", title: "Ademhaling", icon: lungs },
-  { id: "posture", type: "kort", title: "Houding check", icon: posture },
-  { id: "win", type: "kort", title: "Name one win", icon: trophy },
-  { id: "handStretch", type: "kort", title: "Hand stretch", icon: handStretch },
-  { id: "chest", type: "kort", title: "Hand to chest reset", icon: chest },
-  { id: "drink2", type: "kort", title: "Drinkpauze", icon: drink },
-  { id: "eye", type: "kort", title: "Oog reset", icon: eye },
+  { id: "breath", title: "Ademhaling", icon: lungs },
+  { id: "stretch", title: "Stretchen", icon: stretch },
+  { id: "posture", title: "Houding check", icon: posture },
+  { id: "walk", title: "Korte wandeling", icon: walk },
+  { id: "music", title: "Muziek luisteren", icon: headphones },
+  { id: "win", title: "Name one win", icon: trophy },
+  { id: "handStretch", title: "Hand stretch", icon: handStretch },
+  { id: "chest", title: "Hand to chest reset", icon: chest },
+  { id: "drink2", title: "Drinkpauze", icon: drink },
+  { id: "eye", title: "Oog reset", icon: eye },
 ];
 
 export default function PauseSuggestions({ onNavigateToBreathing }) {
