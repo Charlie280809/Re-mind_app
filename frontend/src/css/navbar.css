@@ -4,13 +4,12 @@
 @import "../css/design_tokens/typography_tokens.css";
 
 .sideNav {
-  width: 230px;  /*aanpassen naar fit-content?*/
+  width: fit-content;
+  padding-right: var(--space-32);
   height: 100vh;
   min-height: 100vh;
   background: var(--surface-card);
   border-radius: 0 20px 20px 0;
-  padding: var(--space-6) var(--space-8) var(--space-7) var(--space-3);
-  /* padding: 24px 36px 32px 12px; */
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -25,53 +24,65 @@
   gap: var(--space-8);
 }
 
-.brand {
-  padding: 0 10px;
-}
-
-.brandText {
-  font-size: 48px;
-  line-height: 1;
-  color: #739685;
-  font-family: "Segoe Script", "Lucida Handwriting", cursive;
-  font-weight: 700;
-  letter-spacing: 0.4px;
+.brand img {
+  padding: var(--space-24) var(--space-0) var(--space-0) var(--space-12);
+  width: 200px;
 }
 
 .sideNavLinks {
   display: flex;
   flex-direction: column;
-  gap: var(--space-7);
+  gap: var(--space-20);
+  padding-top: var(--space-12);
 }
 
 .sideNavLink {
-  /* width: 100%; */
-  border: 0;
-  background: transparent;
-  color: #232320;
-  border-radius: 12px;
-  padding: 10px;
+  padding: 0 0 0 var(--space-12);
+  border: none;
+  background-color: transparent;
+  color: var(--text-primary);
   display: flex;
   align-items: center;
-  gap: 12px;
-  font-family: var( --text-navigation-default-font-family);
-  font-size: 24px;
-  /* font-weight: var(--font-weight-semibold); */
-  /* text-align: left; */
+  gap: var(--space-12);
+  font-family: var(--text-navigation-default-font-family);
+  font-size: var(--text-navigation-default-font-size);
+  font-weight: var(--text-navigation-default-font-weight);
+  line-height: var(--text-navigation-default-line-height);
   cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.sideNavLink:hover {
+  font-family: var(--text-navigation-hover-font-family);
+  font-weight: var(--text-navigation-hover-font-weight);
+  font-size: var(--text-navigation-hover-font-size);
+  line-height: var(--text-navigation-hover-line-height);
+
+  .sideNavIcon {
+    color: var(--text-navigation-hover-color);
+  }
 }
 
 .sideNavLink.active {
-  font-weight: 700;
+  font-weight: var(--text-navigation-active-font-weight);
+  font-size: var(--text-navigation-active-font-size);
+  line-height: var(--text-navigation-active-line-height);
+  gap: var(--space-8);
+
+  .sideNavIcon {
+    color: var(--text-navigation-active-color);
+    width: 36px;
+    height: 36px;
+  }
 }
 
 .sideNavIcon {
-  width: 36px;
-  height: 36px;
-  /* 28px, 30px? */
+  width: 32px;
+  height: 32px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s ease-in-out;
 }
 
 .sideNavIcon svg {
@@ -82,45 +93,85 @@
 .sideNavBottom {
   display: flex;
   flex-direction: column;
-  gap: var(--space-7);
-  /* padding: 0 6px; */
+  align-items: flex-start;
+  gap: var(--space-20);
 }
 
 .premiumButton {
-  width: 100%;
-  border: 1px solid #7f998a;
-  background: #789685;
-  color: #f3f0e3;
-  border-radius: 12px;
-  font-size: 24px;
-  /* font-weight: 600; */
+  margin: 0 0 0 var(--space-12);
+  border: 2px solid var(--primary-700);
+  background-color: var(--brand-primary);
+  color: var(--text-on-dark);
+  border-radius: 10px;
+  font-family: var(--text-navigation-default-font-family);
+  font-size: var(--text-navigation-default-font-size);
+  font-weight: var(--text-navigation-default-font-weight);
+  line-height: var(--text-navigation-default-line-height);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-4);
-  padding: 11px 12px;
+  gap: var(--space-8);
+  padding: 4px 32px 4px 4px;
+  padding: var(--space-4) var(--space-48) var(--space-4) var(--space-4);
 }
 
 .settingsLink {
-  width: 100%;
-  border: 0;
-  background: transparent;
-  color: #2b2a28;
+  padding: 0 0 var(--space-24) var(--space-12);
+  border: none;
+  background-color: transparent;
+  color: var(--text-primary);
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 24px;
-  font-weight: 500;
-  padding: 8px 10px;
-  text-align: left;
+  justify-content: center;
+  gap: var(--space-12);
+  font-family: var(--text-navigation-default-font-family);
+  font-size: var(--text-navigation-default-font-size);
+  font-weight: var(--text-navigation-default-font-weight);
+  line-height: var(--text-navigation-default-line-height);
 }
 
+.premiumButton svg,
 .settingsLink svg {
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease-in-out;
 }
 
-/* @media (max-width: 900px) {
+.premiumButton:hover,
+.settingsLink:hover {
+  font-family: var(--text-navigation-hover-font-family);
+  font-weight: var(--text-navigation-hover-font-weight);
+  font-size: var(--text-navigation-hover-font-size);
+  line-height: var(--text-navigation-hover-line-height);
+}
+
+.premiumButton:hover svg {
+  color: var(--highlight-900);
+}
+
+.settingsLink:hover svg {
+  color: var(--text-navigation-hover-color);
+}
+
+.premiumButton:active,
+.settingsLink:active {
+  font-weight: var(--text-navigation-active-font-weight);
+  font-size: var(--text-navigation-active-font-size);
+  line-height: var(--text-navigation-active-line-height);
+  gap: var(--space-8);
+}
+
+.premiumButton:active svg,
+.settingsLink:active svg {
+  color: var(--text-navigation-active-color);
+  width: 36px;
+  height: 36px;
+}
+
+/* @media (max-width: 900px) { //enkel icons zichtbaar?
   .sideNav {
     width: 100%;
     min-height: auto;

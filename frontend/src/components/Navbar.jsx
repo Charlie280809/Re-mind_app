@@ -1,30 +1,46 @@
 import "../css/Navbar.css";
+import logo from "../assets/images/logo.svg";
+import { LuHouse } from "react-icons/lu";
+import { HiOutlineDocumentReport } from "react-icons/hi";
+import { LuPause } from "react-icons/lu";
+import { LuUser } from "react-icons/lu";
+import { TbCrown } from "react-icons/tb";
+import { LuSettings } from "react-icons/lu";
 
 export default function Navbar({ currentPage, setCurrentPage }) {
   const navItems = [
     {
       key: "home",
       label: "Home",
-      // icon: (),
+      icon: <LuHouse />,
       onClick: () => setCurrentPage("home"),
     },
     {
       key: "report",
       label: "Dagrapport",
-      // icon: (),
-      onClick: () => setCurrentPage("home"),
+      icon: <HiOutlineDocumentReport />,
+      onClick: () => setCurrentPage("report"),
     },
     {
       key: "pause",
       label: "Pauzes",
-      // icon: (),
+      icon: <LuPause />,
       onClick: () => setCurrentPage("pause"),
     },
     {
       key: "profile",
       label: "Profiel",
-      // icon: (),
-      onClick: () => setCurrentPage("home"),
+      icon: <LuUser />,
+      onClick: () => setCurrentPage("profile"),
+    },
+  ];
+
+  const bottomNavItems = [
+    {
+      key: "settings",
+      label: "Instellingen",
+      icon: <LuSettings />,
+      className: "settingsLink",
     },
   ];
 
@@ -32,7 +48,7 @@ export default function Navbar({ currentPage, setCurrentPage }) {
     <aside className="sideNav">
       <div className="sideNavTop">
         <div className="brand">
-          {/* logo */}
+          <img src={logo} alt="Logo" />
         </div>
 
         <nav className="sideNavLinks" aria-label="Hoofdnavigatie">
@@ -52,12 +68,12 @@ export default function Navbar({ currentPage, setCurrentPage }) {
 
       <div className="sideNavBottom">
         <button className="premiumButton" type="button">
-          {/* icon */}
+          {<TbCrown />}
           <span>Premium</span>
-        </button>
+        </button> {/*when user is not a premium user*/}
 
-        <button className="settingsLink" type="button">
-          {/* icon */}
+        <button onClick={() => setCurrentPage("settings")} className="sideNavLink settingsLink" type="button">
+          {<LuSettings />}
           <span>Instellingen</span>
         </button>
       </div>
