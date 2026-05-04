@@ -1,0 +1,309 @@
+@import url("https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=Nunito:wght@400;600;700;800&display=swap");
+@import "../css/design_tokens/color_tokens.css";
+@import "../css/design_tokens/spacing_tokens.css";
+@import "../css/design_tokens/typography_tokens.css";
+
+.reportPage {
+    flex: 1;
+    width: 100%;
+    min-width: 0;
+    padding: var(--layout-container-padding);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-32);
+    color: var(--text-primary);
+}
+
+.reportHeader,
+.reportSectionHeader,
+.reportMetricsRow,
+.reportStatsSplit,
+.reportBreakRow,
+.reportStatLabel {
+    display: flex;
+    align-items: center;
+}
+
+.reportHeader {
+    justify-content: space-between;
+    gap: var(--space-24);
+    flex-wrap: wrap;
+}
+
+.reportTitleGroup {
+    display: flex;
+    align-items: center;
+    gap: var(--space-12);
+    min-width: 0;
+}
+
+.reportTitle {
+    margin: 0;
+    font-family: var(--text-heading-1-font-family);
+    font-size: var(--text-heading-2-font-size);
+    line-height: var(--text-heading-2-line-height);
+    font-weight: var(--text-heading-2-font-weight);
+}
+
+.reportNavButton,
+.reportWeekButton,
+.reportAgendaButton {
+    border: 1.5px solid var(--border-color-default);
+    background: var(--background-50);
+    color: var(--text-primary);
+}
+
+.reportNavButton {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    flex: 0 0 auto;
+}
+
+.reportNavButton svg,
+.reportWeekButton svg {
+    width: 22px;
+    height: 22px;
+}
+
+.reportWeekButton {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-8);
+    border-radius: 10px;
+    padding: var(--space-8) var(--space-24);
+    background: var(--primary-400);
+    border-color: var(--primary-700);
+    color: var(--text-on-dark);
+    font-family: var(--text-button-label-font-family);
+    font-size: var(--text-button-label-font-size);
+    line-height: var(--text-button-label-line-height);
+}
+
+.reportMetricsRow {
+    gap: var(--space-32);
+    align-items: stretch;
+}
+
+.reportMetricCard {
+    flex: 1;
+    min-width: 0;
+    border-radius: 20px;
+    border: 1.5px solid var(--border-color-default);
+    background: var(--background-50);
+    padding: var(--space-24);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02);
+}
+
+.reportMetricCardStats {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-20);
+}
+
+.reportSectionTitle {
+    margin: 0;
+    font-family: var(--text-heading-3-font-family);
+    font-size: var(--font-size-md);
+    line-height: var(--line-height-md);
+    font-weight: var(--font-weight-regular);
+}
+
+.reportSectionTitleLarge {
+    font-size: var(--font-size-md);
+    line-height: var(--line-height-md);
+}
+
+.reportBigValue {
+    margin: 0;
+    padding: var(--space-24) 0 var(--space-4);
+    text-align: center;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xl);
+    line-height: var(--line-height-lg);
+    font-weight: var(--font-weight-regular);
+}
+
+.reportStatsSplit {
+    gap: var(--space-24);
+    justify-content: space-between;
+}
+
+.reportStatItem {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+}
+
+.reportStatLabel {
+    justify-content: center;
+    gap: var(--space-8);
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-xs);
+    color: var(--text-secondary);
+}
+
+.reportStatLabel svg {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 auto;
+}
+
+.reportStatValue {
+    margin: var(--space-16) 0 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-md);
+    line-height: var(--line-height-md);
+    font-weight: var(--font-weight-bold);
+}
+
+.reportStatValueStress {
+    color: var(--warning-500);
+}
+
+.reportStatValueEnergy {
+    color: var(--info-400);
+}
+
+.reportSection {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-12);
+}
+
+.reportSectionHeader {
+    justify-content: space-between;
+    gap: var(--space-24);
+}
+
+.reportSectionMeta {
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-xs);
+    color: var(--text-primary);
+}
+
+.reportCard,
+.reportAdviceCard,
+.reportAgendaCard {
+    border: 1.5px solid var(--border-color-default);
+    border-radius: 20px;
+    background: var(--background-50);
+}
+
+.reportBreakCard {
+    padding: var(--space-24) var(--space-32);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-24);
+    background: var(--highlight-50);
+}
+
+.reportBreakRow {
+    gap: var(--space-24);
+    flex-wrap: wrap;
+}
+
+.reportBreakLabel {
+    min-width: 180px;
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-xs);
+}
+
+.reportDots {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+}
+
+.reportDot {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+}
+
+.reportDotGood {
+    background: var(--primary-200);
+}
+
+.reportDotBad {
+    background: var(--error-300);
+}
+
+.reportAdviceCard {
+    padding: var(--space-20) var(--space-24);
+    background: var(--highlight-100);
+    border-color: var(--border-color-green);
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-sm);
+}
+
+.reportAgendaSection {
+    gap: var(--space-16);
+}
+
+.reportAgendaButton {
+    border-radius: 12px;
+    padding: var(--space-8) var(--space-24);
+    font-family: var(--text-button-label-font-family);
+    font-size: var(--text-button-label-font-size);
+    line-height: var(--text-button-label-line-height);
+    background: var(--background-50);
+}
+
+.reportAgendaCard {
+    min-height: 220px;
+    padding: var(--space-20) var(--space-32);
+}
+
+.reportAgendaTime {
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-s);
+    line-height: var(--line-height-sm);
+}
+
+@media (max-width: 1024px) {
+    .reportMetricsRow {
+        flex-direction: column;
+    }
+
+    .reportSectionHeader,
+    .reportHeader {
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 720px) {
+    .reportPage {
+        padding: var(--space-20);
+    }
+
+    .reportTitleGroup,
+    .reportSectionHeader {
+        width: 100%;
+    }
+
+    .reportTitle {
+        font-size: var(--font-size-lg);
+        line-height: var(--line-height-md);
+    }
+
+    .reportStatsSplit {
+        flex-direction: column;
+    }
+
+    .reportBreakCard,
+    .reportAgendaCard,
+    .reportMetricCard {
+        padding-left: var(--space-20);
+        padding-right: var(--space-20);
+    }
+}
