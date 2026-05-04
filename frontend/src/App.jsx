@@ -1,17 +1,28 @@
 import "./css/App.css";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import Navbar from "./components/Navbar";
 import WorkTimerCard from "./components/WorkTimerCard";
 import PauseSuggestions from "./components/PauseSuggestions";
 import BreathingExercises from "./components/BreathingExercises";
 import BreathingExerciseDetail from "./components/BreathingExerciseDetail";
+import ProfilePage from "./components/ProfilePage";
 
 export default function App() {
   const [name] = useState("John Doe");
 
   const [currentPage, setCurrentPage] = useState("home");
   const [selectedExercise, setSelectedExercise] = useState(null);
+  const [pauseFavorites, setPauseFavorites] = useState(() => new Set());
+
+  const togglePauseFavorite = (id) => {
+    setPauseFavorites((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   return (
     <div className="appShell">
@@ -23,6 +34,13 @@ export default function App() {
           onBack={() => setCurrentPage("breathing")}
           onChangeMethod={() => setCurrentPage("breathing")}
         />
+      ) : currentPage === "profile" ? (
+        <ProfilePage
+          name={name}
+          favorites={pauseFavorites}
+          onToggleFavorite={togglePauseFavorite}
+          onNavigateToPause={() => setCurrentPage("pause")}
+        />
       ) : currentPage === "breathing" ? (
         <BreathingExercises
           onBack={() => setCurrentPage("pause")}
@@ -32,7 +50,11 @@ export default function App() {
           }}
         />
       ) : currentPage === "pause" ? (
-        <PauseSuggestions onNavigateToBreathing={() => setCurrentPage("breathing")} />
+        <PauseSuggestions
+          favorites={pauseFavorites}
+          onToggleFavorite={togglePauseFavorite}
+          onNavigateToBreathing={() => setCurrentPage("breathing")}
+        />
       ) : (
 
         <main className="homePage">

@@ -21,7 +21,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
-    padding: var(--layout-container-padding) var(--layout-container-padding) var(--space-32);
+    padding: var(--layout-container-padding);
     max-width: 100%;
 }
 
@@ -121,13 +121,13 @@
 }
 
 .breathing-page,
-.exercise-detail-page {
+.exercise-detail-page,
+.profile-page {
     width: 100%;
 }
 
-/* =========================
-    Pauzesuggesties pagina
-========================= */
+
+/* --- Pause page --- */
 
 .pause-page {
     max-width: 100%;
@@ -168,7 +168,7 @@
     padding: var(--space-16) var(--space-32)var(--space-32)var(--space-32);
     display: grid;
     gap: var(--space-32);
-    grid-template-columns: repeat(auto-fit, minmax(220px, 280px));
+    grid-template-columns: repeat(auto-fit, minmax(220px, 230px));
 }
 
 
@@ -180,8 +180,8 @@
     overflow: visible;
     background-color: var(--surface-card);
     height: 120px;
-    max-width: 280px;
-    /* max-width: 100%; */
+    /* max-width: 230px; */
+    max-width: 100%;
 }
 
 .pause-iconBox {
@@ -238,4 +238,166 @@
 
 .pause-favBtn.active {
     background: var(--highlight-300);
+}
+
+/* --- Profile Page --- */
+.profile-page {
+    flex: 1;
+    background-color: var(--surface-background);
+    padding: var(--layout-container-padding);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-64);
+}
+
+.profile-hero {
+    display: flex;
+    align-items: center;
+    gap: var(--space-32);
+}
+
+.profile-avatar {
+    width: 128px;
+    height: 128px;
+    border-radius: 50%;
+    background: var(--primary-200);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--text-heading-2-font-family);
+    font-size: 2.5rem;
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.05em;
+    border: 4px solid var(--primary-600);
+    flex-shrink: 0;
+}
+
+.profile-heroCopy {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-16);
+}
+
+.profile-title {
+    margin: 0;
+    font-family: var(--text-heading-1-font-family);
+    font-size: var(--text-heading-1-font-size);
+    line-height: var(--text-heading-1-line-height);
+    font-weight: var(--text-heading-1-font-weight);
+}
+
+.profile-jobTitle {
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-s);
+    font-weight: var(--font-weight-regular);
+    color: var(--text-primary);
+    background: var(--background-400);
+    padding: var(--space-8) var(--space-24);
+    border-radius: 10px;
+    display: inline-block;
+    width: fit-content;
+}
+
+.profile-upgradeBtn {
+    border: 2px solid var(--primary-700);
+    background-color: var(--brand-primary);
+    color: var(--text-on-dark);
+    border-radius: 10px;
+    font-family: var(--text-navigation-default-font-family);
+    font-size: var(--text-navigation-default-font-size);
+    font-weight: var(--text-navigation-default-font-weight);
+    line-height: var(--text-navigation-default-line-height);
+    text-align: center;
+    padding: var(--space-4) var(--space-24);
+}
+
+.profile-logoutBtn {
+    align-self: flex-start;
+    margin-left: auto;
+    border: 2px solid var(--error-200);
+    border-radius: 10px;
+    cursor: pointer;
+    padding: var(--space-4) var(--space-24);
+    font-size: var(--font-size-s);
+    font-family: var(--text-button-label-font-family);
+    background-color: var(--error-100);
+    color: var(--text-on-light);
+    transition: all 0.2s ease-in-out;
+}
+
+/* .profile-logoutBtn:hover {
+    background-color: var(--error-200);
+    border-color: var(--error-300);
+} */
+
+.profile-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-sectionTitle {
+    margin: 0;
+    font-family: var(--text-heading-3-font-family);
+    font-size: var(--text-heading-3-font-size);
+    line-height: var(--text-heading-3-line-height);
+    font-weight: var(--text-heading-3-font-weight);
+}
+
+.profile-sectionHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-20);
+}
+
+.profile-favoritesGrid {
+    padding-top: var(--space-32);
+    display: grid;
+    gap: var(--space-24);
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.profile-addPausesButton {
+    border: 2px solid var(--highlight-300);
+    border-radius: 12px;
+    padding: var(--space-12) var(--space-24);
+    background: var(--highlight-200);
+    color: var(--text-primary);
+    font-family: var(--text-button-label-font-family);
+    font-size: var(--text-button-label-font-size);
+    line-height: var(--text-button-label-line-height);
+    cursor: pointer;
+    align-self: flex-start;
+}
+
+.profile-emptyState {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-16);
+    padding: var(--space-32) var(--space-0);
+}
+
+.profile-emptyState p {
+    margin: 0;
+    align-self: center;
+    font-family: var(--text-body-regular-font-family);
+    font-weight: var(--text-body-regular-font-weight);
+    font-size: var(--text-body-regular-font-size);
+    line-height: var(--text-body-regular-line-height);
+}
+
+.profile-addPausesButton {
+    align-self: center;
+    border-radius: 10px;
+    padding: var(--space-4) var(--space-24);
+    font-family: var(--text-button-label-font-family);
+    font-size: var(--font-size-s);
+    font-weight: var(--text-button-label-font-weight);
+    line-height: var(--text-button-label-line-height);
+    cursor: pointer;
+    border: 2px solid var(--highlight-300);
+    background-color: var(--highlight-200);
+    color: var(--text-on-light);
 }
