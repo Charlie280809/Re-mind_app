@@ -1,5 +1,5 @@
 import "../css/worktimercard.css";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 
 function formatTime(totalSeconds) {
   const m = Math.floor(totalSeconds / 60);
@@ -49,31 +49,19 @@ function CircleProgress({ progress = 0 }) {
   );
 }
 
-export default function WorkTimerCard() {
-  const [workStarted, setWorkStarted] = useState(false);
-  const [onBreak, setOnBreak] = useState(false);
-  const [finished, setFinished] = useState(false);
-
-  const [workSeconds, setWorkSeconds] = useState(0);
-  const [breakSeconds, setBreakSeconds] = useState(0);
-
+export default function WorkTimerCard({
+  workStarted,
+  onBreak,
+  finished,
+  workSeconds,
+  breakSeconds,
+  startDay,
+  endDay,
+  takeBreak,
+  endBreak,
+}) {
   // Voor de cirkel: neem bijvoorbeeld een “dag” van 8 uur als referentie
   const dayTargetSeconds = 8 * 60; //*60
-
-  useEffect(() => {
-    let timer = null;
-
-    if (workStarted && !finished && !onBreak) {
-      timer = setInterval(() => setWorkSeconds((p) => p + 1), 1000);
-    }
-    if (workStarted && !finished && onBreak) {
-      timer = setInterval(() => setBreakSeconds((p) => p + 1), 1000);
-    }
-
-    return () => {
-      if (timer) clearInterval(timer);
-    };
-  }, [workStarted, finished, onBreak]);
 
   const mainTime = useMemo(() => formatTime(workSeconds), [workSeconds]);
 
@@ -81,22 +69,6 @@ export default function WorkTimerCard() {
     // toon voortgang van werkdag (0..1)
     return Math.min(1, workSeconds / dayTargetSeconds);
   }, [workSeconds]);
-
-  const startDay = () => {
-    setWorkStarted(true);
-    setFinished(false);
-    setOnBreak(false);
-    setWorkSeconds(0);
-    setBreakSeconds(0);
-  };
-
-  const endDay = () => {
-    setFinished(true);
-    setOnBreak(false);
-  };
-
-  const takeBreak = () => setOnBreak(true);
-  const endBreak = () => setOnBreak(false);
 
   return (
     <div className="card">

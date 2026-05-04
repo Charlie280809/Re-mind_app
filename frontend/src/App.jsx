@@ -1,5 +1,5 @@
 import "./css/App.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import Navbar from "./components/Navbar";
 import WorkTimerCard from "./components/WorkTimerCard";
@@ -7,6 +7,7 @@ import PauseSuggestions from "./components/PauseSuggestions";
 import BreathingExercises from "./components/BreathingExercises";
 import BreathingExerciseDetail from "./components/BreathingExerciseDetail";
 import ProfilePage from "./components/ProfilePage";
+import ReportPage from "./components/ReportPage";
 
 export default function App() {
   const [name] = useState("John Doe");
@@ -14,6 +15,32 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState("home");
   const [selectedExercise, setSelectedExercise] = useState(null);
   const [pauseFavorites, setPauseFavorites] = useState(() => new Set());
+
+  // Persistent work timer state lifted here so the timer keeps running
+  // even when `WorkTimerCard` unmounts during navigation.
+  const [workStarted, setWorkStarted] = useState(false);
+  const [onBreak, setOnBreak] = useState(false);
+  const [finished, setFinished] = useState(false);
+
+  const [workSeconds, setWorkSeconds] = useState(0);
+  const [breakSeconds, setBreakSeconds] = useState(0);
+
+  // reference target for progress (kept small for demo; original used 8*60)
+  const dayTargetSeconds = 8 * 60;
+
+  useEffect(() => {
+    let timer = null;
+
+    if (workStarted && !finished && !onBreak) {
+      timer = setInterval(() => setWorkSeconds((p) => p + 1), 1000);
+    } else if (workStarted && !finished && onBreak) {
+      timer = setInterval(() => setBreakSeconds((p) => p + 1), 1000);
+    }
+
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [workStarted, finished, onBreak]);
 
   const togglePauseFavorite = (id) => {
     setPauseFavorites((prev) => {
@@ -23,6 +50,23 @@ export default function App() {
       return next;
     });
   };
+
+  // timer control handlers passed down to WorkTimerCard
+  const startDay = () => {
+    setWorkStarted(true);
+    setFinished(false);
+    setOnBreak(false);
+    setWorkSeconds(0);
+    setBreakSeconds(0);
+  };
+
+  const endDay = () => {
+    setFinished(true);
+    setOnBreak(false);
+  };
+
+  const takeBreak = () => setOnBreak(true);
+  const endBreak = () => setOnBreak(false);
 
   return (
     <div className="appShell">
@@ -34,6 +78,8 @@ export default function App() {
           onBack={() => setCurrentPage("breathing")}
           onChangeMethod={() => setCurrentPage("breathing")}
         />
+      ) : currentPage === "report" ? (
+        <ReportPage />
       ) : currentPage === "profile" ? (
         <ProfilePage
           name={name}
@@ -78,7 +124,17 @@ export default function App() {
           </header>
 
           <section className="homeCard timerCardWrap">
-            <WorkTimerCard />
+            <WorkTimerCard
+              workStarted={workStarted}
+              onBreak={onBreak}
+              finished={finished}
+              workSeconds={workSeconds}
+              breakSeconds={breakSeconds}
+              startDay={startDay}
+              endDay={endDay}
+              takeBreak={takeBreak}
+              endBreak={endBreak}
+            />
           </section>
 
           <section className="homeSection">
