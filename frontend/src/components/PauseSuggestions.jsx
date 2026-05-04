@@ -12,7 +12,7 @@ import trophy from "../assets/icons/nameOneWin.svg";
 import eye from "../assets/icons/oogReset.svg";
 import stretch from "../assets/icons/stretchen.svg";
 
-const DATA = [
+export const DATA = [
   { id: "breath", title: "Ademhaling", icon: lungs },
   { id: "stretch", title: "Stretchen", icon: stretch },
   { id: "posture", title: "Houding check", icon: posture },
@@ -25,9 +25,8 @@ const DATA = [
   { id: "eye", title: "Oog reset", icon: eye },
 ];
 
-export default function PauseSuggestions({ onNavigateToBreathing }) {
+export default function PauseSuggestions({ favorites = new Set(), onToggleFavorite, onNavigateToBreathing }) {
   const [tab, setTab] = useState("all"); // "all" | "fav"
-  const [favorites, setFavorites] = useState(() => new Set());
 
   const filtered = useMemo(() => {
     if (tab === "all") return DATA;
@@ -68,14 +67,7 @@ export default function PauseSuggestions({ onNavigateToBreathing }) {
               title={item.title}
               isFavorite={isFav}
               onClick={item.id === "breath" && onNavigateToBreathing ? onNavigateToBreathing : undefined}
-              onToggleFavorite={() => {
-                setFavorites((prev) => {
-                  const next = new Set(prev);
-                  if (next.has(item.id)) next.delete(item.id);
-                  else next.add(item.id);
-                  return next;
-                });
-              }}
+              onToggleFavorite={() => onToggleFavorite?.(item.id)}
             />
           );
         })}
