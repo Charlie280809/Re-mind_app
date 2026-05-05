@@ -1,4 +1,5 @@
 import "../css/ReportPage.css";
+import { useEffect, useMemo, useState } from "react";
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
 import { TbCrown } from "react-icons/tb";
 
@@ -20,6 +21,48 @@ function EnergyIcon() {
 }
 
 export default function ReportPage() {
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+    const [report, setReport] = useState(null);
+
+    useEffect(() => {
+        const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+        async function loadReport() {
+            setLoading(true);
+            setError("");
+
+            try {
+                const response = await fetch(`${apiBaseUrl}/report/today`);
+
+                if (!response.ok) {
+                    throw new Error(`Backend gaf status ${response.status}`);
+                }
+
+                const data = await response.json();
+                setReport(data);
+            } catch (err) {
+                setError(err.message || "Kon het dagrapport niet ophalen.");
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        loadReport();
+    }, []);
+
+    const reportTitle = useMemo(() => {
+        if (!report?.date) {
+            return "Dagrapport van vandaag";
+        }
+
+        const date = new Date(`${report.date}T00:00:00`);
+        return `Dagrapport van ${date.toLocaleDateString("nl-BE")}`;
+    }, [report?.date]);
+
+    const avgStressLabel = report?.averageStress == null ? "-" : `${report.averageStress}/5`;
+    const avgEnergyLabel = report?.averageEnergy == null ? "-" : `${report.averageEnergy}/5`;
+
     return (
         <main className="reportPage">
             <header className="reportHeader">
@@ -28,7 +71,7 @@ export default function ReportPage() {
                         <LuChevronLeft />
                     </button>
 
-                    <h1 className="reportTitle">Dagrapport van 16-12-2025</h1>
+                    <h1 className="reportTitle">{reportTitle}</h1>
 
                     <button className="reportNavButton" type="button" aria-label="Volgende dagrapport">
                         <LuChevronRight />
@@ -56,7 +99,7 @@ export default function ReportPage() {
                                 <TrendIcon />
                                 <span>Gemiddelde stress</span>
                             </div>
-                            <p className="reportStatValue reportStatValueStress">2/5</p>
+                            <p className="reportStatValue reportStatValueStress">{avgStressLabel}</p>
                         </div>
 
                         <div className="reportStatItem">
@@ -64,11 +107,17 @@ export default function ReportPage() {
                                 <EnergyIcon />
                                 <span>Gemiddelde energie</span>
                             </div>
-                            <p className="reportStatValue reportStatValueEnergy">4/5</p>
+                            <p className="reportStatValue reportStatValueEnergy">{avgEnergyLabel}</p>
                         </div>
                     </div>
                 </article>
             </section>
+
+            {loading ? <p className="reportSectionMeta">Rapport wordt geladen...</p> : null}
+            {!loading && error ? <p className="reportSectionMeta">Fout: {error}</p> : null}
+            {!loading && !error && report?.totalCheckins === 0 ? (
+                <p className="reportSectionMeta">Nog geen check-ins vandaag. Vul stress en energie in om data op te bouwen.</p>
+            ) : null}
 
             <section className="reportSection">
                 <div className="reportSectionHeader">
