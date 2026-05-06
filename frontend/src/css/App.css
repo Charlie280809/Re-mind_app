@@ -115,7 +115,7 @@
     border-radius: 20px;
     background-color: var(--highlight-200);
     padding: 18px 28px;
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-s);
     font-family: var(--font-family-body);
     line-height: var(--text-body-regular-line-height);
 }
@@ -128,7 +128,6 @@
 
 
 /* --- Pause page --- */
-
 .pause-page {
     max-width: 100%;
     /* margin: 0 auto; */
@@ -310,7 +309,17 @@
     font-weight: var(--text-navigation-default-font-weight);
     line-height: var(--text-navigation-default-line-height);
     text-align: center;
-    padding: var(--space-4) var(--space-24);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-8);
+    padding: var(--space-4) var(--space-16);
+}
+
+.profile-upgradeBtn svg{
+    width: 28px;
+    height: 28px;
+    transition: all 0.2s ease-in-out;
 }
 
 .profile-logoutBtn {

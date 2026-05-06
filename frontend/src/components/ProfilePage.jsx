@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { TbCrown } from "react-icons/tb";
 import PauseCard from "./PauseCard";
 import { DATA as PAUSE_OPTIONS } from "./PauseSuggestions";
 
@@ -24,8 +25,9 @@ export default function ProfilePage({ name, favorites, onToggleFavorite, onNavig
                 <div className="profile-heroCopy">
                     <h1 className="profile-title">{name}</h1>
                     <p className="profile-jobTitle">Technieker</p>
-                    <button className="profile-upgradeBtn" type="button"> {/* onclick navigate to upgrade page */}
-                        Upgrade plan
+                    <button className="profile-upgradeBtn" type="button">
+                        {<TbCrown />}
+                        <span>Upgrade plan</span>
                     </button>
                 </div>
 
