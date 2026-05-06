@@ -16,6 +16,45 @@
     align-items: stretch;
 }
 
+.authLoadingState {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: var(--space-32);
+    background:
+        radial-gradient(circle at top left, rgba(168, 191, 175, 0.22), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(213, 222, 216, 0.55), transparent 28%),
+        var(--surface-background);
+}
+
+.authLoadingCard {
+    width: min(100%, 360px);
+    border-radius: 24px;
+    padding: 28px 30px;
+    background: rgba(255, 255, 253, 0.88);
+    border: 1px solid rgba(84, 107, 120, 0.12);
+    box-shadow: 0 24px 50px rgba(41, 51, 46, 0.12);
+    text-align: center;
+}
+
+.authLoadingLabel {
+    display: block;
+    margin-bottom: 10px;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xxs);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-brand);
+}
+
+.authLoadingCard p {
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-s);
+    color: var(--text-secondary);
+}
+
 .homePage {
     flex: 1;
     display: flex;
@@ -39,6 +78,14 @@
     line-height: var(--text-heading-1-line-height);
     font-weight: var(--text-heading-1-font-weight);
     font-family: var(--text-heading-1-font-family);
+}
+
+.homeCompanyName {
+    margin: var(--space-8) 0 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-s);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-secondary);
 }
 
 .homeSubtitle {
@@ -320,6 +367,12 @@
     width: 28px;
     height: 28px;
     transition: all 0.2s ease-in-out;
+}
+
+.profile-upgradeBtnActive {
+    background-color: var(--highlight-200);
+    border-color: var(--border-color-green);
+    color: var(--text-primary);
 }
 
 .profile-logoutBtn {
