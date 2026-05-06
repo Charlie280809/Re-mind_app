@@ -3,7 +3,10 @@ import { TbCrown } from "react-icons/tb";
 import PauseCard from "./PauseCard";
 import { DATA as PAUSE_OPTIONS } from "./PauseSuggestions";
 
-export default function ProfilePage({ name, favorites, onToggleFavorite, onNavigateToPause }) {
+export default function ProfilePage({ profile, favorites, onToggleFavorite, onNavigateToPause, onLogout }) {
+    const name = profile?.username || profile?.email || "Gebruiker";
+    const companyName = profile?.bedrijfsnaam || "Geen bedrijfsnaam";
+    const isPremium = Boolean(profile?.is_premium);
 
     const favoritePauses = useMemo(
         () => PAUSE_OPTIONS.filter((item) => favorites.has(item.id)),
@@ -24,14 +27,16 @@ export default function ProfilePage({ name, favorites, onToggleFavorite, onNavig
 
                 <div className="profile-heroCopy">
                     <h1 className="profile-title">{name}</h1>
-                    <p className="profile-jobTitle">Technieker</p>
-                    <button className="profile-upgradeBtn" type="button">
-                        {<TbCrown />}
-                        <span>Upgrade plan</span>
-                    </button>
+                    <p className="profile-jobTitle">{companyName}</p>
+                    {isPremium ? null : (
+                        <button className="profile-upgradeBtn" type="button">
+                            {<TbCrown />}
+                            <span>Upgrade plan</span>
+                        </button>
+                    )}
                 </div>
 
-                <button className="profile-logoutBtn" type="button"> {/* onclick navigate to login */}
+                <button className="profile-logoutBtn" type="button" onClick={onLogout}>
                     Afmelden
                 </button>
             </section>

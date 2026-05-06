@@ -1,7 +1,6 @@
 import { useState } from "react";
 import "../css/CheckInModal.css";
 import { FaArrowTrendUp } from "react-icons/fa6";
-import { LuBatteryCharging } from "react-icons/lu";
 import { LuZap } from "react-icons/lu";
 
 export default function CheckInModal({ onClose, onSubmitCheckIn }) {
