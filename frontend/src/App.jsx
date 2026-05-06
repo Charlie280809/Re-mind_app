@@ -9,9 +9,18 @@ import BreathingExerciseDetail from "./components/BreathingExerciseDetail";
 import ProfilePage from "./components/ProfilePage";
 import ReportPage from "./components/ReportPage";
 import CheckInModal from "./components/CheckInModal";
+import LoginPage from "./components/LoginPage";
+import { supabase } from "./lib/supabaseClient";
 
 export default function App() {
-  const [name] = useState("John Doe");
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+  const [session, setSession] = useState(null);
+  const [profile, setProfile] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [loginSubmitting, setLoginSubmitting] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [authError, setAuthError] = useState("");
 
   const [currentPage, setCurrentPage] = useState("home");
   const [selectedExercise, setSelectedExercise] = useState(null);
@@ -32,7 +41,123 @@ export default function App() {
 
   // reference target for progress (kept small for demo; original used 8*60)
   const dayTargetSeconds = 8 * 60;
-  const checkInIntervalSeconds = 1 * 60; // Show check-in every 2 minutes of work (demo; normally 2 hours)
+  const checkInIntervalSeconds = 0.5 * 60; // Show check-in every 2 minutes of work (demo; normally 2 hours)
+
+  useEffect(() => {
+    if (!supabase) {
+      setAuthLoading(false);
+      setAuthError("Supabase is niet geconfigureerd. Voeg VITE_SUPABASE_URL en VITE_SUPABASE_ANON_KEY toe.");
+      return undefined;
+    }
+
+    let isMounted = true;
+
+    const initializeSession = async () => {
+      const { data, error } = await supabase.auth.getSession();
+
+      if (!isMounted) {
+        return;
+      }
+
+      if (error) {
+        setAuthError(error.message);
+      }
+
+      setSession(data.session ?? null);
+      setAuthLoading(false);
+    };
+
+    initializeSession();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      if (!isMounted) {
+        return;
+      }
+
+      setSession(nextSession ?? null);
+
+      if (!nextSession) {
+        setProfile(null);
+        setProfileLoading(false);
+        setCurrentPage("home");
+      }
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!session) {
+      setProfile(null);
+      setProfileLoading(false);
+      return undefined;
+    }
+
+    let isCancelled = false;
+
+    const loadProfile = async () => {
+      setProfileLoading(true);
+      setAuthError("");
+
+      try {
+        const response = await fetch(`${apiBaseUrl}/profile/me`, {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        });
+
+        const contentType = response.headers.get("content-type") || "";
+
+        let payload = null;
+        if (contentType.includes("application/json")) {
+          payload = await response.json();
+        } else {
+          const bodyText = await response.text();
+          const snippet = bodyText.slice(0, 120).replace(/\s+/g, " ").trim();
+          throw new Error(
+            `Backend antwoordde niet met JSON op ${apiBaseUrl}/profile/me (status ${response.status}). Controleer VITE_API_BASE_URL en of backend draait op poort 3000. Respons: ${snippet}`
+          );
+        }
+
+        if (!response.ok) {
+          throw new Error(payload.error || "Kon je profiel niet laden.");
+        }
+
+        if (!isCancelled) {
+          setProfile(payload.profile);
+          setCurrentPage("home");
+        }
+      } catch (error) {
+        if (!isCancelled) {
+          setAuthError(error.message);
+          setProfile(null);
+          setSession(null);
+        }
+
+        if (supabase) {
+          await supabase.auth.signOut();
+        }
+      } finally {
+        if (!isCancelled) {
+          setProfileLoading(false);
+        }
+      }
+    };
+
+    loadProfile();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [apiBaseUrl, session]);
+
+  const displayName = profile?.username || session?.user?.email?.split("@")[0] || "Gebruiker";
+  const companyName = profile?.bedrijfsnaam || "";
 
   useEffect(() => {
     let timer = null;
@@ -93,6 +218,72 @@ export default function App() {
     closeCheckInModal();
   };
 
+  const handleLogin = async ({ email, password }) => {
+    if (!supabase) {
+      setAuthError("Supabase is niet geconfigureerd. Voeg VITE_SUPABASE_URL en VITE_SUPABASE_ANON_KEY toe.");
+      return;
+    }
+
+    setAuthError("");
+    setLoginSubmitting(true);
+
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        setAuthError(error.message);
+      }
+    } finally {
+      setLoginSubmitting(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    setAuthError("");
+    setCurrentPage("home");
+    setProfile(null);
+
+    if (supabase) {
+      await supabase.auth.signOut();
+    }
+  };
+
+  if (authLoading || (session && profileLoading)) {
+    return (
+      <div className="authLoadingState" aria-live="polite">
+        <div className="authLoadingCard">
+          <span className="authLoadingLabel">re-mind</span>
+          <p>Bezig met inloggen...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return (
+      <LoginPage
+        onLogin={handleLogin}
+        isSubmitting={loginSubmitting}
+        error={authError}
+        isConfigured={Boolean(supabase)}
+      />
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="authLoadingState" aria-live="polite">
+        <div className="authLoadingCard">
+          <span className="authLoadingLabel">re-mind</span>
+          <p>{authError || "Profiel laden..."}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="appShell">
       {showCheckInModal && (
@@ -113,10 +304,11 @@ export default function App() {
         <ReportPage />
       ) : currentPage === "profile" ? (
         <ProfilePage
-          name={name}
+          profile={profile}
           favorites={pauseFavorites}
           onToggleFavorite={togglePauseFavorite}
           onNavigateToPause={() => setCurrentPage("pause")}
+          onLogout={handleLogout}
         />
       ) : currentPage === "breathing" ? (
         <BreathingExercises
@@ -137,7 +329,8 @@ export default function App() {
         <main className="homePage">
           <header className="homeHeader">
             <div>
-              <h1 className="homeGreeting">Hallo {name},</h1>
+              <h1 className="homeGreeting">Hallo {displayName},</h1>
+              {companyName ? <p className="homeCompanyName">{companyName}</p> : null}
               <h2 className="homeSubtitle">Klaar om je werkdag te starten?</h2>
             </div>
 
