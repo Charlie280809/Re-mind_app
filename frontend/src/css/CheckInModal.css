@@ -1,0 +1,219 @@
+.checkInModalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.checkInModalContent {
+    background-color: var(--surface-background);
+    border-radius: 20px;
+    padding: var(--space-24);
+    min-width: 500px;
+    max-width: 1000px;
+    width: 90%;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.checkInModalHeader {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--space-20);
+}
+
+.checkInTitle {
+    font-size: var(--text-heading-2-font-size);
+    font-family: var(--text-heading-2-font-family);
+    font-weight: var(--text-heading-2-font-weight);
+    line-height: var(--text-heading-2-line-height);
+    margin: 0 0 var(--space-12) 0;
+    color: var(--text-primary);
+}
+
+.checkInSubtitle {
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--text-body-regular-font-size);
+    line-height: var(--text-body-regular-line-height);
+    margin: 0;
+}
+
+.checkInModalActions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-12);
+    min-width: 140px;
+}
+
+.checkInSkipButton,
+.checkInSubmitButton {
+    padding: var(--space-8) var(--space-32);
+    border-radius: 10px;
+    font-family: var(--text-button-label-font-family);
+    font-size: var(--text-body-regular-font-size);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.checkInSkipButton {
+    background-color: var(--highlight-50);
+    border: 2px solid var(--highlight-300);
+    color: var(--text-on-light);
+}
+
+.checkInSkipButton:hover:not(:disabled) {
+    border-color: var(--highlight-400);
+    background-color: var(--highlight-200);
+}
+
+.checkInSkipButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.checkInSubmitButton {
+    border: 2px solid var(--primary-700);
+    background-color: var(--primary-300);
+    color: var(--text-on-dark);
+}
+
+.checkInSubmitButton:hover:not(:disabled) {
+    background-color: var(--primary-400);
+}
+
+.checkInSubmitButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.checkInInputsRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-24);
+}
+
+.checkInInputCard {
+    background-color: var(--surface-card);
+    border-radius: 20px;
+    padding: var(--space-20);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-24);
+    justify-content: center;
+}
+
+.checkInLabel {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--text-body-regular-font-size);
+    font-weight: var(--text-body-regular-font-weight);
+    color: var(--text-primary);
+    cursor: pointer;
+}
+
+.checkInLabelIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-md);
+}
+
+.checkInSlider {
+    width: 100%;
+    height: 8px;
+    border-radius: var(--space-4);
+    background-color: var(--border-color-default);
+    /* background: linear-gradient(to right, #d0d0d0 0%, #d0d0d0 100%); */
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.checkInSlider::-webkit-slider-thumb {
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #7a9986;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.checkInSlider::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    /* background-color: #7a9986; */
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.checkInSlider::-webkit-slider-thumb:hover {
+    background-color: #6a8876;
+}
+
+.checkInSlider::-moz-range-thumb:hover {
+    background-color: #6a8876;
+}
+
+.checkInSlider:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.checkInScaleLabels {
+    /* display: grid; */
+    /* grid-template-columns: repeat(5, 1fr); */
+    width: 96%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    font-size: var(--font-size-xs);
+    color: var(--text-primary);
+    font-weight: var(--font-weight-regular);
+}
+
+.checkInError {
+    color: var(--error-color);
+    font-size: var(--font-size-xs);
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    /* .checkInModalContent {
+        padding: 24px;
+    }
+
+    .checkInModalHeader {
+        flex-direction: column;
+        gap: 24px;
+        margin-bottom: 24px;
+    }
+
+    .checkInModalActions {
+        align-self: flex-start;
+    } */
+
+    .checkInInputsRow {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    /* .checkInTitle {
+        font-size: 24px;
+    }
+
+    .checkInSubtitle {
+        font-size: 16px;
+    } */
+}
