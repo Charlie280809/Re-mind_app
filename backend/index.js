@@ -13,6 +13,16 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const supabase = supabaseUrl && supabaseServiceRoleKey ? createClient(supabaseUrl, supabaseServiceRoleKey) : null;
 
+function getBearerToken(req) {
+  const header = req.headers.authorization || "";
+
+  if (!header.startsWith("Bearer ")) {
+    return null;
+  }
+
+  return header.slice(7).trim() || null;
+}
+
 function getTodayRange() {
   const start = new Date();
   start.setHours(0, 0, 0, 0);
@@ -111,6 +121,57 @@ app.post("/checkin", async (req, res) => {
   }
 
   res.json({ needPause });
+});
+
+app.get("/profile/me", async (req, res) => {
+  if (!supabase) {
+    return res.status(500).json({
+      error: "Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in backend/.env.",
+    });
+  }
+
+  const token = getBearerToken(req);
+
+  if (!token) {
+    return res.status(401).json({
+      error: "Missing Bearer token.",
+    });
+  }
+
+  const { data: userData, error: userError } = await supabase.auth.getUser(token);
+
+  if (userError || !userData?.user) {
+    return res.status(401).json({
+      error: "Invalid or expired session.",
+    });
+  }
+
+  const { data: profile, error } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("user_id", userData.user.id)
+    .maybeSingle();
+
+  if (error) {
+    return res.status(500).json({
+      error: "Failed to load profile from Supabase.",
+      details: error.message,
+    });
+  }
+
+  if (!profile) {
+    return res.status(404).json({
+      error: "No profile found for the signed-in user.",
+    });
+  }
+
+  return res.json({
+    user: {
+      id: userData.user.id,
+      email: userData.user.email,
+    },
+    profile,
+  });
 });
 
 app.listen(3000, () => {
