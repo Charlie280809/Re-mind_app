@@ -10,6 +10,7 @@ import ProfilePage from "./components/ProfilePage";
 import ReportPage from "./components/ReportPage";
 import CheckInModal from "./components/CheckInModal";
 import LoginPage from "./components/LoginPage";
+import notitie from "./assets/icons/Afsluitnotitie.svg";
 import { supabase } from "./lib/supabaseClient";
 
 export default function App() {
@@ -37,7 +38,7 @@ export default function App() {
 
   // Check-in modal state: show every ~2 hours of work (3-4 times per 8-hour day)
   const [showCheckInModal, setShowCheckInModal] = useState(false);
-  const [checkInsShownCount, setCheckInsShownCount] = useState(0);
+  const [lastCheckInPromptIndex, setLastCheckInPromptIndex] = useState(0);
 
   // reference target for progress (kept small for demo; original used 8*60)
   const dayTargetSeconds = 8 * 60;
@@ -173,23 +174,97 @@ export default function App() {
     };
   }, [workStarted, finished, onBreak]);
 
+  // Load user's favorite pauses from Supabase when session/profile is available
+  useEffect(() => {
+    if (!session || !supabase) return undefined;
+
+    let isCancelled = false;
+
+    const loadFavorites = async () => {
+      try {
+        const userId = session.user.id;
+        const { data, error } = await supabase
+          .from("favorite_pauses")
+          .select("pauze_type")
+          .eq("user_id", userId);
+
+        if (error) {
+          console.error("Failed to load favorite pauses:", error);
+          return;
+        }
+
+        if (isCancelled) return;
+
+        const set = new Set((data || []).map((r) => r.pauze_type));
+        setPauseFavorites(set);
+      } catch (err) {
+        console.error("Error loading favorites:", err);
+      }
+    };
+
+    loadFavorites();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [session]);
+
   // Check-in modal trigger: show every ~checkInIntervalSeconds of work time
   useEffect(() => {
     if (workStarted && !finished && !onBreak && !showCheckInModal) {
-      const nextCheckInTime = (checkInsShownCount + 1) * checkInIntervalSeconds;
-      if (workSeconds >= nextCheckInTime) {
+      const currentPromptIndex = Math.floor(workSeconds / checkInIntervalSeconds);
+      if (currentPromptIndex > lastCheckInPromptIndex) {
         setShowCheckInModal(true);
       }
     }
-  }, [workSeconds, workStarted, finished, onBreak, showCheckInModal, checkInsShownCount, checkInIntervalSeconds]);
+  }, [workSeconds, workStarted, finished, onBreak, showCheckInModal, lastCheckInPromptIndex, checkInIntervalSeconds]);
 
-  const togglePauseFavorite = (id) => {
+  const togglePauseFavorite = async (id) => {
+    if (!session || !supabase) {
+      setPauseFavorites((prev) => {
+        const next = new Set(prev);
+        if (next.has(id)) next.delete(id);
+        else next.add(id);
+        return next;
+      });
+      return;
+    }
+
+    const userId = session.user.id;
+    const previouslyHad = pauseFavorites.has(id);
+
+    // ask for confirmation only when removing
+    if (previouslyHad) {
+      const confirmed = window.confirm("Weet je zeker dat je deze pauze uit favorieten wilt verwijderen?");
+      if (!confirmed) return;
+    }
+
+    // optimistic update
     setPauseFavorites((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
+      if (previouslyHad) next.delete(id);
       else next.add(id);
       return next;
     });
+
+    try {
+      if (!previouslyHad) {
+        const { error } = await supabase.from("favorite_pauses").insert([{ user_id: userId, pauze_type: id }]);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("favorite_pauses").delete().match({ user_id: userId, pauze_type: id });
+        if (error) throw error;
+      }
+    } catch (err) {
+      console.error("Failed to toggle favorite in Supabase:", err);
+      // revert optimistic update
+      setPauseFavorites((prev) => {
+        const next = new Set(prev);
+        if (previouslyHad) next.add(id);
+        else next.delete(id);
+        return next;
+      });
+    }
   };
 
   // timer control handlers passed down to WorkTimerCard
@@ -199,6 +274,8 @@ export default function App() {
     setOnBreak(false);
     setWorkSeconds(0);
     setBreakSeconds(0);
+    setShowCheckInModal(false);
+    setLastCheckInPromptIndex(0);
   };
 
   const endDay = () => {
@@ -210,8 +287,10 @@ export default function App() {
   const endBreak = () => setOnBreak(false);
 
   const closeCheckInModal = () => {
+    const currentPromptIndex = Math.floor(workSeconds / checkInIntervalSeconds);
+
     setShowCheckInModal(false);
-    setCheckInsShownCount((p) => p + 1);
+    setLastCheckInPromptIndex(currentPromptIndex);
   };
 
   const handleCheckInSubmit = () => {
@@ -330,20 +409,11 @@ export default function App() {
           <header className="homeHeader">
             <div>
               <h1 className="homeGreeting">Hallo {displayName},</h1>
-              {companyName ? <p className="homeCompanyName">{companyName}</p> : null}
               <h2 className="homeSubtitle">Klaar om je werkdag te starten?</h2>
             </div>
 
-            <button className="statusButton" type="button" aria-label="Meldingen"> {/* aanpassen --> afsluitroutine van voorgaande dag */}
-              <svg width="56" height="56" viewBox="0 0 56 56" fill="none" aria-hidden="true">
-                <rect x="6" y="4" width="40" height="48" rx="10" stroke="currentColor" strokeWidth="2.8" />
-                <path d="M17 18H35" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" />
-                <path d="M17 27H35" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" />
-                <path d="M17 36H31" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" />
-                <circle cx="41" cy="39" r="9" fill="#b5c6b6" stroke="#2b2a28" strokeWidth="2.4" />
-                <path d="M41 34.5V39" stroke="#2b2a28" strokeWidth="2.2" strokeLinecap="round" />
-                <circle cx="41" cy="43" r="1.4" fill="#2b2a28" />
-              </svg>
+            <button className="noteButton" type="button" aria-label="Meldingen"> {/* aanpassen --> afsluitroutine van voorgaande dag */}
+              <img src={notitie} alt="Afsluitnotitie van vorige dag"/>
             </button>
           </header>
 
