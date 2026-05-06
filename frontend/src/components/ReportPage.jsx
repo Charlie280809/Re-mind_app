@@ -1,24 +1,8 @@
 import "../css/ReportPage.css";
 import { useEffect, useMemo, useState } from "react";
-import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
+import { LuChevronLeft, LuChevronRight, LuZap } from "react-icons/lu";
+import { FaArrowTrendUp } from "react-icons/fa6";
 import { TbCrown } from "react-icons/tb";
-
-function TrendIcon() {
-    return (
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M4 16l5-5 4 4 7-7" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M14 8h6v6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-    );
-}
-
-function EnergyIcon() {
-    return (
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M14 3l-1 7h5l-6 11 1-7H8l6-11z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
-        </svg>
-    );
-}
 
 export default function ReportPage() {
     const [loading, setLoading] = useState(true);
@@ -53,11 +37,11 @@ export default function ReportPage() {
 
     const reportTitle = useMemo(() => {
         if (!report?.date) {
-            return "Dagrapport van vandaag";
+            return "Rapport van vandaag";
         }
 
         const date = new Date(`${report.date}T00:00:00`);
-        return `Dagrapport van ${date.toLocaleDateString("nl-BE")}`;
+        return `Rapport van ${date.toLocaleDateString("nl-BE")}`;
     }, [report?.date]);
 
     const avgStressLabel = report?.averageStress == null ? "-" : `${report.averageStress}/5`;
@@ -71,7 +55,7 @@ export default function ReportPage() {
                         <LuChevronLeft />
                     </button>
 
-                    <h1 className="reportTitle">{reportTitle}</h1>
+                    <h2 className="reportTitle">{reportTitle}</h2>
 
                     <button className="reportNavButton" type="button" aria-label="Volgende dagrapport">
                         <LuChevronRight />
@@ -86,17 +70,17 @@ export default function ReportPage() {
 
             <section className="reportMetricsRow" aria-label="Samenvatting">
                 <article className="reportMetricCard reportMetricCardWorktime">
-                    <h2 className="reportSectionTitle">Totale werktijd</h2>
-                    <p className="reportBigValue">7 uur en 26 minuten</p>
+                    <h3 className="reportSectionTitle">Totale werktijd</h3>
+                    <p className="reportBigValue">{report?.totalWorkTime || "0 uur en 0 minuten"}</p>
                 </article>
 
                 <article className="reportMetricCard reportMetricCardStats">
-                    <h2 className="reportSectionTitle">Gemiddelde stress en energie</h2>
+                    <h3 className="reportSectionTitle">Gemiddelde stress en energie</h3>
 
                     <div className="reportStatsSplit">
                         <div className="reportStatItem">
                             <div className="reportStatLabel">
-                                <TrendIcon />
+                                <FaArrowTrendUp />
                                 <span>Gemiddelde stress</span>
                             </div>
                             <p className="reportStatValue reportStatValueStress">{avgStressLabel}</p>
@@ -104,7 +88,7 @@ export default function ReportPage() {
 
                         <div className="reportStatItem">
                             <div className="reportStatLabel">
-                                <EnergyIcon />
+                                <LuZap />
                                 <span>Gemiddelde energie</span>
                             </div>
                             <p className="reportStatValue reportStatValueEnergy">{avgEnergyLabel}</p>
@@ -121,8 +105,8 @@ export default function ReportPage() {
 
             <section className="reportSection">
                 <div className="reportSectionHeader">
-                    <h2 className="reportSectionTitle reportSectionTitleLarge">Pauzeoverzicht</h2>
-                    <p className="reportSectionMeta">Totale tijd gepauzeerd: <strong>34 minuten</strong></p>
+                    <h3 className="reportSectionTitle reportSectionTitleLarge">Pauzeoverzicht</h3>
+                    <p className="reportSectionMeta">Totale tijd gepauzeerd: <strong>{report?.totalBreakTime || "0 minuten"}</strong></p>
                 </div>
 
                 <article className="reportCard reportBreakCard">
@@ -146,7 +130,7 @@ export default function ReportPage() {
             </section>
 
             <section className="reportSection">
-                <h2 className="reportSectionTitle reportSectionTitleLarge">Advies</h2>
+                <h3 className="reportSectionTitle reportSectionTitleLarge">Advies</h3>
 
                 <article className="reportAdviceCard">
                     Er wordt aangeraden om minstens elk uur (maximum elke 2 uur) een korte pauze te nemen om je geest tot rust te
@@ -156,7 +140,7 @@ export default function ReportPage() {
 
             <section className="reportSection reportAgendaSection">
                 <div className="reportSectionHeader">
-                    <h2 className="reportSectionTitle reportSectionTitleLarge">Jouw agenda vandaag</h2>
+                    <h3 className="reportSectionTitle reportSectionTitleLarge">Jouw agenda vandaag</h3>
                     <button className="reportAgendaButton" type="button">
                         Link agenda
                     </button>

@@ -16,7 +16,6 @@
 
 .reportHeader,
 .reportSectionHeader,
-.reportMetricsRow,
 .reportStatsSplit,
 .reportBreakRow,
 .reportStatLabel {
@@ -39,7 +38,7 @@
 
 .reportTitle {
     margin: 0;
-    font-family: var(--text-heading-1-font-family);
+    font-family: var(--text-heading-2-font-family);
     font-size: var(--text-heading-2-font-size);
     line-height: var(--text-heading-2-line-height);
     font-weight: var(--text-heading-2-font-weight);
@@ -48,6 +47,7 @@
 .reportNavButton,
 .reportWeekButton,
 .reportAgendaButton {
+    border-radius: 10px;
     border: 1.5px solid var(--border-color-default);
     background: var(--background-50);
     color: var(--text-primary);
@@ -66,70 +66,83 @@
 
 .reportNavButton svg,
 .reportWeekButton svg {
-    width: 22px;
-    height: 22px;
+    width: 28px;
+    height: 28px;
 }
 
 .reportWeekButton {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-8);
-    border-radius: 10px;
-    padding: var(--space-8) var(--space-24);
-    background: var(--primary-400);
-    border-color: var(--primary-700);
+    border: 2px solid var(--primary-700);
+    background-color: var(--brand-primary);
     color: var(--text-on-dark);
-    font-family: var(--text-button-label-font-family);
-    font-size: var(--text-button-label-font-size);
-    line-height: var(--text-button-label-line-height);
+    border-radius: 10px;
+    font-family: var(--text-navigation-default-font-family);
+    font-size: var(--text-navigation-default-font-size);
+    font-weight: var(--text-navigation-default-font-weight);
+    line-height: var(--text-navigation-default-line-height);
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-8);
+    padding: var(--space-4) var(--space-16);
 }
 
 .reportMetricsRow {
+    display: flex;
     gap: var(--space-32);
     align-items: stretch;
 }
 
-.reportMetricCard {
-    flex: 1;
-    min-width: 0;
-    border-radius: 20px;
-    border: 1.5px solid var(--border-color-default);
-    background: var(--background-50);
-    padding: var(--space-24);
-    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02);
+.reportMetricCardWorktime {
+    flex: 0 0 auto;
 }
 
 .reportMetricCardStats {
+    flex: 1 1 0;
+    min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: var(--space-20);
 }
 
+/* .reportMetricCard {} */
+
+/* .reportMetricCardStats {} */
+
 .reportSectionTitle {
-    margin: 0;
+    margin: 0 0 var(--space-8) 0;
     font-family: var(--text-heading-3-font-family);
     font-size: var(--font-size-md);
     line-height: var(--line-height-md);
     font-weight: var(--font-weight-regular);
+    width: fit-content;
 }
 
 .reportSectionTitleLarge {
+    margin: 0;
     font-size: var(--font-size-md);
     line-height: var(--line-height-md);
 }
 
 .reportBigValue {
+    width: fit-content;
+    background-color: var(--background-50);
+    border-radius: 20px;
+    border: 2px solid var(--border-color-default);
     margin: 0;
-    padding: var(--space-24) 0 var(--space-4);
+    padding: var(--space-20);
     text-align: center;
     font-family: var(--font-family-body);
-    font-size: var(--font-size-xl);
-    line-height: var(--line-height-lg);
+    font-size: var(--font-size-lg);
     font-weight: var(--font-weight-regular);
 }
 
 .reportStatsSplit {
+    width: 100%;
+    background-color: var(--background-50);
+    border-radius: 20px;
+    border: 2px solid var(--border-color-default);
     gap: var(--space-24);
+    padding: var(--space-8);
     justify-content: space-between;
 }
 
@@ -145,7 +158,7 @@
     font-family: var(--text-body-regular-font-family);
     font-size: var(--font-size-xs);
     line-height: var(--line-height-xs);
-    color: var(--text-secondary);
+    color: var(--text-primary);
 }
 
 .reportStatLabel svg {
@@ -155,7 +168,7 @@
 }
 
 .reportStatValue {
-    margin: var(--space-16) 0 0;
+    margin: var(--space-4) 0 0;
     font-family: var(--font-family-body);
     font-size: var(--font-size-md);
     line-height: var(--line-height-md);
@@ -173,7 +186,7 @@
 .reportSection {
     display: flex;
     flex-direction: column;
-    gap: var(--space-12);
+    gap: var(--space-8);
 }
 
 .reportSectionHeader {
@@ -189,20 +202,13 @@
     color: var(--text-primary);
 }
 
-.reportCard,
-.reportAdviceCard,
-.reportAgendaCard {
-    border: 1.5px solid var(--border-color-default);
-    border-radius: 20px;
-    background: var(--background-50);
-}
-
 .reportBreakCard {
     padding: var(--space-24) var(--space-32);
     display: flex;
+    border-radius: 20px;
     flex-direction: column;
     gap: var(--space-24);
-    background: var(--highlight-50);
+    background: var(--surface-card);
 }
 
 .reportBreakRow {
@@ -213,7 +219,7 @@
 .reportBreakLabel {
     min-width: 180px;
     font-family: var(--text-body-regular-font-family);
-    font-size: var(--font-size-xs);
+    font-size: var(--text-body-regular-font-size);
     line-height: var(--line-height-xs);
 }
 
@@ -230,20 +236,21 @@
 }
 
 .reportDotGood {
-    background: var(--primary-200);
+    background-color: var(--highlight-300);
 }
 
 .reportDotBad {
-    background: var(--error-300);
+    background-color: var(--error-300);
 }
 
 .reportAdviceCard {
+    border: 2px solid var(--border-color-green);
+    border-radius: 20px;
+    background-color: var(--highlight-200);
     padding: var(--space-20) var(--space-24);
-    background: var(--highlight-100);
-    border-color: var(--border-color-green);
-    font-family: var(--text-body-regular-font-family);
-    font-size: var(--font-size-xs);
-    line-height: var(--line-height-sm);
+    font-size: var(--font-size-s);
+    font-family: var(--font-family-body);
+    line-height: var(--text-body-regular-line-height);
 }
 
 .reportAgendaSection {
@@ -270,7 +277,7 @@
     line-height: var(--line-height-sm);
 }
 
-@media (max-width: 1024px) {
+/* @media (max-width: 1024px) {
     .reportMetricsRow {
         flex-direction: column;
     }
@@ -292,6 +299,7 @@
     }
 
     .reportTitle {
+        font-family: var(--text-heading-2-font-family);
         font-size: var(--font-size-lg);
         line-height: var(--line-height-md);
     }
@@ -306,4 +314,4 @@
         padding-left: var(--space-20);
         padding-right: var(--space-20);
     }
-}
+} */
