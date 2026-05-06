@@ -8,6 +8,7 @@ import BreathingExercises from "./components/BreathingExercises";
 import BreathingExerciseDetail from "./components/BreathingExerciseDetail";
 import ProfilePage from "./components/ProfilePage";
 import ReportPage from "./components/ReportPage";
+import CheckInModal from "./components/CheckInModal";
 
 export default function App() {
   const [name] = useState("John Doe");
@@ -25,8 +26,13 @@ export default function App() {
   const [workSeconds, setWorkSeconds] = useState(0);
   const [breakSeconds, setBreakSeconds] = useState(0);
 
+  // Check-in modal state: show every ~2 hours of work (3-4 times per 8-hour day)
+  const [showCheckInModal, setShowCheckInModal] = useState(false);
+  const [checkInsShownCount, setCheckInsShownCount] = useState(0);
+
   // reference target for progress (kept small for demo; original used 8*60)
   const dayTargetSeconds = 8 * 60;
+  const checkInIntervalSeconds = 1 * 60; // Show check-in every 2 minutes of work (demo; normally 2 hours)
 
   useEffect(() => {
     let timer = null;
@@ -41,6 +47,16 @@ export default function App() {
       if (timer) clearInterval(timer);
     };
   }, [workStarted, finished, onBreak]);
+
+  // Check-in modal trigger: show every ~checkInIntervalSeconds of work time
+  useEffect(() => {
+    if (workStarted && !finished && !onBreak && !showCheckInModal) {
+      const nextCheckInTime = (checkInsShownCount + 1) * checkInIntervalSeconds;
+      if (workSeconds >= nextCheckInTime) {
+        setShowCheckInModal(true);
+      }
+    }
+  }, [workSeconds, workStarted, finished, onBreak, showCheckInModal, checkInsShownCount, checkInIntervalSeconds]);
 
   const togglePauseFavorite = (id) => {
     setPauseFavorites((prev) => {
@@ -68,8 +84,23 @@ export default function App() {
   const takeBreak = () => setOnBreak(true);
   const endBreak = () => setOnBreak(false);
 
+  const closeCheckInModal = () => {
+    setShowCheckInModal(false);
+    setCheckInsShownCount((p) => p + 1);
+  };
+
+  const handleCheckInSubmit = () => {
+    closeCheckInModal();
+  };
+
   return (
     <div className="appShell">
+      {showCheckInModal && (
+        <CheckInModal
+          onClose={closeCheckInModal}
+          onSubmitCheckIn={handleCheckInSubmit}
+        />
+      )}
       <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
 
       {currentPage === "exercise-detail" ? (
