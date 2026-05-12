@@ -10,6 +10,7 @@ import ProfilePage from "./components/ProfilePage";
 import ReportPage from "./components/ReportPage";
 import CheckInModal from "./components/CheckInModal";
 import LoginPage from "./components/LoginPage";
+import Settings from "./components/Settings";
 import notitie from "./assets/icons/Afsluitnotitie.svg";
 import { supabase } from "./lib/supabaseClient";
 
@@ -389,6 +390,8 @@ export default function App() {
           onNavigateToPause={() => setCurrentPage("pause")}
           onLogout={handleLogout}
         />
+      ) : currentPage === "settings" ? (
+        <Settings onBack={() => setCurrentPage("home")} />
       ) : currentPage === "breathing" ? (
         <BreathingExercises
           onBack={() => setCurrentPage("pause")}

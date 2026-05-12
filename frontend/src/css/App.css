@@ -217,7 +217,8 @@
 .pause-grid {
     padding: var(--space-16) var(--space-32)var(--space-32)var(--space-32);
     display: grid;
-    gap: var(--space-32);
+    gap: var(--space-24);
+    row-gap: var(--space-32);
     grid-template-columns: repeat(auto-fit, minmax(220px, 230px));
 }
 
