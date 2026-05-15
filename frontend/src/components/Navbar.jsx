@@ -41,6 +41,7 @@ export default function Navbar({ currentPage, setCurrentPage }) {
       label: "Instellingen",
       icon: <LuSettings />,
       className: "settingsLink",
+      onClick: () => setCurrentPage("settings"),
     },
   ];
 
@@ -72,10 +73,18 @@ export default function Navbar({ currentPage, setCurrentPage }) {
           <span>Premium</span>
         </button> {/*when user is not a premium user*/}
 
-        <button onClick={() => setCurrentPage("settings")} className="sideNavLink settingsLink" type="button">
-          {<LuSettings />}
-          <span>Instellingen</span>
-        </button>
+        {bottomNavItems.map((item) => (
+          <button
+            key={item.key}
+            className={`sideNavLink ${currentPage === item.key ? "active" : ""} ${item.className || ""}`}
+            onClick={item.onClick}
+            type="button"
+          >
+            <span className="sideNavIcon">{item.icon}</span>
+            <span>{item.label}</span>
+          </button>
+        ))}
+
       </div>
     </aside>
   );
