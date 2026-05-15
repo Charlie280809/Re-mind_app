@@ -18,41 +18,33 @@
 
 .authLoadingState {
     min-height: 100vh;
-    display: grid;
-    place-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     padding: var(--space-32);
-    background:
-        radial-gradient(circle at top left, rgba(168, 191, 175, 0.22), transparent 30%),
-        radial-gradient(circle at bottom right, rgba(213, 222, 216, 0.55), transparent 28%),
-        var(--surface-background);
-}
-
-.authLoadingCard {
-    width: min(100%, 360px);
-    border-radius: 24px;
-    padding: 28px 30px;
-    background: rgba(255, 255, 253, 0.88);
-    border: 1px solid rgba(84, 107, 120, 0.12);
-    box-shadow: 0 24px 50px rgba(41, 51, 46, 0.12);
-    text-align: center;
-}
-
-.authLoadingLabel {
-    display: block;
-    margin-bottom: 10px;
+    background-color: var(--surface-background);
     font-family: var(--font-family-body);
-    font-size: var(--font-size-xxs);
-    font-weight: var(--font-weight-bold);
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--text-brand);
+    font-size: var(--font-size-md);
 }
 
-.authLoadingCard p {
-    margin: 0;
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-s);
-    color: var(--text-secondary);
+.authLoadingSpinner {
+    margin-top: var(--space-24);
+    width: 120px;
+    height: auto;
+    object-fit: contain;
+    animation: loadingSpin 1.2s linear infinite;
+    transform-origin: center;
+}
+
+@keyframes loadingSpin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .homePage {
@@ -262,7 +254,6 @@
 }
 
 .pause-content p {
-    /* margin: 0; */
     font-family: var(--text-body-regular-font-family);
     font-size: var(--text-body-regular-font-size);
     line-height: var(--text-body-regular-line-height);
@@ -423,7 +414,7 @@
     padding-top: var(--space-32);
     display: grid;
     gap: var(--space-24);
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(220px, 230px));
 }
 
 .profile-addPausesButton {

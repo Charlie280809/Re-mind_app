@@ -12,6 +12,7 @@ import CheckInModal from "./components/CheckInModal";
 import LoginPage from "./components/LoginPage";
 import Settings from "./components/Settings";
 import notitie from "./assets/icons/Afsluitnotitie.svg";
+import spinner from "./assets/images/loadingSpinner.svg";
 import { supabase } from "./lib/supabaseClient";
 
 export default function App() {
@@ -334,10 +335,8 @@ export default function App() {
   if (authLoading || (session && profileLoading)) {
     return (
       <div className="authLoadingState" aria-live="polite">
-        <div className="authLoadingCard">
-          <span className="authLoadingLabel">re-mind</span>
           <p>Bezig met inloggen...</p>
-        </div>
+          <img className="authLoadingSpinner" src={spinner} alt="Laden" />
       </div>
     );
   }
@@ -356,10 +355,8 @@ export default function App() {
   if (!profile) {
     return (
       <div className="authLoadingState" aria-live="polite">
-        <div className="authLoadingCard">
-          <span className="authLoadingLabel">re-mind</span>
           <p>{authError || "Profiel laden..."}</p>
-        </div>
+          <img className="authLoadingSpinner" src={spinner} alt="Laden" />
       </div>
     );
   }
