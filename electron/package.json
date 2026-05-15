@@ -4,7 +4,14 @@
     "description": "",
     "main": "main.js",
     "scripts": {
-        "start": "electron ."
+        "start": "electron .",
+        "build": "electron-builder"
+    },
+    "build": {
+        "appId": "com.remind.app",
+        "win": {
+            "icon": "assets/favicon.ico"
+        }
     },
     "keywords": [],
     "author": "",
@@ -12,5 +19,8 @@
     "type": "commonjs",
     "devDependencies": {
         "electron": "^41.1.1"
+    },
+    "dependencies": {
+        "electron-builder": "^26.8.1"
     }
 }
