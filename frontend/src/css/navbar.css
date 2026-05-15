@@ -106,15 +106,14 @@
   background-color: var(--brand-primary);
   color: var(--text-on-dark);
   border-radius: 10px;
-  font-family: var(--text-navigation-default-font-family);
+  font-family: var(--font-family-heading);
   font-size: var(--text-navigation-default-font-size);
-  font-weight: var(--text-navigation-default-font-weight);
+  font-weight: var(--font-weight-semibold);
   line-height: var(--text-navigation-default-line-height);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-8);
-  /* padding: 4px 32px 4px 4px; */
   padding: var(--space-4) var(--space-48) var(--space-4) var(--space-4);
 }
 
