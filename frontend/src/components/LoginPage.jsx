@@ -48,7 +48,7 @@ export default function LoginPage({ onLogin, isSubmitting, error, isConfigured }
             {!isConfigured ? <p className="loginError" role="alert">Supabase is nog niet geconfigureerd.</p> : null}
 
             <button className="loginSubmit" type="submit" disabled={isSubmitting || !isConfigured}>
-              {isSubmitting ? "Bezig met inloggen..." : "Log in"}
+              {isSubmitting ? "Bezig..." : "Log in"}
             </button>
           </form>
         </div>
