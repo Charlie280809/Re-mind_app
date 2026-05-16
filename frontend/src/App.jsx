@@ -397,6 +397,11 @@ export default function App() {
           onToggleFavorite={togglePauseFavorite}
           onNavigateToPause={() => setCurrentPage("pause")}
           onLogout={handleLogout}
+          onNavigateToUpgrade={() => {
+            setSettingsInitialView("upgrade");
+            setCurrentPage("settings");
+            setSettingsResetKey((k) => k + 1);
+          }}
         />
       ) : currentPage === "settings" ? (
         <Settings

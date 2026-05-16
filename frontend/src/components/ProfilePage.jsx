@@ -3,7 +3,7 @@ import { TbCrown } from "react-icons/tb";
 import PauseCard from "./PauseCard";
 import { DATA as PAUSE_OPTIONS } from "./PauseSuggestions";
 
-export default function ProfilePage({ profile, favorites, onToggleFavorite, onNavigateToPause, onLogout }) {
+export default function ProfilePage({ profile, favorites, onToggleFavorite, onNavigateToPause, onLogout, onNavigateToUpgrade }) {
     const name = profile?.username || profile?.email || "Gebruiker";
     const companyName = profile?.bedrijfsnaam || "Geen bedrijfsnaam";
     const isPremium = Boolean(profile?.is_premium);
@@ -29,8 +29,15 @@ export default function ProfilePage({ profile, favorites, onToggleFavorite, onNa
                     <h1 className="profile-title">{name}</h1>
                     <p className="profile-jobTitle">{companyName}</p>
                     {isPremium ? null : (
-                        <button className="profile-upgradeBtn" type="button">
-                            {<TbCrown />}
+                        <button
+                            className="profile-upgradeBtn"
+                            type="button"
+                            onClick={() => {
+                                if (onNavigateToUpgrade) onNavigateToUpgrade();
+                            }}
+                            aria-label="Upgrade naar premium"
+                        >
+                            <TbCrown />
                             <span>Upgrade plan</span>
                         </button>
                     )}
