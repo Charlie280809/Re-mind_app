@@ -94,13 +94,11 @@
 /* Checkbox */
 --checkbox-size: 28px;
 --checkbox-radius: 6px;
---checkbox-border-width: var(--border-width-md);
---checkbox-border-style: var(--border-style-solid);
 --checkbox-icon-size: 12px;
 --checkbox-icon-color: var(--text-on-dark);
 
 --checkbox-default-bg: transparent;
---checkbox-default-border: var(--border-control-color);
+--checkbox-default-border: var(--primary-400);
 
 --checkbox-hover-bg: var(--primary-50);
 --checkbox-hover-border: var(--border-state-hover);
@@ -117,43 +115,21 @@
 --checkbox-focus-ring-color: var(--primary-200);
 --checkbox-focus-ring-width: 2px;
 
-/* Radio */
---radio-size: 20px;
---radio-radius: var(--radius-circle);
---radio-border-width: var(--border-width-md);
---radio-border-style: var(--border-style-solid);
-
---radio-dot-size: 10px;
---radio-dot-color: var(--primary-300);
-
---radio-default-bg: transparent;
---radio-default-border: var(--border-control-color);
-
---radio-hover-border: var(--border-state-hover);
---radio-selected-border: var(--primary-300);
---radio-error-border: var(--border-state-error);
---radio-disabled-border: var(--border-state-disabled);
-
---radio-focus-ring-color: var(--primary-200);
---radio-focus-ring-width: 2px;
-
 /* Toggle */
---toggle-track-width: 40px;
---toggle-track-height: 22px;
---toggle-track-radius: var(--radius-full);
---toggle-track-border-width: var(--border-width-md);
---toggle-track-border-style: var(--border-style-solid);
+--toggle-track-width: 50px;
+--toggle-track-height: 28px;
+--toggle-track-radius: 20px;
+--toggle-thumb-size: 20px;
+--toggle-thumb-radius: 50%;
+--toggle-border-color: var(--primary-600);
 
---toggle-thumb-size: 18px;
---toggle-thumb-radius: var(--radius-circle);
+--toggle-off-bg: var(--primary-50);
+--toggle-off-thumb: var(--primary-300);
 
---toggle-off-bg: var(--background-300);
---toggle-off-border: var(--border-control-color);
-
---toggle-hover-bg: var(--primary-100);
+--toggle-hover-bg: var(--primary-200);
 
 --toggle-on-bg: var(--primary-300);
---toggle-on-border: var(--primary-300);
+--toggle-on-thumb: var(--primary-50);
 
 --toggle-disabled-bg: var(--background-200);
 --toggle-disabled-border: var(--border-state-disabled);
