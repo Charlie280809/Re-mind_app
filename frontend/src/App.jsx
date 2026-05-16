@@ -396,7 +396,11 @@ export default function App() {
           onLogout={handleLogout}
         />
       ) : currentPage === "settings" ? (
-        <Settings onBack={() => setCurrentPage("home")} resetKey={settingsResetKey} />
+        <Settings
+          onBack={() => setCurrentPage("home")}
+          resetKey={settingsResetKey}
+          isPremium={Boolean(profile?.is_premium)}
+        />
       ) : currentPage === "breathing" ? (
         <BreathingExercises
           onBack={() => setCurrentPage("pause")}
