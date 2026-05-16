@@ -7,7 +7,7 @@ import { LuUser } from "react-icons/lu";
 import { TbCrown } from "react-icons/tb";
 import { LuSettings } from "react-icons/lu";
 
-export default function Navbar({ currentPage, setCurrentPage }) {
+export default function Navbar({ currentPage, setCurrentPage, onSettingsNavigate }) {
   const navItems = [
     {
       key: "home",
@@ -41,7 +41,10 @@ export default function Navbar({ currentPage, setCurrentPage }) {
       label: "Instellingen",
       icon: <LuSettings />,
       className: "settingsLink",
-      onClick: () => setCurrentPage("settings"),
+      onClick: () => {
+        if (onSettingsNavigate) onSettingsNavigate();
+        else setCurrentPage("settings");
+      },
     },
   ];
 
