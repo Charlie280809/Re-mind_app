@@ -41,7 +41,7 @@ export default function ReportPage() {
         }
 
         const date = new Date(`${report.date}T00:00:00`);
-        return `Rapport van ${date.toLocaleDateString("nl-BE")}`;
+        return `Rapport van ${date.toLocaleDateString("be-BE")}`;
     }, [report?.date]);
 
     const avgStressLabel = report?.averageStress == null ? "-" : `${report.averageStress}/5`;
