@@ -1,6 +1,7 @@
 @import url("./design_tokens/color_tokens.css");
 @import url("./design_tokens/typography_tokens.css");
 @import url("./design_tokens/spacing_tokens.css");
+@import url("./design_tokens/components.css");
 
 .settingsPage {
     flex: 1;
@@ -68,6 +69,7 @@
     font-weight: var(--font-weight-bold);
     max-height: 60px;
     transition: all 0.2s ease;
+
     .settingsChevron {
         font-size: var(--font-size-xl);
         transform: translateX(8px);
@@ -110,12 +112,11 @@
     padding: var(--layout-container-padding);
     background-color: var(--surface-background);
     max-width: 100%;
-    /* height: 100vh; */
-    gap: var(--space-40);
+    gap: var(--space-32);
 }
 
 .workhoursContent {
-    max-width: 820px;
+    /* max-width: 820px; */
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -125,6 +126,10 @@
     color: var(--text-primary);
 }
 
+/* .workhoursContent :nth-child(2) {
+    margin-bottom: 200px;
+} */
+
 .row {
     display: flex;
     align-items: center;
@@ -133,18 +138,6 @@
 
 .label {
     width: 360px;
-    min-width: 220px;
-    /* font-family: var(--text-body-regular-font-family); */
-    /* font-size: var(--text-body-regular-font-size); */
-    /* color: var(--text-primary); */
-}
-
-.value {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: var(--space-12);
-
 }
 
 .weekdays {
@@ -157,7 +150,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--space-8);
+    gap: var(--space-4);
 }
 
 .weekdayLabel {
@@ -170,32 +163,35 @@
 .weekdayCheckbox {
     margin: 0;
     appearance: none;
-    width: 32px;
-    height: 32px;
-    border-radius: 6px;
-    border: 2px solid var(--border-color-default);
-    background: transparent;
+    width: var(--checkbox-size);
+    height: var(--checkbox-size);
+    border-radius: var(--checkbox-radius);
+    border: 2px solid var(--checkbox-default-border);
+    background-color: transparent;
     cursor: pointer;
     display: grid;
     place-items: center;
     transition: all 0.2s ease;
 }
 
+.weekdayCheckbox:hover {
+    background-color: var(--primary-100);
+}
+
 .weekdayCheckbox::after {
     content: "";
-    width: 11px;
-    height: 7px;
+    width: var(--checkbox-icon-size);
+    height: 6px;
     border: 3px solid transparent;
     border-top: 0;
     border-right: 0;
-    transform: rotate(-45deg) scale(0);
-    transform-origin: center;
-    transition: transform 0.18s ease;
+    margin: 0 0 var(--space-4) 0;
+    transform: rotate(-45deg) scale(0) translateY(8px);
+    transition: transform 0.2s ease;
 }
 
 .weekdayCheckbox:checked {
-    background: var(--highlight-300);
-    border-color: var(--highlight-300);
+    background-color: var(--highlight-400);
 }
 
 .weekdayCheckbox:checked::after {
@@ -203,66 +199,111 @@
     transform: rotate(-45deg) scale(1);
 }
 
-.weekdayCheckbox:hover {
-    border-color: var(--primary-700);
+.value {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    transition: all 0.2s ease;
 }
 
-.weekdayCheckbox:focus-visible {
-    outline: 0;
-    box-shadow: 0 0 0 3px rgba(87, 120, 99, 0.25);
+.value input[type="number"] {
+    width: 64px;
+    margin: 0 var(--space-4);
+}
+
+.value input {
+    /* margin: 0; */
+    width: fit-content;
+    padding: var(--space-4);
+    border-radius: 10px;
+    border: 1px solid var(--border-color-default);
+    /* background-color: var(--surface-card); */
+    background-color: transparent;
+    color: var(--text-primary);
+    font-family: var(--text-input-value-font-family);
+    font-size: var(--text-input-value-font-size);
+}
+
+.value input[type="time"]::-webkit-calendar-picker-indicator,
+.value input[type="time"]::-webkit-clear-button,
+.value input[type="time"]::-webkit-inner-spin-button,
+.value input[type="time"]::-webkit-outer-spin-button {
+    display: none;
+    -webkit-appearance: none;
 }
 
 .iconEdit {
-    margin-left: 8px;
+    margin: 0 0 0 var(--space-4);
     color: var(--primary-700);
-}
-
-.iconEdit.muted {
-    opacity: 0.45;
+    font-size: var(--font-size-md);
 }
 
 .toggle {
-    width: 56px;
-    height: 32px;
-    background: var(--surface-card);
-    border-radius: 20px;
-    border: 1px solid var(--border-color-default);
+    width: var(--toggle-track-width);
+    height: var(--toggle-track-height);
+    background-color: var(--toggle-off-bg);
+    border-radius: var(--toggle-track-radius);
+    border: 2px solid var(--toggle-border-color);
     display: inline-flex;
     align-items: center;
-    padding: 4px;
+    padding: var(--space-4);
     cursor: pointer;
+}
+
+.toggle:hover {
+    background-color: var(--toggle-hover-bg);
+    transition: all 0.2s ease;
 }
 
 .toggle[aria-pressed="true"] {
-    background: var(--highlight-300);
-    border-color: var(--border-color-green);
+    background: var(--toggle-on-bg);
+    border: 2px solid var(--toggle-border-color);
 }
 
 .knob {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: var(--surface-background);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    width: var(--toggle-thumb-size);
+    height: var(--toggle-thumb-size);
+    border-radius: var(--toggle-thumb-radius);
+    background-color: var(--toggle-off-thumb);
+    transform: translateX(0);
+    transition: all 0.2s ease;
 }
 
 .toggle[aria-pressed="true"] .knob {
-    margin-left: 20px;
+    transform: translateX(var(--toggle-thumb-size));
+    background-color: var(--toggle-on-thumb);
 }
 
-.saveRow {
-    display: flex;
-    justify-content: flex-end;
+.toggle:disabled,
+.value input:disabled,
+.rowDisabled .label,
+.rowDisabled .durationUnit,
+.rowDisabled .iconEdit {
+    opacity: 0.5;
 }
 
 .saveButton {
-    padding: var(--space-8) var(--space-24);
-    border-radius: 12px;
+    width: fit-content;
+    /* padding: var(--space-8) var(--space-24); */
+    padding: 4px 24px;
+    border-radius: var(--button-radius);
     border: 2px solid var(--border-color-green);
-    background: var(--surface-background);
-    color: var(--text-primary);
+    color: var(--text-on-light);
     cursor: pointer;
     font-family: var(--text-button-label-font-family);
+    margin-left: auto;
+
+    padding: var(--layout-button-padding-y) var(--layout-button-padding-x);
+    font-size: var(--font-size-s);
+    font-family: var(--text-button-label-font-family);
+    font-weight: var(--font-weight-regular);
+    border: 2px solid var(--primary-700);
+    background-color: var(--brand-primary);
+
+
+    border: 2px solid var(--highlight-300);
+    background-color: var(--highlight-200);
 }
 
 /* @media (max-width: 880px) {
