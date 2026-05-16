@@ -1,6 +1,7 @@
-@import "../css/design_tokens/color_tokens.css";
-@import "../css/design_tokens/typography_tokens.css";
-@import "../css/design_tokens/spacing_tokens.css";
+@import url("./design_tokens/color_tokens.css");
+@import url("./design_tokens/typography_tokens.css");
+@import url("./design_tokens/spacing_tokens.css");
+@import url("./design_tokens/components.css");
 
 .loginPage {
     min-height: 100vh;
