@@ -9,8 +9,10 @@ import BreathingExerciseDetail from "./components/BreathingExerciseDetail";
 import ProfilePage from "./components/ProfilePage";
 import ReportPage from "./components/ReportPage";
 import CheckInModal from "./components/CheckInModal";
+import FavoriteRemovalModal from "./components/FavoriteRemovalModal";
 import LoginPage from "./components/LoginPage";
 import Settings from "./components/Settings";
+import { DATA as PAUSE_OPTIONS } from "./components/PauseSuggestions";
 import notitie from "./assets/icons/Afsluitnotitie.svg";
 import spinner from "./assets/images/loadingSpinner.svg";
 import { supabase } from "./lib/supabaseClient";
@@ -30,6 +32,7 @@ export default function App() {
   const [settingsInitialView, setSettingsInitialView] = useState(null);
   const [selectedExercise, setSelectedExercise] = useState(null);
   const [pauseFavorites, setPauseFavorites] = useState(() => new Set());
+  const [favoriteRemovalTarget, setFavoriteRemovalTarget] = useState(null);
 
   // Persistent work timer state lifted here so the timer keeps running
   // even when `WorkTimerCard` unmounts during navigation.
@@ -223,27 +226,7 @@ export default function App() {
     }
   }, [workSeconds, workStarted, finished, onBreak, showCheckInModal, lastCheckInPromptIndex, checkInIntervalSeconds]);
 
-  const togglePauseFavorite = async (id) => {
-    if (!session || !supabase) {
-      setPauseFavorites((prev) => {
-        const next = new Set(prev);
-        if (next.has(id)) next.delete(id);
-        else next.add(id);
-        return next;
-      });
-      return;
-    }
-
-    const userId = session.user.id;
-    const previouslyHad = pauseFavorites.has(id);
-
-    // ask for confirmation only when removing
-    if (previouslyHad) {
-      const confirmed = window.confirm("Weet je zeker dat je deze pauze uit favorieten wilt verwijderen?");
-      if (!confirmed) return;
-    }
-
-    // optimistic update
+  const persistFavoriteToggle = async (id, previouslyHad) => {
     setPauseFavorites((prev) => {
       const next = new Set(prev);
       if (previouslyHad) next.delete(id);
@@ -252,12 +235,16 @@ export default function App() {
     });
 
     try {
-      if (!previouslyHad) {
-        const { error } = await supabase.from("favorite_pauses").insert([{ user_id: userId, pauze_type: id }]);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase.from("favorite_pauses").delete().match({ user_id: userId, pauze_type: id });
-        if (error) throw error;
+      if (session && supabase) {
+        const userId = session.user.id;
+
+        if (!previouslyHad) {
+          const { error } = await supabase.from("favorite_pauses").insert([{ user_id: userId, pauze_type: id }]);
+          if (error) throw error;
+        } else {
+          const { error } = await supabase.from("favorite_pauses").delete().match({ user_id: userId, pauze_type: id });
+          if (error) throw error;
+        }
       }
     } catch (err) {
       console.error("Failed to toggle favorite in Supabase:", err);
@@ -269,6 +256,29 @@ export default function App() {
         return next;
       });
     }
+  };
+
+  const togglePauseFavorite = async (id) => {
+    const previouslyHad = pauseFavorites.has(id);
+
+    if (previouslyHad) {
+      setFavoriteRemovalTarget(id);
+      return;
+    }
+
+    await persistFavoriteToggle(id, false);
+  };
+
+  const confirmFavoriteRemoval = async () => {
+    if (!favoriteRemovalTarget) return;
+
+    const id = favoriteRemovalTarget;
+    setFavoriteRemovalTarget(null);
+    await persistFavoriteToggle(id, true);
+  };
+
+  const cancelFavoriteRemoval = () => {
+    setFavoriteRemovalTarget(null);
   };
 
   // timer control handlers passed down to WorkTimerCard
@@ -371,6 +381,13 @@ export default function App() {
           onSubmitCheckIn={handleCheckInSubmit}
         />
       )}
+      {favoriteRemovalTarget ? (
+        <FavoriteRemovalModal
+          pauseTitle={PAUSE_OPTIONS.find((item) => item.id === favoriteRemovalTarget)?.title || "deze pauze"}
+          onConfirm={confirmFavoriteRemoval}
+          onCancel={cancelFavoriteRemoval}
+        />
+      ) : null}
       <Navbar
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
