@@ -84,7 +84,7 @@
     margin-top: var(--space-12);
     border: 1px solid var(--primary-700);
     border-radius: var(--button-radius);
-    padding: var(--layout-button-padding-y) var(--layout-button-padding-x);
+    padding: var(--button-padding-y) var(--button-padding-x);
     background-color: var(--brand-primary);
     cursor: pointer;
     align-self: center;

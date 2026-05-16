@@ -9,26 +9,7 @@
 --button-border-style: var(--border-style-solid);
 --button-gap: var(--space-4);
 --button-icon-size: var(--space-4);
-
-/* ================================================= */
-/* BUTTON SIZE */
-/* ================================================= */
-
---button-sm-padding-y: var(--space-2);
---button-sm-padding-x: var(--space-3);
---button-sm-min-height: var(--space-8);
---button-sm-font: var(--text-body-small);
-
---button-md-padding-y: var(--space-3);
---button-md-padding-x: var(--space-4);
---button-md-min-height: var(--space-10);
---button-md-font: var(--text-button);
-
---button-lg-padding-y: var(--space-4);
---button-lg-padding-x: var(--space-5);
---button-lg-min-height: var(--space-12);
---button-lg-font: var(--text-button);
-
+--button-default-font-size: var(--font-size-s);
 
 /* ================================================= */
 /* BUTTON SHAPE */
