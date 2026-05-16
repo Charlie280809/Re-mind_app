@@ -39,7 +39,7 @@
     width: 100%;
     min-width: fit-content;
     min-height: fit-content;
-    border-radius: 10px;
+    border-radius: var(--button-radius);
     padding: var(--layout-button-padding-y) var(--layout-button-padding-x);
     font-size: var(--font-size-s);
     font-family: var(--text-button-label-font-family);

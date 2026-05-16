@@ -4,7 +4,7 @@
 /* BUTTON BASE */
 /* ================================================= */
 
---button-radius: var(--radius-sm);
+--button-radius: 10px;
 --button-border-width: var(--border-width-sm);
 --button-border-style: var(--border-style-solid);
 --button-gap: var(--space-4);
@@ -34,8 +34,8 @@
 /* BUTTON SHAPE */
 /* ================================================= */
 
---button-shape-default-radius: var(--radius-sm);
---button-shape-pill-radius: var(--radius-full);
+--button-shape-default-radius: 10px;
+--button-shape-pill-radius: 50%;
 --button-shape-min-width: var(--space-10);
 
 
@@ -92,13 +92,12 @@
 
 /* SELECTION CONTROLS */
 /* Checkbox */
---checkbox-size: 20px;
---checkbox-radius: var(--radius-xs);
+--checkbox-size: 28px;
+--checkbox-radius: 6px;
 --checkbox-border-width: var(--border-width-md);
 --checkbox-border-style: var(--border-style-solid);
 --checkbox-icon-size: 12px;
 --checkbox-icon-color: var(--text-on-dark);
---checkbox-gap: var(--space-3);
 
 --checkbox-default-bg: transparent;
 --checkbox-default-border: var(--border-control-color);

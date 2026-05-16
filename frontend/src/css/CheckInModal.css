@@ -53,7 +53,7 @@
 .checkInSkipButton,
 .checkInSubmitButton {
     padding: var(--space-8) var(--space-32);
-    border-radius: 10px;
+    border-radius: var(--button-radius);
     font-family: var(--text-button-label-font-family);
     font-size: var(--text-body-regular-font-size);
     cursor: pointer;

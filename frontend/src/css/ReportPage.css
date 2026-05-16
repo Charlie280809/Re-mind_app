@@ -47,7 +47,7 @@
 .reportNavButton,
 .reportWeekButton,
 .reportAgendaButton {
-    border-radius: 10px;
+    border-radius: var(--button-radius);
     border: 1.5px solid var(--border-color-default);
     background: var(--background-50);
     color: var(--text-primary);
@@ -56,7 +56,7 @@
 .reportNavButton {
     width: 38px;
     height: 38px;
-    border-radius: 10px;
+    border-radius: var(--button-radius);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -74,7 +74,7 @@
     border: 2px solid var(--primary-700);
     background-color: var(--brand-primary);
     color: var(--text-on-dark);
-    border-radius: 10px;
+    border-radius: var(--button-radius);
     font-family: var(--text-navigation-default-font-family);
     font-size: var(--text-navigation-default-font-size);
     font-weight: var(--text-navigation-default-font-weight);

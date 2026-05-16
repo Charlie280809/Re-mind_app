@@ -346,7 +346,7 @@
     border: 2px solid var(--primary-700);
     background-color: var(--brand-primary);
     color: var(--text-on-dark);
-    border-radius: 10px;
+    border-radius: var(--button-radius);
     font-family: var(--text-navigation-default-font-family);
     font-size: var(--text-navigation-default-font-size);
     font-weight: var(--text-navigation-default-font-weight);
@@ -375,7 +375,7 @@
     align-self: flex-start;
     margin-left: auto;
     border: 2px solid var(--error-200);
-    border-radius: 10px;
+    border-radius: var(--button-radius);
     cursor: pointer;
     padding: var(--space-4) var(--space-24);
     font-size: var(--font-size-s);
@@ -448,7 +448,7 @@
 
 .profile-addPausesButton {
     align-self: center;
-    border-radius: 10px;
+    border-radius: var(--button-radius);
     padding: var(--space-4) var(--space-24);
     font-family: var(--text-button-label-font-family);
     font-size: var(--font-size-s);

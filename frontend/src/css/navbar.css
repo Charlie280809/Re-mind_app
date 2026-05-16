@@ -105,7 +105,7 @@
   border: 2px solid var(--primary-700);
   background-color: var(--brand-primary);
   color: var(--text-on-dark);
-  border-radius: 10px;
+  border-radius: var(--button-radius);
   font-family: var(--font-family-heading);
   font-size: var(--text-navigation-default-font-size);
   font-weight: var(--font-weight-semibold);
