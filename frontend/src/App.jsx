@@ -26,6 +26,7 @@ export default function App() {
   const [authError, setAuthError] = useState("");
 
   const [currentPage, setCurrentPage] = useState("home");
+  const [settingsResetKey, setSettingsResetKey] = useState(0);
   const [selectedExercise, setSelectedExercise] = useState(null);
   const [pauseFavorites, setPauseFavorites] = useState(() => new Set());
 
@@ -369,7 +370,14 @@ export default function App() {
           onSubmitCheckIn={handleCheckInSubmit}
         />
       )}
-      <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
+      <Navbar
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+        onSettingsNavigate={() => {
+          setCurrentPage("settings");
+          setSettingsResetKey((k) => k + 1);
+        }}
+      />
 
       {currentPage === "exercise-detail" ? (
         <BreathingExerciseDetail
@@ -388,7 +396,7 @@ export default function App() {
           onLogout={handleLogout}
         />
       ) : currentPage === "settings" ? (
-        <Settings onBack={() => setCurrentPage("home")} />
+        <Settings onBack={() => setCurrentPage("home")} resetKey={settingsResetKey} />
       ) : currentPage === "breathing" ? (
         <BreathingExercises
           onBack={() => setCurrentPage("pause")}
