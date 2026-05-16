@@ -23,8 +23,8 @@ export default function Settings({ onBack }) {
             <header className="settingsHeader">
                 <button className="settingsBack" type="button" onClick={onBack} aria-label="Terug">
                     <LuArrowLeft />
-                    <span>Alle instellingen</span>
                 </button>
+                <h1 className="settingsTitle">Alle instellingen</h1>
             </header>
 
             <section className="settingsListWrap">

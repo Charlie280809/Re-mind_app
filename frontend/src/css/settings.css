@@ -13,37 +13,66 @@
 .settingsHeader {
     display: flex;
     align-items: center;
-    gap: var(--space-16);
-    margin-bottom: var(--space-40);
+    gap: var(--space-12);
 }
 
 .settingsBack {
+    padding: 0;
     border: 0;
-    background: transparent;
+    background-color: transparent;
     display: flex;
     align-items: center;
-    gap: var(--space-12);
-    font-family: var(--text-heading-1-font-family);
-    font-size: var(--text-heading-1-font-size);
+    font-family: var(--text-heading-2-font-family);
+    font-size: var(--text-heading-2-font-size);
     color: var(--text-primary);
     cursor: pointer;
+}
+
+.settingsTitle {
+    margin: 0;
+    font-family: var(--text-heading-2-font-family);
+    font-size: var(--text-heading-2-font-size);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
 }
 
 .settingsListWrap {
     display: flex;
     justify-content: center;
+    margin: 10% 0 auto;
 }
 
 .settingsList {
     list-style: none;
     margin: 0;
     padding: 0;
-    width: min(540px, 90%);
+    width: min(500px, 80%);
     background: transparent;
 }
 
 .settingsListItem {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    border-bottom: 1px solid var(--background-600);
+    display: flex;
+    align-items: center;
+}
+
+.settingsListItem:last-child {
+    border-bottom: none;
+}
+
+.settingsChevron {
+    font-size: var(--font-size-lg);
+}
+
+.settingsListItem:hover {
+    font-weight: var(--font-weight-bold);
+    max-height: 60px;
+    transition: all 0.2s ease;
+    .settingsChevron {
+        font-size: var(--font-size-xl);
+        transform: translateX(8px);
+        transition: all 0.2s ease;
+    }
 }
 
 .settingsRow {
@@ -51,7 +80,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: var(--space-20) var(--space-8);
+    padding: var(--space-16) var(--space-12);
     background: transparent;
     border: 0;
     cursor: pointer;
@@ -63,12 +92,7 @@
     color: var(--text-primary);
 }
 
-.settingsChevron {
-    color: var(--text-primary);
-    opacity: 0.9;
-}
-
-@media (max-width: 720px) {
+/* @media (max-width: 720px) {
     .settingsList {
         width: 100%;
     }
@@ -76,40 +100,18 @@
     .settingsHeader {
         margin-bottom: var(--space-24);
     }
-}
+} */
 
-/* === WORK HOURS PAGE === */
+/* --- Work hours Page --- */
 .workhoursPage {
     flex: 1;
-    padding: var(--layout-container-padding);
-    background: var(--surface-background);
     display: flex;
     flex-direction: column;
-}
-
-.workhoursHeader {
-    display: flex;
-    align-items: center;
-    gap: var(--space-16);
-    margin-bottom: var(--space-40);
-}
-
-.workhoursBack {
-    border: 0;
-    background: transparent;
-    font-size: 28px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-primary);
-    cursor: pointer;
-}
-
-.workhoursTitle {
-    margin: 0;
-    font-family: var(--text-heading-1-font-family);
-    font-size: var(--text-heading-1-font-size);
-    color: var(--text-primary);
+    padding: var(--layout-container-padding);
+    background-color: var(--surface-background);
+    max-width: 100%;
+    /* height: 100vh; */
+    gap: var(--space-40);
 }
 
 .workhoursContent {
@@ -118,6 +120,9 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-20);
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--text-body-regular-font-size);
+    color: var(--text-primary);
 }
 
 .row {
@@ -129,9 +134,9 @@
 .label {
     width: 360px;
     min-width: 220px;
-    font-family: var(--text-body-regular-font-family);
-    font-size: var(--text-body-regular-font-size);
-    color: var(--text-primary);
+    /* font-family: var(--text-body-regular-font-family); */
+    /* font-size: var(--text-body-regular-font-size); */
+    /* color: var(--text-primary); */
 }
 
 .value {
@@ -139,39 +144,72 @@
     display: flex;
     align-items: center;
     gap: var(--space-12);
-    font-family: var(--text-body-regular-font-family);
-    font-size: var(--text-body-regular-font-size);
-    color: var(--text-primary);
+
 }
 
 .weekdays {
     display: flex;
     gap: var(--space-8);
-    align-items: center;
+    align-items: flex-start;
 }
 
-.weekday {
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
-    border: 1px solid var(--border-color-default);
-    background: transparent;
-    display: inline-flex;
+.weekdayOption {
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    font-family: var(--text-body-regular-font-family);
-    cursor: pointer;
-    color: var(--text-primary);
-}
-
-.weekday.active {
-    background: var(--highlight-300);
-    color: var(--surface-background);
-    border-color: transparent;
+    gap: var(--space-8);
 }
 
 .weekdayLabel {
-    margin-left: 6px;
+    margin: 0;
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--text-body-regular-font-size);
+    color: var(--text-primary);
+}
+
+.weekdayCheckbox {
+    margin: 0;
+    appearance: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: 2px solid var(--border-color-default);
+    background: transparent;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: all 0.2s ease;
+}
+
+.weekdayCheckbox::after {
+    content: "";
+    width: 11px;
+    height: 7px;
+    border: 3px solid transparent;
+    border-top: 0;
+    border-right: 0;
+    transform: rotate(-45deg) scale(0);
+    transform-origin: center;
+    transition: transform 0.18s ease;
+}
+
+.weekdayCheckbox:checked {
+    background: var(--highlight-300);
+    border-color: var(--highlight-300);
+}
+
+.weekdayCheckbox:checked::after {
+    border-color: var(--surface-background);
+    transform: rotate(-45deg) scale(1);
+}
+
+.weekdayCheckbox:hover {
+    border-color: var(--primary-700);
+}
+
+.weekdayCheckbox:focus-visible {
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(87, 120, 99, 0.25);
 }
 
 .iconEdit {
@@ -227,7 +265,7 @@
     font-family: var(--text-button-label-font-family);
 }
 
-@media (max-width: 880px) {
+/* @media (max-width: 880px) {
     .label {
         width: 220px;
     }
@@ -250,4 +288,4 @@
     .value {
         width: 100%;
     }
-}
+} */
