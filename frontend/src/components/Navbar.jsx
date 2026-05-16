@@ -1,13 +1,10 @@
 import "../css/Navbar.css";
 import logo from "../assets/images/logo.svg";
-import { LuHouse } from "react-icons/lu";
+import { LuHouse, LuPause, LuUser, LuSettings } from "react-icons/lu";
 import { HiOutlineDocumentReport } from "react-icons/hi";
-import { LuPause } from "react-icons/lu";
-import { LuUser } from "react-icons/lu";
 import { TbCrown } from "react-icons/tb";
-import { LuSettings } from "react-icons/lu";
 
-export default function Navbar({ currentPage, setCurrentPage, onSettingsNavigate }) {
+export default function Navbar({ currentPage, setCurrentPage, onSettingsNavigate, isPremium }) {
   const navItems = [
     {
       key: "home",
@@ -71,10 +68,20 @@ export default function Navbar({ currentPage, setCurrentPage, onSettingsNavigate
       </div>
 
       <div className="sideNavBottom">
-        <button className="premiumButton" type="button">
-          {<TbCrown />}
-          <span>Premium</span>
-        </button> {/*when user is not a premium user*/}
+        {!isPremium ? (
+          <button
+            className="premiumButton"
+            type="button"
+            onClick={() => {
+              if (onSettingsNavigate) onSettingsNavigate("upgrade");
+              else setCurrentPage("settings");
+            }}
+            aria-label="Upgrade naar premium"
+          >
+            <TbCrown />
+            <span>Premium</span>
+          </button>
+        ) : null}
 
         {bottomNavItems.map((item) => (
           <button

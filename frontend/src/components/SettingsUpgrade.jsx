@@ -1,12 +1,13 @@
 import "../css/settings.css";
-import { LuArrowLeft, LuCheck, LuHeart, LuCrown } from "react-icons/lu";
+import { LuArrowLeft, LuCheck, LuHeart } from "react-icons/lu";
+import { TbCrown } from "react-icons/tb";
 import { useState } from "react";
 
 export default function SettingsUpgrade({ onBack, isPremium }) {
     const [billingCycle, setBillingCycle] = useState("monthly");
 
-    const premiumPrice = billingCycle === "monthly" ? "€2,99/maand" : "€29,99/jaar";
-    const companyPrice = billingCycle === "monthly" ? "€2,20/maand" : "€22,00/jaar";
+    const premiumPrice = billingCycle === "monthly" ? "€2,99/maand" : "€33/jaar";
+    const companyPrice = billingCycle === "monthly" ? "€2,20/maand" : "€20/jaar";
 
     return (
         <main className="upgradePage">
@@ -41,7 +42,7 @@ export default function SettingsUpgrade({ onBack, isPremium }) {
             <section className="upgradeGrid">
                 <article className="upgradeCard upgradeCardTop">
                     <h2 className="upgradeCardTitle">
-                        <LuCrown /> Premium plan
+                        <TbCrown /> Premium plan
                     </h2>
                     <p className="upgradePrice">{premiumPrice}</p>
                     <ul className="upgradeList" role="list">
@@ -59,7 +60,7 @@ export default function SettingsUpgrade({ onBack, isPremium }) {
 
                 <article className="upgradeCard upgradeCardTop">
                     <h2 className="upgradeCardTitle">
-                        <LuCrown /> Bedrijfslicentie
+                        <TbCrown /> Bedrijfslicentie
                     </h2>
                     <p className="upgradePrice">{companyPrice}</p>
                     <p className="upgradeSubPrice">per werknemer</p>
@@ -92,9 +93,7 @@ export default function SettingsUpgrade({ onBack, isPremium }) {
                     <p className="upgradeSupportText">
                         Jouw steun maakt het verschil!
                         <br />
-                        Elke bijdrage, hoe klein die ook mag zijn, helpt
-                        <br />
-                        om een betere gebruikerservaring te creeren.
+                        Elke bijdrage, hoe klein die ook mag zijn, helpt om een betere gebruikerservaring te creeren.
                     </p>
                     <button className="upgradePrimaryBtn" type="button">
                         <LuHeart /> Doe een gift

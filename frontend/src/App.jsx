@@ -27,6 +27,7 @@ export default function App() {
 
   const [currentPage, setCurrentPage] = useState("home");
   const [settingsResetKey, setSettingsResetKey] = useState(0);
+  const [settingsInitialView, setSettingsInitialView] = useState(null);
   const [selectedExercise, setSelectedExercise] = useState(null);
   const [pauseFavorites, setPauseFavorites] = useState(() => new Set());
 
@@ -373,10 +374,12 @@ export default function App() {
       <Navbar
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
-        onSettingsNavigate={() => {
+        onSettingsNavigate={(view) => {
+          setSettingsInitialView(view || null);
           setCurrentPage("settings");
           setSettingsResetKey((k) => k + 1);
         }}
+        isPremium={Boolean(profile?.is_premium)}
       />
 
       {currentPage === "exercise-detail" ? (
@@ -400,6 +403,8 @@ export default function App() {
           onBack={() => setCurrentPage("home")}
           resetKey={settingsResetKey}
           isPremium={Boolean(profile?.is_premium)}
+          initialView={settingsInitialView}
+          clearInitialView={() => setSettingsInitialView(null)}
         />
       ) : currentPage === "breathing" ? (
         <BreathingExercises

@@ -7,12 +7,13 @@ import SettingsPersonalData from "./SettingsPersonalData";
 import SettingsUpgrade from "./SettingsUpgrade";
 import SettingsPrivacy from "./SettingsPrivacy";
 
-export default function Settings({ onBack, resetKey, isPremium }) {
+export default function Settings({ onBack, resetKey, isPremium, initialView, clearInitialView }) {
     const [view, setView] = useState("list");
 
     useEffect(() => {
-        // reset view to list when resetKey changes (e.g., user clicked Settings in side-nav)
-        setView("list");
+        // when resetKey changes (e.g., user clicked Settings in side-nav), set view to initialView or list
+        setView(initialView ?? "list");
+        if (clearInitialView) clearInitialView();
     }, [resetKey]);
 
     const items = [
