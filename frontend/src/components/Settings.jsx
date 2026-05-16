@@ -1,10 +1,19 @@
 import "../css/settings.css";
 import { LuChevronRight, LuArrowLeft } from "react-icons/lu";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SettingsWorkHours from "./SettingsWorkHours";
+import SettingsNotifications from "./SettingsNotifications";
+import SettingsPersonalData from "./SettingsPersonalData";
+import SettingsUpgrade from "./SettingsUpgrade";
+import SettingsPrivacy from "./SettingsPrivacy";
 
-export default function Settings({ onBack }) {
+export default function Settings({ onBack, resetKey, isPremium }) {
     const [view, setView] = useState("list");
+
+    useEffect(() => {
+        // reset view to list when resetKey changes (e.g., user clicked Settings in side-nav)
+        setView("list");
+    }, [resetKey]);
 
     const items = [
         { key: "workhours", label: "Werktijden en pauzes" },
@@ -16,6 +25,22 @@ export default function Settings({ onBack }) {
 
     if (view === "workhours") {
         return <SettingsWorkHours onBack={() => setView("list")} />;
+    }
+
+    if (view === "notifications") {
+        return <SettingsNotifications onBack={() => setView("list")} />;
+    }
+
+    if (view === "personal") {
+        return <SettingsPersonalData onBack={() => setView("list")} />;
+    }
+
+    if (view === "upgrade") {
+        return <SettingsUpgrade onBack={() => setView("list")} isPremium={isPremium} />;
+    }
+
+    if (view === "privacy") {
+        return <SettingsPrivacy onBack={() => setView("list")} />;
     }
 
     return (
@@ -34,7 +59,7 @@ export default function Settings({ onBack }) {
                             <button
                                 className="settingsRow"
                                 type="button"
-                                onClick={() => item.key === "workhours" && setView("workhours")}
+                                onClick={() => setView(item.key)}
                             >
                                 <span className="settingsLabel">{item.label}</span>
                                 <LuChevronRight className="settingsChevron" />

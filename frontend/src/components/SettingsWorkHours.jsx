@@ -182,12 +182,11 @@ export default function SettingsWorkHours({ onBack, userId }) {
                         <LuPencil className="iconEdit" />
                     </div>
                 </div>
-
-                <button className="saveButton" type="button" onClick={handleSave} disabled={saving}>
-                    {saving ? "Opslaan..." : "Opslaan"}
-                </button>
-                {message && <div className="saveMessage">{message}</div>}
             </section>
+            <button className="saveButton" type="button" onClick={handleSave} disabled={saving}>
+                {saving ? "Opslaan..." : "Opslaan"}
+            </button>
+            {message && <div className="saveMessage">{message}</div>}
         </main>
     );
 

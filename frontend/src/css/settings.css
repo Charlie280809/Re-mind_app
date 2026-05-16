@@ -94,15 +94,7 @@
     color: var(--text-primary);
 }
 
-/* @media (max-width: 720px) {
-    .settingsList {
-        width: 100%;
-    }
-
-    .settingsHeader {
-        margin-bottom: var(--space-24);
-    }
-} */
+/* === Other pages === */
 
 /* --- Work hours Page --- */
 .workhoursPage {
@@ -294,7 +286,7 @@
     font-family: var(--text-button-label-font-family);
     margin-left: auto;
 
-    padding: var(--layout-button-padding-y) var(--layout-button-padding-x);
+    padding: var(--button-padding-y) var(--button-padding-x);
     font-size: var(--font-size-s);
     font-family: var(--text-button-label-font-family);
     font-weight: var(--font-weight-regular);
@@ -306,27 +298,497 @@
     background-color: var(--highlight-200);
 }
 
-/* @media (max-width: 880px) {
-    .label {
-        width: 220px;
+.saveButton:hover {
+    background-color: var(--highlight-300);
+    border-color: var(--highlight-400);
+    transition: all 0.2s ease;
+}
+
+/* --- Notifications Page --- */
+.notificationsPage {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: var(--layout-container-padding);
+    background-color: var(--surface-background);
+    max-width: 100%;
+    gap: var(--space-32);
+}
+
+.notificationsContent {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    /* justify-content: center; */
+    gap: var(--space-32);
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--text-body-regular-font-size);
+    color: var(--text-primary);
+    margin: 0 auto;
+}
+
+.notificationRow .label {
+    /* width: 360px; */
+    width: fit-content;
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+}
+
+.notificationTitle {
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--text-body-regular-font-size);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+}
+
+.notificationDescription {
+    width: 100%;
+    margin-top: var(--space-4);
+    font-family: var(--text-body-small-font-family, var(--text-body-regular-font-family));
+    font-size: var(--text-body-small-font-size, 0.9rem);
+    color: var(--text-secondary, var(--text-primary));
+}
+
+.saveButton{
+    position: absolute;
+    right: var(--layout-container-padding);
+    bottom: var(--layout-container-padding);
+}
+
+.saveMessage {
+    margin-left: auto;
+    color: var(--text-primary);
+}
+
+/* --- Personal Data Page --- */
+.personalPage {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: var(--layout-container-padding);
+    background-color: var(--surface-background);
+    max-width: 100%;
+    gap: var(--space-32);
+}
+
+.personalContent {
+    width: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-32);
+    padding-top: clamp(24px, 8vh, 90px);
+}
+
+.personalAvatarRow {
+    display: flex;
+    align-items: center;
+    gap: var(--space-12);
+}
+
+.personalAvatarButton,
+.personalInlineEdit {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    color: var(--primary-700);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.personalAvatarIcon {
+    width: 96px;
+    height: 96px;
+    color: var(--highlight-400);
+}
+
+.personalInlineEdit {
+    font-size: var(--font-size-lg);
+}
+
+.personalFields {
+    width: min(520px, 100%);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-24);
+}
+
+.personalFieldRow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-12);
+}
+
+.personalFieldLabel {
+    min-width: 150px;
+    text-align: right;
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--text-body-regular-font-size);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+}
+
+.personalFieldValueWrap {
+    min-width: 200px;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-8);
+}
+
+.personalFieldValue {
+    color: var(--text-primary);
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--text-body-regular-font-size);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.35);
+    line-height: 1.2;
+}
+
+.personalDeleteButton {
+    margin-top: auto;
+    padding: var(--button-padding-y) var(--button-padding-x);
+    border-radius: var(--button-radius);
+    border: 1px solid var(--accent-danger, #d79c9c);
+    background-color: transparent;
+    color: var(--text-primary);
+    font-family: var(--text-button-label-font-family);
+    font-size: var(--font-size-s);
+    font-weight: var(--font-weight-regular);
+    cursor: pointer;
+}
+
+.personalSaveButton {
+    position: absolute;
+    right: var(--layout-container-padding);
+    bottom: var(--layout-container-padding);
+}
+
+@media (max-width: 720px) {
+    .personalFieldRow {
+        justify-content: flex-start;
+        flex-wrap: wrap;
     }
 
-    .workhoursContent {
-        padding-right: var(--space-16);
+    .personalFieldLabel {
+        min-width: 120px;
+        text-align: left;
+    }
+
+    .personalSaveButton {
+        position: static;
+        margin-left: auto;
     }
 }
 
-@media (max-width: 640px) {
-    .row {
-        flex-direction: column;
-        align-items: flex-start;
+/* --- Privacy Page --- */
+.privacyPage {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: var(--layout-container-padding);
+    background-color: var(--surface-background);
+    max-width: 100%;
+    gap: var(--space-32);
+}
+
+.privacyContent {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-20);
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--text-body-regular-font-size);
+    color: var(--text-primary);
+}
+
+.privacyAccordion {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-12);
+}
+
+.accordionRow {
+    display: flex;
+    align-items: center;
+    gap: var(--space-12);
+    background: transparent;
+    border: 0;
+    padding: var(--space-8) 0;
+    text-align: left;
+    font-family: var(--text-body-regular-font-family);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    cursor: pointer;
+}
+
+.accordionPanel {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease, opacity 0.15s ease;
+    opacity: 0;
+}
+
+.accordionPanel.open {
+    max-height: 400px;
+    opacity: 1;
+}
+
+.accordionList {
+    margin: var(--space-8) 0 var(--space-12) 0;
+    padding-left: var(--space-16);
+    color: var(--text-secondary);
+}
+
+.accordionList li {
+    margin-bottom: var(--space-6);
+}
+
+.accordionChevron {
+    font-size: var(--font-size-lg);
+    transition: transform 0.18s ease;
+    transform-origin: center;
+    display: inline-block;
+    margin-right: var(--space-8);
+}
+
+.accordionRow.open .accordionChevron {
+    transform: rotate(90deg);
+}
+
+.privacyActions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-12);
+    margin-top: var(--space-8);
+}
+
+.privacyHint {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: var(--text-body-small-font-size, 0.9rem);
+}
+
+.personalDeleteButton {
+    width: fit-content;
+    padding: var(--button-padding-y) var(--button-padding-x);
+    border-radius: var(--button-radius);
+    border: 1px solid var(--accent-danger, #d79c9c);
+    background-color: transparent;
+    color: var(--text-primary);
+    font-family: var(--text-button-label-font-family);
+    font-size: var(--font-size-s);
+    cursor: pointer;
+}
+
+.exportButton {
+    width: fit-content;
+    padding: var(--button-padding-y) var(--button-padding-x);
+    border-radius: var(--button-radius);
+    border: 2px solid var(--primary-700);
+    background-color: var(--highlight-200);
+    color: var(--text-primary);
+    font-family: var(--text-button-label-font-family);
+    font-size: var(--font-size-s);
+    cursor: pointer;
+}
+
+.exportButton:hover {
+    background-color: var(--highlight-300);
+}
+
+/* --- Upgrade Page --- */
+.upgradePage {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: var(--layout-container-padding);
+    background-color: var(--surface-background);
+    max-width: 100%;
+    gap: var(--space-24);
+}
+
+.upgradeHeader {
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    align-items: center;
+}
+
+.upgradeBillingToggle {
+    margin-left: auto;
+    display: inline-flex;
+    border: 1px solid var(--border-color-default);
+    border-radius: 14px;
+    background-color: var(--surface-card, #d6dedb);
+    padding: 2px;
+    gap: 2px;
+}
+
+.upgradeBillingOption {
+    border: 0;
+    background: transparent;
+    min-width: 170px;
+    padding: var(--space-10) var(--space-16);
+    border-radius: 12px;
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--text-body-regular-font-size);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    cursor: pointer;
+}
+
+.upgradeBillingOption.active {
+    background-color: var(--primary-700);
+    color: var(--text-on-dark, #f2f2f0);
+}
+
+.upgradeGrid {
+    width: min(1120px, 100%);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(320px, 1fr));
+    gap: var(--space-24);
+}
+
+.upgradeCard {
+    border-radius: 18px;
+    border: 1px solid var(--border-color-default);
+    padding: var(--space-24);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 255px;
+}
+
+.upgradeCardTop {
+    background-color: var(--surface-card, #edf2f0);
+}
+
+.upgradeCardBottom {
+    background-color: var(--surface-alt, #f1ead8);
+    min-height: 170px;
+}
+
+.upgradeCardTitle {
+    width: 100%;
+    margin: 0;
+    padding-bottom: var(--space-8);
+    border-bottom: 2px solid var(--primary-700);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-8);
+    font-family: var(--text-heading-2-font-family);
+    font-size: var(--text-heading-2-font-size);
+    color: var(--text-primary);
+}
+
+.upgradeCardTitleCentered {
+    text-align: center;
+    display: block;
+}
+
+.upgradePrice {
+    margin: var(--space-8) 0 0;
+    font-family: var(--text-heading-1-font-family, var(--text-heading-2-font-family));
+    font-size: clamp(2rem, 3.2vw, 3rem);
+    line-height: 1.05;
+    color: var(--text-primary);
+}
+
+.upgradePriceCentered {
+    text-align: center;
+}
+
+.upgradeSubPrice {
+    margin: var(--space-2) 0 var(--space-12);
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--font-size-s);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+}
+
+.upgradeList {
+    width: 100%;
+    list-style: none;
+    margin: var(--space-8) 0 var(--space-16);
+    padding: 0;
+    display: grid;
+    gap: var(--space-8);
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--text-body-regular-font-size);
+    color: var(--text-primary);
+}
+
+.upgradeList li {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-8);
+}
+
+.upgradeListCompact {
+    grid-template-columns: 1fr 1fr;
+    margin-bottom: var(--space-16);
+}
+
+.upgradePrimaryBtn {
+    margin-top: auto;
+    border: 2px solid var(--primary-700);
+    background-color: var(--primary-700);
+    color: var(--text-on-dark, #f2f2f0);
+    border-radius: var(--button-radius);
+    padding: var(--button-padding-y) var(--button-padding-x);
+    font-family: var(--text-button-label-font-family);
+    font-size: var(--font-size-s);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-8);
+}
+
+.upgradeCurrentPlan {
+    margin-top: var(--space-12);
+    border-radius: 12px;
+    background-color: var(--surface-background);
+    padding: var(--space-8) var(--space-16);
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--text-body-regular-font-size);
+    color: var(--text-primary);
+}
+
+.upgradeSupportText {
+    width: 100%;
+    margin: var(--space-16) 0 var(--space-20);
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--text-body-regular-font-size);
+    color: var(--text-primary);
+    text-align: left;
+}
+
+@media (max-width: 1060px) {
+    .upgradeHeader {
+        grid-template-columns: auto 1fr;
+        row-gap: var(--space-12);
     }
 
-    .label {
-        width: 100%;
+    .upgradeHeader .settingsTitle {
+        grid-column: 2;
     }
 
-    .value {
-        width: 100%;
+    .upgradeBillingToggle {
+        grid-column: 1 / -1;
+        justify-self: end;
     }
-} */
+
+    .upgradeGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .upgradeListCompact {
+        grid-template-columns: 1fr;
+    }
+}
