@@ -2,7 +2,7 @@ import "../css/LoginPage.css";
 import { useState } from "react";
 import logo from "../assets/images/logo.svg";
 
-export default function LoginPage({ onLogin, isSubmitting, error, isConfigured }) {
+export default function LoginPage({ onLogin, onNavigateToSignup, isSubmitting, error, isConfigured }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -53,10 +53,10 @@ export default function LoginPage({ onLogin, isSubmitting, error, isConfigured }
           </form>
         </div>
 
-        <div className="loginBrandColumn" aria-hidden="true">
+        <div className="loginBrandColumn">
           <img className="loginBrandLogo" src={logo} alt="" />
           <p className="loginBrandText">
-            Nog geen account? <span>Maak account aan.</span>
+            Nog geen account? <button type="button" onClick={onNavigateToSignup}>Maak account aan.</button>
           </p>
         </div>
       </section>
