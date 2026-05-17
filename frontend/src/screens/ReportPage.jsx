@@ -1,7 +1,7 @@
 import "../css/ReportPage.css";
 import { useEffect, useMemo, useState } from "react";
 import { LuChevronLeft, LuChevronRight, LuZap } from "react-icons/lu";
-import { FaArrowTrendUp } from "react-icons/fa6";
+import { HiOutlineTrendingUp  } from "react-icons/hi";
 import { TbCrown } from "react-icons/tb";
 
 export default function ReportPage() {
@@ -80,7 +80,7 @@ export default function ReportPage() {
                     <div className="reportStatsSplit">
                         <div className="reportStatItem">
                             <div className="reportStatLabel">
-                                <FaArrowTrendUp />
+                                <HiOutlineTrendingUp />
                                 <span>Gemiddelde stress</span>
                             </div>
                             <p className="reportStatValue reportStatValueStress">{avgStressLabel}</p>

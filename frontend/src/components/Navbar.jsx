@@ -1,7 +1,7 @@
 import "../css/Navbar.css";
 import logo from "../assets/images/logo.svg";
 import { LuHouse, LuPause, LuUser, LuSettings } from "react-icons/lu";
-import { HiOutlineDocumentReport } from "react-icons/hi";
+import { HiOutlineChartBar, HiOutlineChartSquareBar } from "react-icons/hi";
 import { TbCrown } from "react-icons/tb";
 
 export default function Navbar({ currentPage, setCurrentPage, onSettingsNavigate, isPremium }) {
@@ -15,7 +15,7 @@ export default function Navbar({ currentPage, setCurrentPage, onSettingsNavigate
     {
       key: "report",
       label: "Dagrapport",
-      icon: <HiOutlineDocumentReport />,
+      icon: <HiOutlineChartBar />,
       onClick: () => setCurrentPage("report"),
     },
     {
@@ -73,8 +73,8 @@ export default function Navbar({ currentPage, setCurrentPage, onSettingsNavigate
             className="premiumButton"
             type="button"
             onClick={() => {
-              if (onSettingsNavigate) onSettingsNavigate("upgrade");
-              else setCurrentPage("settings");
+              if (setCurrentPage) setCurrentPage("upgrade");
+              else if (onSettingsNavigate) onSettingsNavigate("upgrade");
             }}
             aria-label="Upgrade naar premium"
           >

@@ -3,16 +3,16 @@ import { useState, useEffect } from "react";
 
 import Navbar from "./components/Navbar";
 import WorkTimerCard from "./components/WorkTimerCard";
-import PauseSuggestions from "./components/PauseSuggestions";
-import BreathingExercises from "./components/BreathingExercises";
-import BreathingExerciseDetail from "./components/BreathingExerciseDetail";
-import ProfilePage from "./components/ProfilePage";
-import ReportPage from "./components/ReportPage";
+import PauseSuggestions from "./screens/PauseSuggestions";
+import BreathingExerciseDetail from "./screens/BreathingExerciseDetail";
+import ProfilePage from "./screens/ProfilePage";
+import ReportPage from "./screens/ReportPage";
 import CheckInModal from "./components/CheckInModal";
 import FavoriteRemovalModal from "./components/FavoriteRemovalModal";
-import LoginPage from "./components/LoginPage";
-import Settings from "./components/Settings";
-import { DATA as PAUSE_OPTIONS } from "./components/PauseSuggestions";
+import LoginPage from "./screens/LoginPage";
+import Settings from "./screens/Settings";
+import UpgradePlan from "./screens/UpgradePlan";
+import { DATA as PAUSE_OPTIONS } from "./screens/PauseSuggestions";
 import notitie from "./assets/icons/Afsluitnotitie.svg";
 import spinner from "./assets/images/loadingSpinner.svg";
 import { supabase } from "./lib/supabaseClient";
@@ -415,9 +415,7 @@ export default function App() {
           onNavigateToPause={() => setCurrentPage("pause")}
           onLogout={handleLogout}
           onNavigateToUpgrade={() => {
-            setSettingsInitialView("upgrade");
-            setCurrentPage("settings");
-            setSettingsResetKey((k) => k + 1);
+            setCurrentPage("upgrade");
           }}
         />
       ) : currentPage === "settings" ? (
@@ -427,7 +425,10 @@ export default function App() {
           isPremium={Boolean(profile?.is_premium)}
           initialView={settingsInitialView}
           clearInitialView={() => setSettingsInitialView(null)}
+          onNavigateToUpgrade={() => setCurrentPage("upgrade")}
         />
+      ) : currentPage === "upgrade" ? (
+        <UpgradePlan onBack={() => setCurrentPage("home")} isPremium={Boolean(profile?.is_premium)} />
       ) : currentPage === "breathing" ? (
         <BreathingExercises
           onBack={() => setCurrentPage("pause")}

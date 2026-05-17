@@ -1,0 +1,196 @@
+@import url("./design_tokens/color_tokens.css");
+@import url("./design_tokens/typography_tokens.css");
+@import url("./design_tokens/spacing_tokens.css");
+@import url("./design_tokens/components.css");
+
+.upgradePage {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: var(--layout-container-padding);
+    background-color: var(--surface-background);
+    max-width: 100%;
+    gap: var(--space-24);
+}
+
+.upgradeHeader {
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    align-items: center;
+}
+
+.upgradeBillingToggle {
+    margin-left: auto;
+    display: inline-flex;
+    border: 1px solid var(--border-color-default);
+    border-radius: 14px;
+    background-color: var(--surface-card, #d6dedb);
+    padding: 2px;
+    gap: 2px;
+}
+
+.upgradeBillingOption {
+    border: 0;
+    background: transparent;
+    min-width: 170px;
+    padding: var(--space-10) var(--space-16);
+    border-radius: 12px;
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--text-body-regular-font-size);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    cursor: pointer;
+}
+
+.upgradeBillingOption.active {
+    background-color: var(--primary-700);
+    color: var(--text-on-dark, #f2f2f0);
+}
+
+.upgradeGrid {
+    width: min(1120px, 100%);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(320px, 1fr));
+    gap: var(--space-24);
+}
+
+.upgradeCard {
+    border-radius: 18px;
+    border: 1px solid var(--border-color-default);
+    padding: var(--space-24);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 255px;
+}
+
+.upgradeCardTop {
+    background-color: var(--surface-card, #edf2f0);
+}
+
+.upgradeCardBottom {
+    background-color: var(--surface-alt, #f1ead8);
+    min-height: 170px;
+}
+
+.upgradeCardTitle {
+    width: 100%;
+    margin: 0;
+    padding-bottom: var(--space-8);
+    border-bottom: 2px solid var(--primary-700);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-8);
+    font-family: var(--text-heading-2-font-family);
+    font-size: var(--text-heading-2-font-size);
+    color: var(--text-primary);
+}
+
+.upgradeCardTitleCentered {
+    text-align: center;
+    display: block;
+}
+
+.upgradePrice {
+    margin: var(--space-8) 0 0;
+    font-family: var(--text-heading-1-font-family, var(--text-heading-2-font-family));
+    font-size: clamp(2rem, 3.2vw, 3rem);
+    line-height: 1.05;
+    color: var(--text-primary);
+}
+
+.upgradePriceCentered {
+    text-align: center;
+}
+
+.upgradeSubPrice {
+    margin: var(--space-2) 0 var(--space-12);
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--font-size-s);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+}
+
+.upgradeList {
+    width: 100%;
+    list-style: none;
+    margin: var(--space-8) 0 var(--space-16);
+    padding: 0;
+    display: grid;
+    gap: var(--space-8);
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--text-body-regular-font-size);
+    color: var(--text-primary);
+}
+
+.upgradeList li {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-8);
+}
+
+.upgradeListCompact {
+    grid-template-columns: 1fr 1fr;
+    margin-bottom: var(--space-16);
+}
+
+.upgradePrimaryBtn {
+    margin-top: auto;
+    border: 2px solid var(--primary-700);
+    background-color: var(--primary-700);
+    color: var(--text-on-dark, #f2f2f0);
+    border-radius: var(--button-radius);
+    padding: var(--button-padding-y) var(--button-padding-x);
+    font-family: var(--text-button-label-font-family);
+    font-size: var(--font-size-s);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-8);
+}
+
+.upgradeCurrentPlan {
+    margin-top: var(--space-12);
+    border-radius: 12px;
+    background-color: var(--surface-background);
+    padding: var(--space-8) var(--space-16);
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--text-body-regular-font-size);
+    color: var(--text-primary);
+}
+
+.upgradeSupportText {
+    width: 100%;
+    margin: var(--space-16) 0 var(--space-20);
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--text-body-regular-font-size);
+    color: var(--text-primary);
+    text-align: left;
+}
+
+/* @media (max-width: 1060px) {
+    .upgradeHeader {
+        grid-template-columns: auto 1fr;
+        row-gap: var(--space-12);
+    }
+
+    .upgradeHeader .settingsTitle {
+        grid-column: 2;
+    }
+
+    .upgradeBillingToggle {
+        grid-column: 1 / -1;
+        justify-self: end;
+    }
+
+    .upgradeGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .upgradeListCompact {
+        grid-template-columns: 1fr;
+    }
+} */

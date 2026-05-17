@@ -4,10 +4,9 @@ import { useState, useEffect } from "react";
 import SettingsWorkHours from "./SettingsWorkHours";
 import SettingsNotifications from "./SettingsNotifications";
 import SettingsPersonalData from "./SettingsPersonalData";
-import SettingsUpgrade from "./UpgradePlan";
 import SettingsPrivacy from "./SettingsPrivacy";
 
-export default function Settings({ onBack, resetKey, isPremium, initialView, clearInitialView }) {
+export default function Settings({ onBack, resetKey, isPremium, initialView, clearInitialView, onNavigateToUpgrade }) {
     const [view, setView] = useState("list");
 
     useEffect(() => {
@@ -36,10 +35,6 @@ export default function Settings({ onBack, resetKey, isPremium, initialView, cle
         return <SettingsPersonalData onBack={() => setView("list")} />;
     }
 
-    if (view === "upgrade") {
-        return <SettingsUpgrade onBack={() => setView("list")} isPremium={isPremium} />;
-    }
-
     if (view === "privacy") {
         return <SettingsPrivacy onBack={() => setView("list")} />;
     }
@@ -60,7 +55,13 @@ export default function Settings({ onBack, resetKey, isPremium, initialView, cle
                             <button
                                 className="settingsRow"
                                 type="button"
-                                onClick={() => setView(item.key)}
+                                onClick={() => {
+                                    if (item.key === "upgrade") {
+                                        if (onNavigateToUpgrade) onNavigateToUpgrade();
+                                    } else {
+                                        setView(item.key);
+                                    }
+                                }}
                             >
                                 <span className="settingsLabel">{item.label}</span>
                                 <LuChevronRight className="settingsChevron" />
