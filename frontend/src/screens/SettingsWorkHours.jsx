@@ -139,8 +139,6 @@ export default function SettingsWorkHours({ onBack, userId }) {
                     </div>
                 </div>
 
-
-
                 <div className="row toggleRow">
                     <div className="label">Middagpauze instellen:</div>
                     <div className="value">
@@ -183,6 +181,7 @@ export default function SettingsWorkHours({ onBack, userId }) {
                     </div>
                 </div>
             </section>
+
             <button className="saveButton" type="button" onClick={handleSave} disabled={saving}>
                 {saving ? "Opslaan..." : "Opslaan"}
             </button>

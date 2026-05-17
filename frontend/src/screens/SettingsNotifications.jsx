@@ -113,6 +113,13 @@ export default function SettingsNotifications({ onBack }) {
                     </div>
                 </div>
             </section>
+
+            <div className="saveRow">
+                <button className="saveButton" type="button" onClick={handleSave} disabled={saving}>
+                    {saving ? "Opslaan..." : "Opslaan"}
+                </button>
+                {message && <div className="saveMessage">{message}</div>}
+            </div>
         </main>
     );
 }

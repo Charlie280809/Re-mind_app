@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "../css/CheckInModal.css";
-import { FaArrowTrendUp } from "react-icons/fa6";
+import { HiOutlineTrendingUp  } from "react-icons/hi";
 import { LuZap } from "react-icons/lu";
 
 export default function CheckInModal({ onClose, onSubmitCheckIn }) {
@@ -77,7 +77,7 @@ export default function CheckInModal({ onClose, onSubmitCheckIn }) {
                     <article className="checkInInputCard">
                         <label className="checkInLabel">
                             <div className="checkInLabelIcon">
-                                <FaArrowTrendUp />
+                                <HiOutlineTrendingUp />
                             </div>
                             <span>Hoe hoog is je stressniveau nu?</span>
                         </label>
