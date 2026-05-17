@@ -1,4 +1,4 @@
-import "../css/breathingexercises.css";
+// import "../css/breathingexercises.css";
 import { useState, useEffect, useRef } from "react";
 
 const EXERCISE_DATA = {

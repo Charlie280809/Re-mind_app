@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { TbCrown } from "react-icons/tb";
-import PauseCard from "./PauseCard";
+import PauseCard from "../components/PauseCard";
 import { DATA as PAUSE_OPTIONS } from "./PauseSuggestions";
 
 export default function ProfilePage({ profile, favorites, onToggleFavorite, onNavigateToPause, onLogout, onNavigateToUpgrade }) {

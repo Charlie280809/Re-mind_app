@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import PauseCard from "./PauseCard";
+import PauseCard from "../components/PauseCard";
 
 import lungs from "../assets/icons/ademhaling.svg";
 import drink from "../assets/icons/drinkPauze.svg";

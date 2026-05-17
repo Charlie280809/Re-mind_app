@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import SettingsWorkHours from "./SettingsWorkHours";
 import SettingsNotifications from "./SettingsNotifications";
 import SettingsPersonalData from "./SettingsPersonalData";
-import SettingsUpgrade from "./SettingsUpgrade";
+import SettingsUpgrade from "./UpgradePlan";
 import SettingsPrivacy from "./SettingsPrivacy";
 
 export default function Settings({ onBack, resetKey, isPremium, initialView, clearInitialView }) {
