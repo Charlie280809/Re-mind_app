@@ -272,36 +272,7 @@
 .rowDisabled .label,
 .rowDisabled .durationUnit,
 .rowDisabled .iconEdit {
-    opacity: 0.5;
-}
-
-.saveButton {
-    width: fit-content;
-    /* padding: var(--space-8) var(--space-24); */
-    padding: 4px 24px;
-    border-radius: var(--button-radius);
-    border: 2px solid var(--border-color-green);
-    color: var(--text-on-light);
-    cursor: pointer;
-    font-family: var(--text-button-label-font-family);
-    margin-left: auto;
-
-    padding: var(--button-padding-y) var(--button-padding-x);
-    font-size: var(--font-size-s);
-    font-family: var(--text-button-label-font-family);
-    font-weight: var(--font-weight-regular);
-    border: 2px solid var(--primary-700);
-    background-color: var(--brand-primary);
-
-
-    border: 2px solid var(--highlight-300);
-    background-color: var(--highlight-200);
-}
-
-.saveButton:hover {
-    background-color: var(--highlight-300);
-    border-color: var(--highlight-400);
-    transition: all 0.2s ease;
+    opacity: var(--opacity-disabled);
 }
 
 /* --- Notifications Page --- */
@@ -350,15 +321,53 @@
     color: var(--text-secondary, var(--text-primary));
 }
 
-.saveButton{
+.saveRow{
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: flex-end;
+    gap: var(--space-12);
+
     position: absolute;
     right: var(--layout-container-padding);
     bottom: var(--layout-container-padding);
 }
 
+.saveButton {
+    min-width: var(--button-min-width);
+    padding: var(--button-padding-y) var(--button-padding-x);
+    border-radius: var(--button-radius);
+    border: 2px solid var(--border-color-green);
+    color: var(--button-default-text);
+    cursor: pointer;
+    font-family: var(--button-default-font-family);
+    /* margin: 0 0 0 auto; */
+
+    font-size: var(--font-size-s);
+    font-family: var(--button-default-font-family);
+    font-weight: var(--font-weight-regular);
+
+    border: 2px solid var(--highlight-300);
+    background-color: var(--highlight-200);
+
+    /* position: absolute;
+    right: var(--layout-container-padding);
+    bottom: var(--layout-container-padding); */
+}
+
+.saveButton:hover {
+    background-color: var(--highlight-300);
+    border-color: var(--highlight-400);
+    transition: all 0.2s ease;
+}
+
 .saveMessage {
-    margin-left: auto;
-    color: var(--text-primary);
+    font-family: var(--text-body-small-font-family);
+    font-size: var(--text-body-small-font-size);
+    color: var(--text-secondary);
+    /* position: absolute;
+    right: var(--layout-container-padding);
+    bottom: var(--layout-container-padding);
+    padding: 0  0 0; */
 }
 
 /* --- Personal Data Page --- */
@@ -455,7 +464,7 @@
     border: 1px solid var(--accent-danger, #d79c9c);
     background-color: transparent;
     color: var(--text-primary);
-    font-family: var(--text-button-label-font-family);
+    font-family: var(--button-default-font-family);
     font-size: var(--font-size-s);
     font-weight: var(--font-weight-regular);
     cursor: pointer;
@@ -467,7 +476,7 @@
     bottom: var(--layout-container-padding);
 }
 
-@media (max-width: 720px) {
+/* @media (max-width: 720px) {
     .personalFieldRow {
         justify-content: flex-start;
         flex-wrap: wrap;
@@ -482,7 +491,7 @@
         position: static;
         margin-left: auto;
     }
-}
+} */
 
 /* --- Privacy Page --- */
 .privacyPage {
@@ -579,7 +588,7 @@
     border: 1px solid var(--accent-danger, #d79c9c);
     background-color: transparent;
     color: var(--text-primary);
-    font-family: var(--text-button-label-font-family);
+    font-family: var(--button-default-font-family);
     font-size: var(--font-size-s);
     cursor: pointer;
 }
@@ -591,7 +600,7 @@
     border: 2px solid var(--primary-700);
     background-color: var(--highlight-200);
     color: var(--text-primary);
-    font-family: var(--text-button-label-font-family);
+    font-family: var(--button-default-font-family);
     font-size: var(--font-size-s);
     cursor: pointer;
 }

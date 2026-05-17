@@ -72,14 +72,14 @@
 
   .sideNavIcon {
     color: var(--text-navigation-active-color);
-    width: 36px;
-    height: 36px;
+    width: var(--icon-size-36);
+    height: var(--icon-size-36);
   }
 }
 
 .sideNavIcon {
-  width: 32px;
-  height: 32px;
+  width: var(--icon-size-32);
+  height: var(--icon-size-32);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -106,7 +106,7 @@
   background-color: var(--brand-primary);
   color: var(--text-on-dark);
   border-radius: var(--button-radius);
-  font-family: var(--font-family-heading);
+  font-family: var(--button-default-font-family);
   font-size: var(--text-navigation-default-font-size);
   font-weight: var(--font-weight-semibold);
   line-height: var(--text-navigation-default-line-height);
@@ -118,8 +118,8 @@
 }
 
 .premiumButton svg {
-  width: 32px;
-  height: 32px;
+  width: var(--icon-size-32);
+  height: var(--icon-size-32);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -134,8 +134,8 @@
 }
 
 .premiumButton:hover svg {
-  width: 36px;
-  height: 36px;
+  width: var(--icon-size-36);
+  height: var(--icon-size-36);
 }
 
 .premiumButton:active{
@@ -143,11 +143,6 @@
   font-size: var(--text-navigation-active-font-size);
   line-height: var(--text-navigation-active-line-height);
   gap: var(--space-8);
-}
-
-.premiumButton:active svg {
-  width: 36px;
-  height: 36px;
 }
 
 .settingsLink:active svg {

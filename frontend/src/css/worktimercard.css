@@ -35,24 +35,64 @@
     font-weight: var(--text-heading-1-font-weight);
 }
 
+.btnStack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-12);
+    max-width: 280px;
+    width: 33%;
+}
+
 .btn {
     width: 100%;
-    min-width: fit-content;
-    min-height: fit-content;
+    min-width: var(--button-min-width);
+    min-height: var(--button-min-height);
     border-radius: var(--button-radius);
     padding: var(--button-padding-y) var(--button-padding-x);
-    font-size: var(--font-size-s);
-    font-family: var(--text-button-label-font-family);
-    font-weight: var(--text-button-label-font-weight);
-    border: 2px solid var(--primary-700);
-    background-color: var(--brand-primary);
-    color: var(--text-on-dark);
+    font-size: var(--button-default-font-size);
+    font-family: var(--button-default-font-family);
+    font-weight: var(--button-primary-font-weight);
+    border: 2px solid var(--button-primary-border);
+    background-color: var(--button-primary-bg);
+    color: var(--button-primary-text);
+}
+
+.btn:hover {
+    background-color: var(--button-primary-hover-bg);
+    border-color: var(--button-primary-hover-border);
+    box-shadow: var(--button-default-hover-shadow);
+    transition: var(--button-default-transition);
+}
+
+.breakbtn {
+    background-color: var(--button-highlight-bg);
+    border: 2px solid var(--button-highlight-border);
+    color: var(--button-highlight-text);
+}
+
+.breakbtn:hover {
+    background-color: var(--button-highlight-hover-bg);
+    border-color: var(--button-highlight-hover-border);
+    box-shadow: var(--button-default-hover-shadow);
+}
+
+.endbtn {
+    background-color: var(--background-200);
+    border: 2px solid transparent;
+    color: var(--text-on-light);
+}
+
+.endbtn:hover {
+    background-color: var(--background-300);
+    border-color: transparent;
+    box-shadow: var(--button-default-hover-shadow);
 }
 
 .muted {
     text-align: center;
     font-family: var(--text-body-small-font-family);
     font-size: var(--text-body-small-font-size);
+    font-weight: var(--text-body-small-font-weight);
     color: var(--text-secondary);
 }
 
@@ -64,24 +104,4 @@
     font-weight: var(--font-weight-bold);
     color: var(--text-primary);
     text-align: center;
-}
-
-.btnStack {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-12);
-    max-width: 280px;
-    width: 33%;
-}
-
-.breakbtn {
-    border: 2px solid var(--highlight-300);
-    background-color: var(--highlight-200);
-    color: var(--text-on-light);
-}
-
-.endbtn {
-    border: 2px solid transparent;
-    background-color: var(--background-300);
-    color: var(--text-on-light);
 }

@@ -89,7 +89,7 @@
     cursor: pointer;
     align-self: center;
     font-size: var(--font-size-s);
-    font-family: var(--text-button-label-font-family);
+    font-family: var(--button-default-font-family);
     color: var(--text-on-dark);
 }
 
@@ -101,7 +101,7 @@
 
 .loginSubmit:disabled {
     cursor: wait;
-    opacity: 0.75;
+    opacity: 0.8;
 }
 
 .loginBrandColumn {

@@ -165,7 +165,7 @@
         --text-placeholder: var(--border-600);
 
         --text-on-light: var(--text-primary-300);
-        --text-on-dark: var(--background-200);
+        --text-on-dark: var(--background-50);
 
         --text-success: var(--success-300);
         --text-warning: var(--warning-300);

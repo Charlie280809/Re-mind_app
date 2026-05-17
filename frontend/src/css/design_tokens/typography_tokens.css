@@ -1,16 +1,9 @@
 :root {
-
-    /* ================================= */
     /* FONT FAMILY */
-    /* ================================= */
-
     --font-family-heading: "Lora", serif;
     --font-family-body: "Nunito", sans-serif;
 
-    /* ================================= */
     /* FONT SIZES */
-    /* ================================= */
-
     --font-size-xxs: 14px;
     --font-size-xs: 16px;
     --font-size-s: 18px;
@@ -20,35 +13,23 @@
     --font-size-xl: 32px;
     --font-size-2xl: 36px;
 
-    /* ================================= */
     /* FONT WEIGHTS */
-    /* ================================= */
-
     --font-weight-regular: 400;
     --font-weight-semibold: 600;
     --font-weight-bold: 700;
     --font-weight-extrabold: 800;
 
-    /* ================================= */
     /* LINE HEIGHTS */
-    /* ================================= */
-
     --line-height-xs: 22px;
     --line-height-sm: 28px;
     --line-height-md: 36px;
     --line-height-lg: 42px;
     --line-height-xl: 46px;
 
-    /* ================================= */
     /* LETTER SPACING */
-    /* ================================= */
-
     --letter-spacing-default: 0px;
 
-    /* ================================= */
-    /* TEXT STYLES */
-    /* ================================= */
-
+    /* === TEXT STYLES === */
     /* Heading 1 */
     --text-heading-1-font-family: var(--font-family-heading);
     --text-heading-1-font-weight: var(--font-weight-bold);
@@ -76,20 +57,11 @@
     --text-body-regular-font-size: var(--font-size-s);
     --text-body-regular-line-height: var(--line-height-sm);
 
-    --text-body-bold-font-family: var(--font-family-body);
-    --text-body-bold-font-weight: var(--font-weight-bold);
-    --text-body-bold-font-size: var(--font-size-sm);
-    --text-body-bold-line-height: var(--line-height-sm);
-
     --text-body-small-font-family: var(--font-family-body);
     --text-body-small-font-weight: var(--font-weight-regular);
     --text-body-small-font-size: var(--font-size-xs);
-    --text-body-small-line-height: var(--line-height-xs);
 
-    /* ================================================= */
-    /* TEXT COMPONENT TOKENS */
-    /* ================================================= */
-
+    /* === TEXT COMPONENT TOKENS === */
     /* Navigation */
     --text-navigation-default-font-family: var(--font-family-body);
     --text-navigation-default-font-weight: var(--font-weight-semibold);
@@ -109,7 +81,6 @@
     --text-navigation-active-line-height: var(--line-height-sm);
     --text-navigation-active-color: var(--primary-600);
 
-
     /* Text link */
     --text-link-default-font-family: var(--font-family-body);
     --text-link-default-font-weight: var(--font-weight-regular);
@@ -120,13 +91,6 @@
 
     --text-link-hover-color: var(--primary-400);
     --text-link-active-color: var(--primary-500);
-
-    /* Button text */
-    --text-button-label-font-family: var(--font-family-heading);
-    --text-button-label-font-weight: var(--font-weight-semibold);
-    --text-button-label-font-size: var(--font-size-sm);
-    --text-button-label-line-height: var(--line-height-sm);
-    --text-button-label-color: var(--text-on-light);
 
     /* Input text */
     --text-input-value-font-family: var(--font-family-body);

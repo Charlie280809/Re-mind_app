@@ -54,43 +54,43 @@
 
 .checkInSkipButton,
 .checkInSubmitButton {
-    padding: var(--space-8) var(--space-32);
+    padding: var(--button-padding-y) var(--button-padding-x);
     border-radius: var(--button-radius);
-    font-family: var(--text-button-label-font-family);
-    font-size: var(--text-body-regular-font-size);
+    font-family: var(--button-default-font-family);
+    font-weight: var(--button-default-font-weight);
+    font-size: var(--button-default-font-size);
+    text-align: var(--button-default-text-align);
     cursor: pointer;
     transition: all 0.2s ease;
-    text-align: center;
 }
 
 .checkInSkipButton {
-    background-color: var(--highlight-50);
-    border: 2px solid var(--highlight-300);
-    color: var(--text-on-light);
+    background-color: var(--button-secondary-bg);
+    border: 2px solid var(--button-secondary-border);
+    color: var(--button-secondary-text);
 }
 
 .checkInSkipButton:hover:not(:disabled) {
-    border-color: var(--highlight-400);
-    background-color: var(--highlight-200);
-}
-
-.checkInSkipButton:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
+    background-color: var(--button-secondary-hover-bg);
+    border-color: var(--button-secondary-hover-border);
+    box-shadow: var(--button-default-hover-shadow);
 }
 
 .checkInSubmitButton {
-    border: 2px solid var(--primary-700);
-    background-color: var(--primary-300);
-    color: var(--text-on-dark);
+    background-color: var(--button-primary-bg);
+    border: 2px solid var(--button-primary-border);
+    color: var(--button-primary-text);
 }
 
 .checkInSubmitButton:hover:not(:disabled) {
-    background-color: var(--primary-400);
+    background-color: var(--button-primary-hover-bg);
+    border-color: var(--button-primary-hover-border);
+    box-shadow: var(--button-default-hover-shadow);
 }
 
+.checkInSkipButton:disabled,
 .checkInSubmitButton:disabled {
-    opacity: 0.6;
+    opacity: var(--opacity-disabled);
     cursor: not-allowed;
 }
 
@@ -167,22 +167,21 @@
 }
 
 .checkInSlider:disabled {
-    opacity: 0.6;
+    opacity: var(--opacity-disabled);
     cursor: not-allowed;
 }
 
 .checkInScaleLabels {
-    /* display: grid; */
-    /* grid-template-columns: repeat(5, 1fr); */
     width: 96%;
     margin: 0 auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
     text-align: center;
+    font-family: var(--text-body-regular-font-family);
     font-size: var(--font-size-xs);
-    color: var(--text-primary);
     font-weight: var(--font-weight-regular);
+    color: var(--text-primary);
 }
 
 .checkInError {

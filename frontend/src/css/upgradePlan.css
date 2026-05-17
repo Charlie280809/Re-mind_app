@@ -143,7 +143,7 @@
     color: var(--text-on-dark, #f2f2f0);
     border-radius: var(--button-radius);
     padding: var(--button-padding-y) var(--button-padding-x);
-    font-family: var(--text-button-label-font-family);
+    font-family: var(--button-default-font-family);
     font-size: var(--font-size-s);
     font-weight: var(--font-weight-semibold);
     cursor: pointer;

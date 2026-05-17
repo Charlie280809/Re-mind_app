@@ -47,10 +47,13 @@
 .reportNavButton,
 .reportWeekButton,
 .reportAgendaButton {
+    padding: var(--button-padding-y) var(--button-padding-x);
     border-radius: var(--button-radius);
-    border: 1.5px solid var(--border-color-default);
-    background: var(--background-50);
+    /* border: 2px solid var(--border-color-default); */
+    /* background: var(--background-50); */
     color: var(--text-primary);
+    padding: var(--button-padding-small-y) var(--button-padding-small-x);
+
 }
 
 .reportNavButton {
@@ -66,11 +69,12 @@
 
 .reportNavButton svg,
 .reportWeekButton svg {
-    width: 28px;
-    height: 28px;
+    width: var(--icon-size-28);
+    height: var(--icon-size-28);
 }
 
 .reportWeekButton {
+    /* padding: var(--button-padding-small-y) var(--button-padding-small-x); */
     border: 2px solid var(--primary-700);
     background-color: var(--brand-primary);
     color: var(--text-on-dark);
@@ -84,7 +88,7 @@
     align-items: center;
     justify-content: center;
     gap: var(--space-8);
-    padding: var(--space-4) var(--space-16);
+    /* padding: var(--space-4) var(--space-16); */
 }
 
 .reportMetricsRow {
@@ -260,9 +264,9 @@
 .reportAgendaButton {
     border-radius: 12px;
     padding: var(--space-8) var(--space-24);
-    font-family: var(--text-button-label-font-family);
-    font-size: var(--text-button-label-font-size);
-    line-height: var(--text-button-label-line-height);
+    font-family: var(--button-default-font-family);
+    font-size: var(--font-size-sm);
+    line-height: var(--button-default-line-height);
     background: var(--background-50);
 }
 

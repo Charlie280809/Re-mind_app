@@ -1,123 +1,132 @@
 :root {
+    /* === ICONS === */
+    --icon-size-12: 12px;
+    --icon-size-16: 16px;
+    --icon-size-24: 24px;
+    --icon-size-28: 28px;
+    --icon-size-32: 32px;
+    --icon-size-36: 36px;
 
-/* ================================================= */
-/* BUTTON BASE */
-/* ================================================= */
+    /* === BUTTONS === */
+    --button-radius: 10px;
+    --button-border-style: solid;
+    --button-border-width: 2px;
 
---button-radius: 10px;
---button-border-width: var(--border-width-sm);
---button-border-style: var(--border-style-solid);
---button-gap: var(--space-4);
---button-icon-size: var(--space-4);
---button-default-font-size: var(--font-size-s);
+    --button-min-width: fit-content;
+    --button-min-height: fit-content;
+    --button-padding-x: var(--space-20);
+    --button-padding-y: var(--space-8);
+    --button-padding-small-x: var(--space-12);
+    --button-padding-small-y: var(--space-4);
 
-/* ================================================= */
-/* BUTTON SHAPE */
-/* ================================================= */
+    --button-default-font-size: var(--font-size-s);
+    --button-default-font-family: var(--font-family-heading);
+    --button-default-font-weight: var(--font-weight-regular);
+    --button-default-line-height: var(--line-height-sm);
+    --button-default-text-align: center;
 
---button-shape-default-radius: 10px;
---button-shape-pill-radius: 50%;
---button-shape-min-width: var(--space-10);
+    --button-default-hover-shadow: 0px 4px 6px rgba(0, 0, 0, 0.12);
+    --button-default-transition: all 0.2s ease-in-out;
 
+    /* Primary Button */
+    --button-primary-bg: var(--primary-300);
+    --button-primary-border: var(--primary-700);
+    --button-primary-text: var(--text-on-dark);
+    --button-primary-font-weight: var(--font-weight-semibold);
 
-/* ================================================= */
-/* BUTTON VARIANTS */
-/* ================================================= */
+    --button-primary-hover-bg: var(--primary-400);
+    --button-primary-hover-border: var(--primary-700);
 
-/* Primary */
---button-primary-default-bg: var(--primary-300);
---button-primary-default-text: var(--text-on-dark);
---button-primary-default-border: var(--primary-700);
+    --button-primary-active-bg: var(--primary-300);
+    --button-primary-active-border: var(--primary-700);
 
---button-primary-hover-bg: var(--primary-200);
---button-primary-hover-border: var(--primary-400);
---button-primary-hover-text: var(--text-on-light);
+    /* Secondary Button */
+    --button-secondary-bg: var(--highlight-50);
+    --button-secondary-border: var(--highlight-300);
+    --button-secondary-text: var(--text-on-light);
 
---button-primary-active-bg: var(--primary-300);
---button-primary-active-border: var(--primary-700);
---button-primary-active-text: var(--text-on-light);
+    --button-secondary-hover-bg: var(--highlight-200);
+    --button-secondary-hover-border: var(--highlight-400);
 
---button-primary-disabled-bg: var(--background-200);
---button-primary-disabled-text: var(--text-disabled);
---button-primary-disabled-border: var(--border-200);
+    --button-secondary-active-bg: var(--highlight-500);
+    --button-secondary-active-border: var(--highlight-800);
 
-/* Neutral */
---button-neutral-default-bg: var(--background-card-50);
---button-neutral-default-text: var(--text-on-light);
---button-neutral-default-border: var(--background-400);
+    /* Highlight Button */
+    --button-highlight-bg: var(--highlight-200);
+    --button-highlight-border: var(--highlight-300);
+    --button-highlight-text: var(--text-on-light);
 
---button-neutral-hover-bg: var(--background-200);
---button-neutral-hover-border: var(--background-500);
+    --button-highlight-hover-bg: var(--highlight-300);
+    --button-highlight-hover-border: var(--highlight-500);
 
---button-neutral-active-bg: var(--background-400);
---button-neutral-active-border: var(--background-400);
+    --button-highlight-active-bg: var(--highlight-500);
+    --button-highlight-active-border: var(--highlight-800);
 
---button-neutral-disabled-bg: var(--background-200);
---button-neutral-disabled-text: var(--text-disabled);
---button-neutral-disabled-border: var(--border-200);
+    /* Neutral Button */
+    --button-neutral-default-bg: var(--background-card-50);
+    --button-neutral-default-border: var(--background-400);
+    --button-neutral-default-text: var(--text-on-light);
 
-/* Accent / Highlight */
---button-accent-default-bg: var(--highlight-50);
---button-accent-default-text: var(--text-on-light);
---button-accent-default-border: var(--highlight-300);
+    --button-neutral-hover-bg: var(--background-200);
+    --button-neutral-hover-border: var(--background-500);
 
---button-accent-hover-bg: var(--highlight-300);
---button-accent-hover-border: var(--highlight-600);
+    --button-neutral-active-bg: var(--background-400);
+    --button-neutral-active-border: var(--background-400);
 
---button-accent-active-bg: var(--highlight-500);
---button-accent-active-border: var(--highlight-800);
+    /* === SELECTION CONTROLS === */
+    /* Checkbox */
+    --checkbox-size: 28px;
+    --checkbox-radius: 6px;
+    --checkbox-icon-size: var(--icon-size-12);
+    --checkbox-icon-color: var(--text-on-dark);
 
---button-accent-disabled-bg: var(--background-200);
---button-accent-disabled-text: var(--text-disabled);
---button-accent-disabled-border: var(--border-200);
+    --checkbox-default-bg: transparent;
+    --checkbox-default-border: var(--primary-400);
 
-/* SELECTION CONTROLS */
-/* Checkbox */
---checkbox-size: 28px;
---checkbox-radius: 6px;
---checkbox-icon-size: 12px;
---checkbox-icon-color: var(--text-on-dark);
+    --checkbox-hover-bg: var(--primary-50);
+    --checkbox-hover-border: var(--border-state-hover);
 
---checkbox-default-bg: transparent;
---checkbox-default-border: var(--primary-400);
+    --checkbox-selected-bg: var(--primary-300);
+    --checkbox-selected-border: var(--primary-300);
 
---checkbox-hover-bg: var(--primary-50);
---checkbox-hover-border: var(--border-state-hover);
+    --checkbox-error-bg: var(--error-50);
+    --checkbox-error-border: var(--border-state-error);
 
---checkbox-selected-bg: var(--primary-300);
---checkbox-selected-border: var(--primary-300);
+    --checkbox-disabled-bg: var(--background-200);
+    --checkbox-disabled-border: var(--border-state-disabled);
 
---checkbox-error-bg: var(--error-50);
---checkbox-error-border: var(--border-state-error);
+    --checkbox-focus-ring-color: var(--primary-200);
+    --checkbox-focus-ring-width: 2px;
 
---checkbox-disabled-bg: var(--background-200);
---checkbox-disabled-border: var(--border-state-disabled);
+    /* Toggle */
+    --toggle-track-width: 50px;
+    --toggle-track-height: 28px;
+    --toggle-track-radius: 20px;
+    --toggle-thumb-size: 20px;
+    --toggle-thumb-radius: 50%;
+    --toggle-border-color: var(--primary-600);
 
---checkbox-focus-ring-color: var(--primary-200);
---checkbox-focus-ring-width: 2px;
+    --toggle-off-bg: var(--primary-50);
+    --toggle-off-thumb: var(--primary-300);
 
-/* Toggle */
---toggle-track-width: 50px;
---toggle-track-height: 28px;
---toggle-track-radius: 20px;
---toggle-thumb-size: 20px;
---toggle-thumb-radius: 50%;
---toggle-border-color: var(--primary-600);
+    --toggle-hover-bg: var(--primary-200);
 
---toggle-off-bg: var(--primary-50);
---toggle-off-thumb: var(--primary-300);
+    --toggle-on-bg: var(--primary-300);
+    --toggle-on-thumb: var(--primary-50);
 
---toggle-hover-bg: var(--primary-200);
+    --toggle-disabled-bg: var(--background-200);
+    --toggle-disabled-border: var(--border-state-disabled);
 
---toggle-on-bg: var(--primary-300);
---toggle-on-thumb: var(--primary-50);
+    --toggle-focus-ring-color: var(--primary-200);
+    --toggle-focus-ring-width: 2px;
 
---toggle-disabled-bg: var(--background-200);
---toggle-disabled-border: var(--border-state-disabled);
+    --toggle-animation-duration: 150ms;
+    --toggle-animation-easing: ease-in-out;
 
---toggle-focus-ring-color: var(--primary-200);
---toggle-focus-ring-width: 2px;
+    /* === POP UP CARDS === */
+    --popupcard-border-radius: 20px;
+    --popupcard-padding: var(--space-24);
 
---toggle-animation-duration: 150ms;
---toggle-animation-easing: ease-in-out;
+    /* === DISABLED STATES === */
+    --opacity-disabled: 0.6;
 }

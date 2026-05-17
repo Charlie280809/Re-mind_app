@@ -130,7 +130,7 @@
     font-size: var(--font-size-s);
     /* font-weight: 700; */
     font-family: var(--font-family-body);
-    font-weight: var(--text-body-bold-font-weight);
+    font-weight: var(--font-weight-bold);
 }
 
 .pauseSummaryDots {
@@ -191,9 +191,9 @@
 
 .pause-tab {
     padding: var(--space-8) var(--space-40);
-    font-family: var(--text-button-label-font-family);
-    font-size: var(--text-button-label-font-size);
-    line-height: var(--text-button-label-line-height);
+    font-family: var(--button-default-font-family);
+    font-size: var(--font-size-sm);
+    line-height: var(--button-default-line-height);
     cursor: pointer;
     border: 2px solid var(--background-500);
     border-radius: 10px;
@@ -379,7 +379,7 @@
     cursor: pointer;
     padding: var(--space-4) var(--space-24);
     font-size: var(--font-size-s);
-    font-family: var(--text-button-label-font-family);
+    font-family: var(--button-default-font-family);
     background-color: var(--error-100);
     color: var(--text-on-light);
     transition: all 0.2s ease-in-out;
@@ -423,9 +423,9 @@
     padding: var(--space-12) var(--space-24);
     background: var(--highlight-200);
     color: var(--text-primary);
-    font-family: var(--text-button-label-font-family);
-    font-size: var(--text-button-label-font-size);
-    line-height: var(--text-button-label-line-height);
+    font-family: var(--button-default-font-family);
+    font-size: var(--font-size-sm);
+    line-height: var(--button-default-line-height);
     cursor: pointer;
     align-self: flex-start;
 }
@@ -450,10 +450,10 @@
     align-self: center;
     border-radius: var(--button-radius);
     padding: var(--space-4) var(--space-24);
-    font-family: var(--text-button-label-font-family);
+    font-family: var(--button-default-font-family);
     font-size: var(--font-size-s);
-    font-weight: var(--text-button-label-font-weight);
-    line-height: var(--text-button-label-line-height);
+    font-weight: var(--button-default-font-weight);
+    line-height: var(--button-default-line-height);
     cursor: pointer;
     border: 2px solid var(--highlight-300);
     background-color: var(--highlight-200);

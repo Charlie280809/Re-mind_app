@@ -24,7 +24,4 @@
 
     --layout-input-padding-x: var(--space-16);
     --layout-input-padding-y: var(--space-12);
-
-    --button-padding-x: var(--space-20);
-    --button-padding-y: var(--space-8);
 }
