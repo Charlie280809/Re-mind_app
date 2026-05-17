@@ -1,28 +1,11 @@
 import "../css/settings.css";
 import { LuArrowLeft, LuPencil } from "react-icons/lu";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
+import { buildWorkHoursPayload, createDefaultWorkdaySelection, draftFromWorkHoursRow, normalizeDuration, parseIntegerValue } from "../lib/workHours";
 
 export default function SettingsWorkHours({ onBack, userId }) {
-    const weekdayOptions = [
-        { key: "mon", label: "Ma" },
-        { key: "tue", label: "Di" },
-        { key: "wed", label: "Wo" },
-        { key: "thu", label: "Do" },
-        { key: "fri", label: "Vr" },
-        { key: "sat", label: "Za" },
-        { key: "sun", label: "Zo" },
-    ];
-
-    const [selectedWorkdays, setSelectedWorkdays] = useState({
-        mon: true,
-        tue: true,
-        wed: true,
-        thu: true,
-        fri: true,
-        sat: false,
-        sun: false,
-    });
+    const [selectedWorkdays, setSelectedWorkdays] = useState(() => createDefaultWorkdaySelection());
 
     const [breakMinutes, setBreakMinutes] = useState(50);
     const [startTime, setStartTime] = useState("09:00");
@@ -34,6 +17,60 @@ export default function SettingsWorkHours({ onBack, userId }) {
     const [lunchPauseEnabled, setLunchPauseEnabled] = useState(false);
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState("");
+
+    useEffect(() => {
+        let isCancelled = false;
+
+        const loadWorkHours = async () => {
+            if (!supabase?.auth?.getUser) {
+                return;
+            }
+
+            const { data, error } = await supabase.auth.getUser();
+
+            if (error || !data?.user?.id || isCancelled) {
+                return;
+            }
+
+            const { data: workHoursRow, error: workHoursError } = await supabase
+                .from("work_hours")
+                .select("*")
+                .eq("user_id", data.user.id)
+                .maybeSingle();
+
+            if (workHoursError || isCancelled || !workHoursRow) {
+                return;
+            }
+
+            const draft = draftFromWorkHoursRow(workHoursRow);
+
+            setSelectedWorkdays(draft.selectedWorkdays);
+            setBreakHours(draft.breakHours);
+            setBreakMinutes(draft.breakMinutes);
+            setStartTime(draft.startTime);
+            setEndTime(draft.endTime);
+            setAutoStartWorkTimer(draft.autoStartWorkTimer);
+            setLunchPauseEnabled(draft.lunchPauseEnabled);
+            setLunchStart(draft.lunchStart);
+            setLunchEnd(draft.lunchEnd);
+        };
+
+        loadWorkHours();
+
+        return () => {
+            isCancelled = true;
+        };
+    }, []);
+
+    const weekdayOptions = [
+        { key: "mon", label: "Ma" },
+        { key: "tue", label: "Di" },
+        { key: "wed", label: "Wo" },
+        { key: "thu", label: "Do" },
+        { key: "fri", label: "Vr" },
+        { key: "sat", label: "Za" },
+        { key: "sun", label: "Zo" },
+    ];
 
     const handleWorkdayToggle = (dayKey) => {
         setSelectedWorkdays((prev) => ({
@@ -218,19 +255,17 @@ export default function SettingsWorkHours({ onBack, userId }) {
             return;
         }
 
-        const payload = {
-            user_id: uid,
-            workdays: Object.keys(selectedWorkdays).filter((k) => selectedWorkdays[k]),
-            start_time: startTime,
-            end_time: endTime,
-            break_frequency_hours: normalizedDuration.hours,
-            break_frequency_minutes_part: normalizedDuration.minutes,
-            break_frequency_minutes: normalizedDuration.totalMinutes,
-            auto_start_work_timer: autoStartWorkTimer,
-            ...(lunchStart && lunchEnd
-                ? { lunch_start: lunchStart, lunch_end: lunchEnd }
-                : { lunch_start: null, lunch_end: null }),
-        };
+        const payload = buildWorkHoursPayload(uid, {
+            selectedWorkdays,
+            breakHours: normalizedDuration.hours,
+            breakMinutes: normalizedDuration.minutes,
+            startTime,
+            endTime,
+            autoStartWorkTimer,
+            lunchPauseEnabled,
+            lunchStart,
+            lunchEnd,
+        });
 
         // For now prepare payload and attempt to insert/upsert into Supabase if available.
         try {
@@ -257,29 +292,6 @@ export default function SettingsWorkHours({ onBack, userId }) {
         }
 
         setSaving(false);
-    }
-
-    function parseIntegerValue(value) {
-        if (value === "") {
-            return 0;
-        }
-
-        const parsedValue = Number.parseInt(value, 10);
-        return Number.isNaN(parsedValue) || parsedValue < 0 ? 0 : parsedValue;
-    }
-
-    function normalizeDuration(hoursValue, minutesValue) {
-        const safeHours = Math.max(0, parseIntegerValue(hoursValue));
-        const safeMinutes = Math.max(0, parseIntegerValue(minutesValue));
-        const carriedHours = Math.floor(safeMinutes / 60);
-        const normalizedMinutes = safeMinutes % 60;
-        const normalizedHours = safeHours + carriedHours;
-
-        return {
-            hours: normalizedHours,
-            minutes: normalizedMinutes,
-            totalMinutes: normalizedHours * 60 + normalizedMinutes,
-        };
     }
 
     function handleBreakMinutesChange(value) {

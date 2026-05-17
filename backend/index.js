@@ -123,6 +123,92 @@ app.post("/checkin", async (req, res) => {
   res.json({ needPause });
 });
 
+app.post("/signup/bootstrap", async (req, res) => {
+  if (!supabase) {
+    return res.status(500).json({
+      error: "Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in backend/.env.",
+    });
+  }
+
+  const token = getBearerToken(req);
+
+  if (!token) {
+    return res.status(401).json({
+      error: "Missing Bearer token.",
+    });
+  }
+
+  const { data: userData, error: userError } = await supabase.auth.getUser(token);
+
+  if (userError || !userData?.user) {
+    return res.status(401).json({
+      error: "Invalid or expired session.",
+    });
+  }
+
+  const requestedUserId = req.body?.userId || null;
+
+  if (requestedUserId && requestedUserId !== userData.user.id) {
+    return res.status(403).json({
+      error: "The supplied user id does not match the authenticated user.",
+    });
+  }
+
+  const profileSetup = req.body?.profileSetup || {};
+  const workHoursSetup = req.body?.workHoursSetup || null;
+
+  const { error: profileError } = await supabase.from("profiles").upsert(
+    {
+      user_id: userData.user.id,
+      email: userData.user.email || null,
+      username: profileSetup.username || userData.user.user_metadata?.username || userData.user.email?.split("@")[0] || "Gebruiker",
+      bedrijfsnaam: profileSetup.bedrijfsnaam || userData.user.user_metadata?.bedrijfsnaam || null,
+      is_premium: false,
+    },
+    { onConflict: "user_id" }
+  );
+
+  if (profileError) {
+    return res.status(500).json({
+      error: "Failed to save profile for the new user.",
+      details: profileError.message,
+    });
+  }
+
+  if (workHoursSetup) {
+    const { error: workHoursError } = await supabase.from("work_hours").upsert(
+      {
+        user_id: userData.user.id,
+        workdays: workHoursSetup.workdays || [],
+        start_time: workHoursSetup.start_time || null,
+        end_time: workHoursSetup.end_time || null,
+        break_frequency_hours: workHoursSetup.break_frequency_hours ?? 0,
+        break_frequency_minutes_part: workHoursSetup.break_frequency_minutes_part ?? 0,
+        break_frequency_minutes: workHoursSetup.break_frequency_minutes ?? 0,
+        auto_start_work_timer: workHoursSetup.auto_start_work_timer ?? true,
+        lunch_start: workHoursSetup.lunch_start || null,
+        lunch_end: workHoursSetup.lunch_end || null,
+      },
+      { onConflict: "user_id" }
+    );
+
+    if (workHoursError) {
+      return res.status(500).json({
+        error: "Failed to save work hours for the new user.",
+        details: workHoursError.message,
+      });
+    }
+  }
+
+  return res.json({
+    ok: true,
+    user: {
+      id: userData.user.id,
+      email: userData.user.email,
+    },
+  });
+});
+
 app.get("/profile/me", async (req, res) => {
   if (!supabase) {
     return res.status(500).json({
@@ -159,7 +245,73 @@ app.get("/profile/me", async (req, res) => {
     });
   }
 
-  if (!profile) {
+  let profileRecord = profile;
+
+  if (!profileRecord) {
+    const onboarding = userData.user.user_metadata?.onboarding || {};
+    const username = onboarding.username || userData.user.user_metadata?.username || userData.user.email?.split("@")[0] || "Gebruiker";
+    const bedrijfsnaam = onboarding.bedrijfsnaam || userData.user.user_metadata?.bedrijfsnaam || null;
+
+    const { error: insertError } = await supabase.from("profiles").upsert(
+      {
+        user_id: userData.user.id,
+        email: userData.user.email || null,
+        username,
+        bedrijfsnaam,
+        is_premium: false,
+      },
+      { onConflict: "user_id" }
+    );
+
+    if (insertError) {
+      return res.status(500).json({
+        error: "Failed to create profile for the signed-in user.",
+        details: insertError.message,
+      });
+    }
+
+    if (onboarding.work_hours) {
+      const { error: workHoursError } = await supabase.from("work_hours").upsert(
+        {
+          user_id: userData.user.id,
+          workdays: onboarding.work_hours.workdays || [],
+          start_time: onboarding.work_hours.start_time || null,
+          end_time: onboarding.work_hours.end_time || null,
+          break_frequency_hours: onboarding.work_hours.break_frequency_hours ?? 0,
+          break_frequency_minutes_part: onboarding.work_hours.break_frequency_minutes_part ?? 0,
+          break_frequency_minutes: onboarding.work_hours.break_frequency_minutes ?? 0,
+          auto_start_work_timer: onboarding.work_hours.auto_start_work_timer ?? true,
+          lunch_start: onboarding.work_hours.lunch_start || null,
+          lunch_end: onboarding.work_hours.lunch_end || null,
+        },
+        { onConflict: "user_id" }
+      );
+
+      if (workHoursError) {
+        return res.status(500).json({
+          error: "Failed to create work hours for the signed-in user.",
+          details: workHoursError.message,
+        });
+      }
+    }
+
+    const { data: refreshedProfile, error: refreshError } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("user_id", userData.user.id)
+      .maybeSingle();
+
+    if (refreshError) {
+      return res.status(500).json({
+        error: "Failed to reload profile from Supabase.",
+        details: refreshError.message,
+      });
+    }
+
+    profileRecord = refreshedProfile;
+  }
+
+  if (!profileRecord) {
     return res.status(404).json({
       error: "No profile found for the signed-in user.",
     });
@@ -170,7 +322,7 @@ app.get("/profile/me", async (req, res) => {
       id: userData.user.id,
       email: userData.user.email,
     },
-    profile,
+    profile: profileRecord,
   });
 });
 
