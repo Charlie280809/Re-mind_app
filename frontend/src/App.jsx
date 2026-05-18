@@ -197,7 +197,7 @@ export default function App() {
         const userId = session.user.id;
         const { data, error } = await supabase
           .from("favorite_pauses")
-          .select("pauze_type")
+          .select("pause_type")
           .eq("user_id", userId);
 
         if (error) {
@@ -207,7 +207,7 @@ export default function App() {
 
         if (isCancelled) return;
 
-        const set = new Set((data || []).map((r) => r.pauze_type));
+        const set = new Set((data || []).map((r) => r.pause_type));
         setPauseFavorites(set);
       } catch (err) {
         console.error("Error loading favorites:", err);
@@ -244,10 +244,10 @@ export default function App() {
         const userId = session.user.id;
 
         if (!previouslyHad) {
-          const { error } = await supabase.from("favorite_pauses").insert([{ user_id: userId, pauze_type: id }]);
+          const { error } = await supabase.from("favorite_pauses").insert([{ user_id: userId, pause_type: id }]);
           if (error) throw error;
         } else {
-          const { error } = await supabase.from("favorite_pauses").delete().match({ user_id: userId, pauze_type: id });
+          const { error } = await supabase.from("favorite_pauses").delete().match({ user_id: userId, pause_type: id });
           if (error) throw error;
         }
       }
