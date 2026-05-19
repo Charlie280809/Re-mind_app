@@ -2,18 +2,87 @@ import "../css/settings.css";
 import { LuArrowLeft, LuPencil } from "react-icons/lu";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
-import { buildWorkHoursPayload, createDefaultWorkdaySelection, draftFromWorkHoursRow, normalizeDuration, parseIntegerValue } from "../lib/workHours";
+import { createDefaultWorkdaySelection, normalizeDuration, parseIntegerValue } from "../lib/workHours";
+
+function createDefaultSettingsDraft() {
+    return {
+        selectedWorkdays: createDefaultWorkdaySelection(),
+        checkinHours: 0,
+        checkinMinutes: 50,
+        startTime: "09:00",
+        endTime: "17:00",
+        lunchEnabled: false,
+        lunchStart: "12:00",
+        lunchEnd: "13:00",
+    };
+}
+
+function draftFromSettingsRow(row) {
+    if (!row) {
+        return createDefaultSettingsDraft();
+    }
+
+    const selectedWorkdays = createDefaultWorkdaySelection();
+    const workdayMap = {
+        mon: row.mon_isworkday,
+        tue: row.tue_isworkday,
+        wed: row.wed_isworkday,
+        thu: row.thu_isworkday,
+        fri: row.fri_isworkday,
+        sat: row.sat_isworkday,
+        sun: row.sun_isworkday,
+    };
+
+    Object.entries(workdayMap).forEach(([dayKey, isWorkday]) => {
+        if (typeof isWorkday === "boolean") {
+            selectedWorkdays[dayKey] = isWorkday;
+        }
+    });
+
+    const totalMinutes = Number(row.checkin_frequentie);
+    const hasTotalMinutes = Number.isFinite(totalMinutes) && totalMinutes >= 0;
+
+    return {
+        selectedWorkdays,
+        checkinHours: hasTotalMinutes ? Math.floor(totalMinutes / 60) : 0,
+        checkinMinutes: hasTotalMinutes ? totalMinutes % 60 : 50,
+        startTime: row.werk_startuur || "09:00",
+        endTime: row.werk_einduur || "17:00",
+        lunchEnabled: Boolean(row.middag_startuur || row.middag_einduur),
+        lunchStart: row.middag_startuur || "12:00",
+        lunchEnd: row.middag_einduur || "13:00",
+    };
+}
+
+function buildSettingsPayload(userId, draft) {
+    const normalizedDuration = normalizeDuration(draft.checkinHours, draft.checkinMinutes);
+
+    return {
+        user_id: userId,
+        checkin_frequentie: normalizedDuration.totalMinutes,
+        werk_startuur: draft.startTime,
+        werk_einduur: draft.endTime,
+        middag_startuur: draft.lunchEnabled ? draft.lunchStart : null,
+        middag_einduur: draft.lunchEnabled ? draft.lunchEnd : null,
+        mon_isworkday: Boolean(draft.selectedWorkdays.mon),
+        tue_isworkday: Boolean(draft.selectedWorkdays.tue),
+        wed_isworkday: Boolean(draft.selectedWorkdays.wed),
+        thu_isworkday: Boolean(draft.selectedWorkdays.thu),
+        fri_isworkday: Boolean(draft.selectedWorkdays.fri),
+        sat_isworkday: Boolean(draft.selectedWorkdays.sat),
+        sun_isworkday: Boolean(draft.selectedWorkdays.sun),
+    };
+}
 
 export default function SettingsWorkHours({ onBack, userId }) {
     const [selectedWorkdays, setSelectedWorkdays] = useState(() => createDefaultWorkdaySelection());
 
-    const [breakMinutes, setBreakMinutes] = useState(50);
+    const [checkinMinutes, setCheckinMinutes] = useState(50);
     const [startTime, setStartTime] = useState("09:00");
     const [endTime, setEndTime] = useState("17:00");
-    const [breakHours, setBreakHours] = useState(0);
+    const [checkinHours, setCheckinHours] = useState(0);
     const [lunchStart, setLunchStart] = useState("12:00");
     const [lunchEnd, setLunchEnd] = useState("13:00");
-    const [autoStartWorkTimer, setAutoStartWorkTimer] = useState(true);
     const [lunchPauseEnabled, setLunchPauseEnabled] = useState(false);
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState("");
@@ -33,7 +102,7 @@ export default function SettingsWorkHours({ onBack, userId }) {
             }
 
             const { data: workHoursRow, error: workHoursError } = await supabase
-                .from("work_hours")
+                .from("settings")
                 .select("*")
                 .eq("user_id", data.user.id)
                 .maybeSingle();
@@ -42,14 +111,13 @@ export default function SettingsWorkHours({ onBack, userId }) {
                 return;
             }
 
-            const draft = draftFromWorkHoursRow(workHoursRow);
+            const draft = draftFromSettingsRow(workHoursRow);
 
             setSelectedWorkdays(draft.selectedWorkdays);
-            setBreakHours(draft.breakHours);
-            setBreakMinutes(draft.breakMinutes);
+            setCheckinHours(draft.checkinHours);
+            setCheckinMinutes(draft.checkinMinutes);
             setStartTime(draft.startTime);
             setEndTime(draft.endTime);
-            setAutoStartWorkTimer(draft.autoStartWorkTimer);
             setLunchPauseEnabled(draft.lunchPauseEnabled);
             setLunchStart(draft.lunchStart);
             setLunchEnd(draft.lunchEnd);
@@ -98,8 +166,8 @@ export default function SettingsWorkHours({ onBack, userId }) {
                             type="number"
                             min={0}
                             step={1}
-                            value={breakHours}
-                            onChange={(e) => setBreakHours(parseIntegerValue(e.target.value))}
+                            value={checkinHours}
+                            onChange={(e) => setCheckinHours(parseIntegerValue(e.target.value))}
                         />
                         <span className="durationUnit">uur</span>
                         <input
@@ -107,8 +175,8 @@ export default function SettingsWorkHours({ onBack, userId }) {
                             type="number"
                             min={0}
                             step={1}
-                            value={breakMinutes}
-                            onChange={(e) => handleBreakMinutesChange(e.target.value)}
+                            value={checkinMinutes}
+                            onChange={(e) => handleCheckinMinutesChange(e.target.value)}
                         />
                         <span className="durationUnit">min</span>
                         <LuPencil className="iconEdit" />
@@ -159,20 +227,6 @@ export default function SettingsWorkHours({ onBack, userId }) {
                             onChange={(e) => setEndTime(e.target.value)}
                         />
                         <LuPencil className="iconEdit" />
-                    </div>
-                </div>
-
-                <div className="row toggleRow">
-                    <div className="label">Werktimer automatisch starten op startuur:</div>
-                    <div className="value">
-                        <button
-                            className="toggle"
-                            type="button"
-                            aria-pressed={autoStartWorkTimer}
-                            onClick={() => setAutoStartWorkTimer((currentValue) => !currentValue)}
-                        >
-                            <span className="knob" />
-                        </button>
                     </div>
                 </div>
 
@@ -246,7 +300,7 @@ export default function SettingsWorkHours({ onBack, userId }) {
             }
         }
 
-        const normalizedDuration = normalizeDuration(breakHours, breakMinutes);
+        const normalizedDuration = normalizeDuration(checkinHours, checkinMinutes);
 
         // validation: require a positive duration and valid times
         if (normalizedDuration.totalMinutes <= 0) {
@@ -255,34 +309,27 @@ export default function SettingsWorkHours({ onBack, userId }) {
             return;
         }
 
-        const payload = buildWorkHoursPayload(uid, {
+        const payload = buildSettingsPayload(uid, {
             selectedWorkdays,
-            breakHours: normalizedDuration.hours,
-            breakMinutes: normalizedDuration.minutes,
+            checkinHours: normalizedDuration.hours,
+            checkinMinutes: normalizedDuration.minutes,
             startTime,
             endTime,
-            autoStartWorkTimer,
             lunchPauseEnabled,
             lunchStart,
             lunchEnd,
         });
 
-        // For now prepare payload and attempt to insert/upsert into Supabase if available.
         try {
             if (supabase && uid) {
-                // try upsert into `work_hours` table (table must exist server-side)
-                const { data, error } = await supabase.from("work_hours").upsert(payload, { onConflict: "user_id" });
+                const { error } = await supabase.from("settings").upsert(payload, { onConflict: "user_id" });
                 if (error) {
                     console.error("Supabase save error:", error);
-                    setMessage("Opslaan niet gelukt (bewaar lokaal).",);
+                    setMessage("Opslaan niet gelukt.");
                 } else {
                     setMessage("Instellingen opgeslagen.");
                 }
             } else {
-                // Not connected or no user id: just log the payload for later use
-                // In a real app this payload should be sent to the backend with the authenticated user's id
-                // or to the Supabase `work_hours` table.
-                // eslint-disable-next-line no-console
                 console.log("Prepared work hours payload:", payload);
                 setMessage("Instellingen klaargemaakt (niet geüpload).");
             }
@@ -294,12 +341,12 @@ export default function SettingsWorkHours({ onBack, userId }) {
         setSaving(false);
     }
 
-    function handleBreakMinutesChange(value) {
+    function handleCheckinMinutesChange(value) {
         const safeMinutes = parseIntegerValue(value);
         const carriedHours = Math.floor(safeMinutes / 60);
         const normalizedMinutes = safeMinutes % 60;
 
-        setBreakHours((currentHours) => currentHours + carriedHours);
-        setBreakMinutes(normalizedMinutes);
+        setCheckinHours((currentHours) => currentHours + carriedHours);
+        setCheckinMinutes(normalizedMinutes);
     }
 }

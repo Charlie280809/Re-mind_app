@@ -1,33 +1,98 @@
 import "../css/settings.css";
 import { LuArrowLeft } from "react-icons/lu";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "../lib/supabaseClient";
 
 export default function SettingsNotifications({ onBack }) {
     const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-    const [checkInEnabled, setCheckInEnabled] = useState(false);
-    const [suggestFavoritesEnabled, setSuggestFavoritesEnabled] = useState(true);
+    const [checkInEnabled, setCheckInEnabled] = useState(true);
+    const [suggestFavoritesEnabled, setSuggestFavoritesEnabled] = useState(false);
     const [endOfDayNoteEnabled, setEndOfDayNoteEnabled] = useState(true);
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState("");
+
+    useEffect(() => {
+        let isCancelled = false;
+
+        const loadNotificationSettings = async () => {
+            if (!supabase?.auth?.getUser) {
+                return;
+            }
+
+            const { data, error } = await supabase.auth.getUser();
+
+            if (error || !data?.user?.id || isCancelled) {
+                return;
+            }
+
+            const { data: settingsRow, error: settingsError } = await supabase
+                .from("settings")
+                .select("checkin_notifications_on, werktimer_autostart, favorite_pauses_suggest_on, afsluitnotitie_popup_on")
+                .eq("user_id", data.user.id)
+                .maybeSingle();
+
+            if (settingsError || isCancelled || !settingsRow) {
+                return;
+            }
+
+            if (typeof settingsRow.checkin_notifications_on === "boolean") {
+                setNotificationsEnabled(settingsRow.checkin_notifications_on);
+            }
+            if (typeof settingsRow.werktimer_autostart === "boolean") {
+                setCheckInEnabled(settingsRow.werktimer_autostart);
+            }
+            if (typeof settingsRow.favorite_pauses_suggest_on === "boolean") {
+                setSuggestFavoritesEnabled(settingsRow.favorite_pauses_suggest_on);
+            }
+            if (typeof settingsRow.afsluitnotitie_popup_on === "boolean") {
+                setEndOfDayNoteEnabled(settingsRow.afsluitnotitie_popup_on);
+            }
+        };
+
+        loadNotificationSettings();
+
+        return () => {
+            isCancelled = true;
+        };
+    }, []);
 
     async function handleSave() {
         setSaving(true);
         setMessage("");
 
-        // For now keep this local; integration can be added later if desired.
         try {
+            let uid = null;
+
+            if (supabase?.auth?.getUser) {
+                const { data, error } = await supabase.auth.getUser();
+                if (!error && data?.user?.id) {
+                    uid = data.user.id;
+                }
+            }
+
+            if (!uid) {
+                setMessage("Geen gebruiker gevonden.");
+                setSaving(false);
+                return;
+            }
+
             const payload = {
-                notificationsEnabled,
-                checkInEnabled,
-                suggestFavoritesEnabled,
-                endOfDayNoteEnabled,
+                user_id: uid,
+                checkin_notifications_on: notificationsEnabled,
+                werktimer_autostart: checkInEnabled,
+                favorite_pauses_suggest_on: suggestFavoritesEnabled,
+                afsluitnotitie_popup_on: endOfDayNoteEnabled,
             };
 
-            // eslint-disable-next-line no-console
-            console.log("Prepared notification preferences:", payload);
-            setMessage("Instellingen opgeslagen.");
+            const { error } = await supabase.from("settings").upsert(payload, { onConflict: "user_id" });
+
+            if (error) {
+                console.error("Supabase save error:", error);
+                setMessage("Opslaan niet gelukt.");
+            } else {
+                setMessage("Instellingen opgeslagen.");
+            }
         } catch (e) {
-            // eslint-disable-next-line no-console
             console.error(e);
             setMessage("Fout bij opslaan.");
         }
@@ -64,8 +129,8 @@ export default function SettingsNotifications({ onBack }) {
 
                 <div className="row notificationRow">
                     <div className="label">
-                        <div className="notificationTitle">Check-in meldingen inschakelen</div>
-                        <div className="notificationDescription">Ontvang meldingen die doorheen de dag naar je stress en energie vragen.</div>
+                        <div className="notificationTitle">Werktimer automatisch starten</div>
+                        <div className="notificationDescription">Start de werktimer automatisch wanneer je werkdag begint.</div>
                     </div>
                     <div className="value">
                         <button
