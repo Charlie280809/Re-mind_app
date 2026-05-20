@@ -18,7 +18,7 @@ export default function LoginPage({ onLogin, onNavigateToSignup, isSubmitting, e
           <h1 className="loginTitle">Log in</h1>
 
           <form className="loginForm" onSubmit={handleSubmit}>
-            <label className="loginField">
+            <label className="inputField">
               <span>E-mail</span>
               <input
                 type="email"
@@ -31,7 +31,7 @@ export default function LoginPage({ onLogin, onNavigateToSignup, isSubmitting, e
               />
             </label>
 
-            <label className="loginField">
+            <label className="inputField">
               <span>Wachtwoord</span>
               <input
                 type="password"
@@ -44,8 +44,8 @@ export default function LoginPage({ onLogin, onNavigateToSignup, isSubmitting, e
               />
             </label>
 
-            {error ? <p className="loginError" role="alert">{error}</p> : null}
-            {!isConfigured ? <p className="loginError" role="alert">Supabase is nog niet geconfigureerd.</p> : null}
+            {error ? <p className="errorMessage" role="alert">{error}</p> : null}
+            {!isConfigured ? <p className="errorMessage" role="alert">Supabase is nog niet geconfigureerd.</p> : null}
 
             <button className="loginSubmit" type="submit" disabled={isSubmitting || !isConfigured}>
               {isSubmitting ? "Bezig..." : "Log in"}
@@ -55,7 +55,7 @@ export default function LoginPage({ onLogin, onNavigateToSignup, isSubmitting, e
 
         <div className="loginBrandColumn">
           <img className="loginBrandLogo" src={logo} alt="" />
-          <p className="loginBrandText">
+          <p className="subtitle">
             Nog geen account? <button type="button" onClick={onNavigateToSignup}>Maak account aan.</button>
           </p>
         </div>

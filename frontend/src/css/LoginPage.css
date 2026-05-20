@@ -9,7 +9,7 @@
     align-items: center;
     justify-content: center;
     padding: var(--layout-container-padding) var(--space-64);
-    background: var(--surface-background);
+    background-color: var(--surface-background);
     color: var(--text-primary);
 }
 
@@ -38,10 +38,10 @@
 .loginForm {
     display: flex;
     flex-direction: column;
-    gap: var(--space-24);
+    gap: var(--space-20);
 }
 
-.loginField {
+.inputField {
     display: flex;
     flex-direction: column;
     gap: var(--space-8);
@@ -50,29 +50,30 @@
     font-weight: var(--font-weight-bold);
 }
 
-.loginField input {
-    border: 1px solid var(--border-300);
-    border-radius: 10px;
+.inputField input {
+    width: 420px;
+    border: 1px solid var(--input-border-color);
+    border-radius: var(--input-border-radius);
     background-color: var(--background-100);
-    color: var(--text-primary);
-    padding: var(--space-12);
+    padding: var(--input-padding);
     font-family: var(--font-family-body);
     font-size: var(--font-size-xs);
-    outline: none;
     font-weight: var(--font-weight-regular);
+    color: var(--text-primary);
+    outline: var(--input-outline);
 }
 
-.loginField input::placeholder {
+.inputField input::placeholder {
     color: var(--text-placeholder);
-    font-size: var(--font-size-xs);
 }
 
-.loginField input:focus {
+.inputField input:focus {
     border-color: var(--border-green-300);
     box-shadow: 0 0 0 3px var(--border-green-200);
+    transition: var(--input-transition);
 }
 
-.loginError {
+.errorMessage {
     margin: 0;
     font-family: var(--font-family-body);
     font-size: var(--font-size-xxs);
@@ -82,26 +83,28 @@
 .loginSubmit {
     width: 140px;
     margin-top: var(--space-12);
-    border: 1px solid var(--primary-700);
+    border: 2px solid var(--button-primary-border);
     border-radius: var(--button-radius);
     padding: var(--button-padding-y) var(--button-padding-x);
-    background-color: var(--brand-primary);
+    background-color: var(--button-primary-bg);
     cursor: pointer;
     align-self: center;
-    font-size: var(--font-size-s);
+    font-size: var(--button-default-font-size);
     font-family: var(--button-default-font-family);
-    color: var(--text-on-dark);
+    font-weight: var(--button-primary-font-weight);
+    color: var(--button-primary-text);
 }
 
 .loginSubmit:hover {
-    background-color: var(--primary-400);
-    border-color: var(--primary-800);
-    transition: all 0.2s ease;
+    background-color: var(--button-primary-hover-bg);
+    border-color: var(--button-primary-hover-border);
+    box-shadow: var(--button-default-hover-shadow);
+    transition: var(--button-default-transition);
 }
 
 .loginSubmit:disabled {
     cursor: wait;
-    opacity: 0.8;
+    opacity: var(--opacity-disabled);
 }
 
 .loginBrandColumn {
@@ -119,100 +122,260 @@
     height: auto;
 }
 
-.loginBrandText {
+.subtitle {
+    max-width: 640px;
     margin: 0;
     font-family: var(--font-family-body);
-    font-size: 18px;
-    line-height: 1.35;
-    color: var(--text-primary);
+    font-size: var(--font-size-xs);
+    text-align: left;
 }
 
-.loginBrandText button {
+.subtitle button {
     border: 0;
     padding: 0;
-    background: transparent;
-    font: inherit;
+    background-color: transparent;
     text-decoration: underline;
-    font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-bold);
     color: var(--primary-600);
     cursor: pointer;
 }
 
 .signupPage {
     min-height: 100vh;
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: var(--layout-container-padding) var(--space-64);
-    background:
-        radial-gradient(circle at top left, rgba(168, 191, 175, 0.16), transparent 34%),
-        linear-gradient(180deg, var(--background-50), var(--background-300));
+    padding: var(--layout-container-padding);
+    background-color: var(--surface-background);
     color: var(--text-primary);
 }
 
-.signupContent {
-    width: 100%;
-    display: grid;
-    grid-template-columns: minmax(340px, 480px) minmax(280px, 420px);
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-48);
-}
-
-.signupFormColumn {
+.signupLogoCounterGroup {
+    position: fixed;
+    top: var(--layout-container-padding);
+    bottom: var(--layout-container-padding);
+    left: var(--layout-container-padding);
     display: flex;
     flex-direction: column;
-    gap: var(--space-20);
+    justify-content: space-between;
+    align-items: flex-start;
 }
+
+.signupTopLogo {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.signupStepCounter {
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xs);
+}
+
+.signupCenterStage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-32);
+}
+
+.signupQuestionCard {
+    width: 100%;
+    padding: var(--space-24);
+    border-radius: var(--popupcard-border-radius);
+    background-color: var(--surface-card);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-24);
+}
+
+.signupChoiceRow {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-s);
+}
+
+.checkbox {
+    margin: 0;
+    appearance: none;
+    width: var(--checkbox-size);
+    height: var(--checkbox-size);
+    border-radius: var(--checkbox-radius);
+    border: 2px solid var(--checkbox-default-border);
+    background-color: var(--checkbox-default-bg);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: var(--input-transition);
+}
+
+.checkbox:hover {
+    background-color: var(--checkbox-hover-bg);
+}
+
+.checkbox::after {
+    content: "";
+    width: var(--checkbox-icon-size);
+    height: 6px;
+    border: 3px solid var(--checkbox-icon-color);
+    border-top: 0;
+    border-right: 0;
+    margin: 0 0 var(--space-4) 0;
+    transform: rotate(-45deg) scale(0) translateY(8px);
+    transition: var(--input-transition);
+}
+
+.checkbox:checked {
+    background-color: var(--checkbox-selected-bg);
+}
+
+.checkbox:checked::after {
+    transform: rotate(-45deg) scale(1);
+}
+
+.signupOtherRow {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-s);
+}
+
+.signupOtherRow input {
+    flex: 1;
+    border: 0;
+    border-bottom: 1px solid var(--text-primary);
+    background: transparent;
+    padding: 0 var(--space-4);
+    /* font: inherit; */
+    outline: none;
+}
+
+.signupBinaryOption {
+    width: 100%;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: var(--space-12);
+}
+
+.signupBinaryCopy {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    font-family: var(--font-family-body);
+}
+
+.signupBinaryCopy span {
+    font-size: var(--font-size-s);
+    font-weight: var(--font-weight-semibold);
+}
+
+.signupBinaryCopy small {
+    font-size: var(--font-size-xs);
+}
+
+.signupPrimaryAction {
+    min-width: var(--button-min-width);
+    width: 140px;
+    padding: var(--button-padding-y) var(--button-padding-x);
+    border-radius: var(--button-radius);
+    border: 2px solid var(--button-secondary-border);
+    background-color: var(--button-secondary-bg);
+    color: var(--button-secondary-text);
+    font-family: var(--button-default-font-family);
+    font-size: var(--button-default-font-size);
+    cursor: pointer;
+    position: fixed;
+    right: var(--layout-container-padding);
+    bottom: var(--layout-container-padding);
+}
+
+.signupPrimaryAction:hover {
+    border-color: var(--button-secondary-hover-border);
+    background-color: var(--button-secondary-hover-bg);
+    box-shadow: var(--button-default-hover-shadow);
+    transition: var(--button-default-transition);
+}
+
+.signupPrimaryAction:disabled {
+    cursor: wait;
+    opacity: var(--opacity-disabled);
+}
+
+.signupError {
+    width: min(580px, 100%);
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xxs);
+    color: var(--text-error);
+}
+
+/* === Sign up Workhours Page (step 5) === */
+.signupWorkhoursPage{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-32);
+}
+
+.signupWorkhoursContent {
+    background-color: var(--surface-card);
+    padding: var(--popupcard-padding);
+    border-radius: var(--popupcard-border-radius);
+}
+
+/* @media (max-width: 720px) {
+    .signupTopLogo {
+        width: 130px;
+    }
+
+    .signupCenterStage {
+        padding-top: 120px;
+        padding-bottom: 120px;
+    }
+
+    .signupQuestionCard {
+        width: 100%;
+    }
+
+    .signupPrimaryAction {
+        width: 100%;
+    }
+
+    .signupReturnLink {
+        position: static;
+        margin-top: var(--space-16);
+        text-align: center;
+    }
+} */
+
+/* -----------------------------.signupContent {
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-32);
+} */
 
 .signupHeading {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
     gap: var(--space-8);
+    text-align: center;
 }
 
 .signupTitle {
-    margin: 0;
+    margin: 0 0 var(--space-8) 0;
     font-family: var(--font-family-heading);
     font-size: var(--font-size-2xl);
     font-weight: var(--font-weight-bold);
-}
-
-.signupSubtitle {
-    margin: 0;
-    color: var(--text-secondary);
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-xxs);
-}
-
-.signupStepper {
-    display: flex;
-    gap: var(--space-8);
-}
-
-.signupStep {
-    width: 34px;
-    height: 34px;
-    border-radius: 999px;
-    display: grid;
-    place-items: center;
-    border: 1px solid var(--border-300);
-    background: rgba(255, 255, 255, 0.4);
-    font-family: var(--font-family-body);
-    font-weight: var(--font-weight-semibold);
-    color: var(--text-secondary);
-}
-
-.signupStep.active {
-    border-color: var(--primary-500);
-    color: var(--text-on-dark);
-    background: var(--brand-primary);
-}
-
-.signupStep.done {
-    border-color: var(--success-300);
-    background: var(--success-100);
-    color: var(--success-700);
 }
 
 .signupForm {
@@ -221,74 +384,34 @@
     gap: var(--space-20);
 }
 
-.signupField {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-8);
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-s);
-    font-weight: var(--font-weight-bold);
-}
-
-.signupField input {
-    border: 1px solid var(--border-300);
-    border-radius: 10px;
-    background-color: rgba(255, 255, 255, 0.84);
-    color: var(--text-primary);
-    padding: var(--space-12);
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-xs);
-    outline: none;
-    font-weight: var(--font-weight-regular);
-}
-
-.signupField input::placeholder {
-    color: var(--text-placeholder);
-    font-size: var(--font-size-xs);
-}
-
-.signupField input:focus {
-    border-color: var(--border-green-300);
-    box-shadow: 0 0 0 3px rgba(168, 191, 175, 0.28);
-}
-
-.signupSection {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-20);
-    padding: var(--space-20);
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.46);
-    border: 1px solid rgba(214, 210, 202, 0.8);
-    box-shadow: 0 12px 32px rgba(76, 86, 79, 0.08);
-}
-
-.signupSectionHeader {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-}
-
-.signupSectionHeader h2,
-.signupSummary h3 {
-    margin: 0;
-    font-family: var(--font-family-heading);
-    font-size: var(--font-size-md);
-}
-
-.signupSectionHeader p,
-.signupSummary p,
-.signupToggleRow p {
-    margin: 0;
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-xxs);
-    color: var(--text-secondary);
-}
-
 .signupWeekdays {
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
     gap: var(--space-8);
+}
+
+.signupSettingsPanel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-20);
+}
+
+.signupSettingsRows {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-20);
+}
+
+.signupRowValue input[type="time"]::-webkit-calendar-picker-indicator,
+.signupRowValue input[type="time"]::-webkit-clear-button,
+.signupRowValue input[type="time"]::-webkit-inner-spin-button,
+.signupRowValue input[type="time"]::-webkit-outer-spin-button {
+    display: none;
+    -webkit-appearance: none;
+}
+
+.signupWeekdaysRow {
+    align-items: flex-start;
 }
 
 .signupWeekdayOption {
@@ -308,35 +431,67 @@
     accent-color: var(--primary-500);
 }
 
-.signupGrid {
+.signupWeekdayLabel {
+    margin: 0;
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--text-body-regular-font-size);
+    /* color: var(--text-primary); */
+}
+
+.signupWeekdayCheckbox {
+    margin: 0;
+    appearance: none;
+    width: var(--checkbox-size);
+    height: var(--checkbox-size);
+    border-radius: var(--checkbox-radius);
+    border: 2px solid var(--checkbox-default-border);
+    background-color: transparent;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: all 0.2s ease;
+}
+
+.signupWeekdayCheckbox:hover {
+    background-color: var(--checkbox-hover-bg);
+}
+
+.signupWeekdayCheckbox::after {
+    content: "";
+    width: var(--checkbox-icon-size);
+    height: 6px;
+    border: 3px solid transparent;
+    border-top: 0;
+    border-right: 0;
+    margin: 0 0 var(--space-4) 0;
+    transform: rotate(-45deg) scale(0) translateY(8px);
+    transition: transform 0.2s ease;
+}
+
+.signupWeekdayCheckbox:checked {
+    background-color: var(--highlight-400);
+}
+
+.signupWeekdayCheckbox:checked::after {
+    border-color: var(--surface-background);
+    transform: rotate(-45deg) scale(1);
+}
+
+/* ---------------------- .signupGrid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-16);
-}
+} */
 
-.signupDurationRow {
+/* -------------------.signupDurationRow {
     display: flex;
     align-items: center;
     gap: var(--space-8);
-}
+} */
 
-.signupDurationRow input {
+/* ---------------------.signupDurationRow input {
     width: 74px;
-}
-
-.signupToggleRow {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-16);
-    padding: var(--space-12) 0;
-}
-
-.signupToggleRow strong {
-    display: block;
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-s);
-}
+} */
 
 .signupToggle {
     width: 60px;
@@ -354,37 +509,23 @@
     background: var(--primary-500);
 }
 
-.signupKnob {
+/* ---------------------------.signupKnob {
     width: 26px;
     height: 26px;
     border-radius: 999px;
     background: var(--background-50);
     transform: translateX(0);
     transition: transform 0.2s ease;
-}
+} */
 
 .signupToggle[aria-pressed="true"] .signupKnob {
     transform: translateX(26px);
 }
 
-.signupSummary {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-8);
-    padding: var(--space-16);
-    border-radius: 16px;
-    background: linear-gradient(135deg, rgba(168, 191, 175, 0.14), rgba(255, 255, 255, 0.72));
-    border: 1px solid rgba(168, 191, 175, 0.34);
-}
-
-.signupError {
-    margin: 0;
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-xxs);
-    color: var(--text-error);
-}
-
 .signupActions {
+    position: absolute;
+    right: var(--space-64);
+    bottom: var(--space-48);
     display: flex;
     justify-content: flex-end;
     gap: var(--space-16);
@@ -432,31 +573,25 @@
     text-align: center;
 }
 
-.signupBrandLogo {
-    display: block;
-    width: 100%;
-    height: auto;
-}
-
 .signupBrandText {
     margin: 0;
     font-family: var(--font-family-body);
     font-size: var(--font-size-s);
     line-height: 1.4;
-    color: var(--text-primary);
+    /* color: var(--text-primary); */
 }
 
 .signupBrandText button {
     border: 0;
     background: transparent;
     padding: 0;
-    color: var(--primary-600);
+    /* color: var(--primary-600); */
     font: inherit;
     text-decoration: underline;
     cursor: pointer;
 }
 
-@media (max-width: 980px) {
+/* @media (max-width: 980px) {
     .signupPage {
         padding: 32px 24px;
     }
@@ -464,10 +599,6 @@
     .signupContent {
         grid-template-columns: 1fr;
         gap: 40px;
-    }
-
-    .signupBrandLogo {
-        max-width: 420px;
     }
 }
 
@@ -480,11 +611,6 @@
         font-size: 36px;
     }
 
-    .signupGrid,
-    .signupWeekdays {
-        grid-template-columns: 1fr;
-    }
-
     .signupActions {
         flex-direction: column;
     }
@@ -493,11 +619,7 @@
     .signupSecondary {
         width: 100%;
     }
-
-    .signupBrandLogo {
-        max-width: 300px;
-    }
-}
+} */
 
 /* @media (max-width: 980px) {
     .loginPage {

@@ -152,55 +152,56 @@
     color: var(--text-primary);
 }
 
-.weekdayCheckbox {
+.weekdayCheckbox{
     margin: 0;
     appearance: none;
     width: var(--checkbox-size);
     height: var(--checkbox-size);
     border-radius: var(--checkbox-radius);
     border: 2px solid var(--checkbox-default-border);
-    background-color: transparent;
+    background-color: var(--checkbox-default-bg);
     cursor: pointer;
     display: grid;
     place-items: center;
-    transition: all 0.2s ease;
+    transition: var(--input-transition);
 }
 
 .weekdayCheckbox:hover {
-    background-color: var(--primary-100);
+    background-color: var(--checkbox-hover-bg);
 }
 
 .weekdayCheckbox::after {
     content: "";
     width: var(--checkbox-icon-size);
     height: 6px;
-    border: 3px solid transparent;
+    border: 3px solid var(--checkbox-icon-color);
     border-top: 0;
     border-right: 0;
     margin: 0 0 var(--space-4) 0;
     transform: rotate(-45deg) scale(0) translateY(8px);
-    transition: transform 0.2s ease;
+    transition: var(--input-transition);
 }
 
 .weekdayCheckbox:checked {
-    background-color: var(--highlight-400);
+    background-color: var(--checkbox-selected-bg);
 }
 
 .weekdayCheckbox:checked::after {
-    border-color: var(--surface-background);
     transform: rotate(-45deg) scale(1);
-}
+} 
 
 .value {
     flex: 1;
     display: flex;
     align-items: center;
     gap: var(--space-4);
+    
     transition: all 0.2s ease;
 }
 
 .value input[type="number"] {
     width: 64px;
+outline: none;
     margin: 0 var(--space-4);
 }
 

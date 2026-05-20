@@ -1,6 +1,6 @@
 import "../css/LoginPage.css";
 import "../css/settings.css";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import logo from "../assets/images/logo.svg";
 import { WEEKDAY_OPTIONS, buildSignupWorkHoursPayload, createDefaultWorkHoursDraft } from "../lib/workHours";
 
@@ -44,14 +44,6 @@ export default function SignupPage({ onCreateAccount, onSaveNotifications, onSav
     const [workHours, setWorkHours] = useState(() => createDefaultWorkHoursDraft());
 
     const activeError = formError || error;
-
-    const stepTitle = useMemo(() => {
-        if (step === 1) return "Registreren";
-        if (step === 2) return "Formulier vraag 1";
-        if (step === 3) return "Formulier vraag 2";
-        if (step === 4) return "Check-in notificaties";
-        return "Werktijden en pauzes";
-    }, [step]);
 
     const updateAccount = (field, value) => {
         setAccount((currentValue) => ({
@@ -178,138 +170,139 @@ export default function SignupPage({ onCreateAccount, onSaveNotifications, onSav
 
     return (
         <main className={`signupPage ${step === 5 ? "signupPageWorkhours" : ""}`}>
-            <img className="signupBrandLogo signupTopLogo" src={logo} alt="Re:Mind" />
+            <div className="signupLogoCounterGroup">
+                <img className="signupTopLogo" src={logo} alt="Re:Mind" />
+                <div className="signupStepCounter">Stap {step} van 5</div>
+            </div>
 
             {step === 5 ? (
                 <form className="signupForm signupWorkhoursForm" onSubmit={handlePrimaryAction}>
-                    <section className="workhoursPage signupWorkhoursPage">
-                        <header className="signupStepHeader">
+                    <section className="signupWorkhoursPage">
+                        <header className="signupHeading">
                             <h1 className="signupTitle">Werkuren en pauzes instellen</h1>
-                            <p className="signupSubtitle">Deze instellingen kunnen altijd aangepast worden in Instellingen &gt; Werktijden en pauzes.</p>
+                            <p className="subtitle">Deze instellingen kunnen altijd aangepast worden in <br /> Instellingen &gt; Werktijden en pauzes.</p>
                         </header>
 
                         <section className="workhoursContent signupWorkhoursContent">
-                        <div className="row">
-                            <div className="label">Frequentie van pauzeherinneringen:</div>
-                            <div className="value">
-                                <span className="telkensNa">Telkens na</span>
-                                <input
-                                    aria-label="Frequentie uren"
-                                    type="number"
-                                    min={0}
-                                    step={1}
-                                    value={workHours.breakHours}
-                                    onChange={(event) => updateWorkHours("breakHours", Number.parseInt(event.target.value || "0", 10) || 0)}
-                                />
-                                <span className="durationUnit">uur</span>
-                                <input
-                                    aria-label="Frequentie minuten"
-                                    type="number"
-                                    min={0}
-                                    step={1}
-                                    value={workHours.breakMinutes}
-                                    onChange={(event) => updateWorkHours("breakMinutes", Number.parseInt(event.target.value || "0", 10) || 0)}
-                                />
-                                <span className="durationUnit">min</span>
+                            <div className="row">
+                                <div className="label">Frequentie van pauzeherinneringen:</div>
+                                <div className="value">
+                                    <span className="telkensNa">Telkens na</span>
+                                    <input
+                                        aria-label="Frequentie uren"
+                                        type="number"
+                                        min={0}
+                                        max={59}
+                                        step={1}
+                                        value={workHours.breakHours}
+                                        onChange={(event) => updateWorkHours("breakHours", Number.parseInt(event.target.value || "0", 10) || 0)}
+                                    />
+                                    <span className="durationUnit">uur</span>
+                                    <input
+                                        aria-label="Frequentie minuten"
+                                        type="number"
+                                        min={0}
+                                        step={1}
+                                        value={workHours.breakMinutes}
+                                        onChange={(event) => updateWorkHours("breakMinutes", Number.parseInt(event.target.value || "0", 10) || 0)}
+                                    />
+                                    <span className="durationUnit">min</span>
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="row weekdaysRow">
-                            <div className="label">Werkdagen:</div>
-                            <div className="weekdays" role="group" aria-label="Selecteer werkdagen">
-                                {WEEKDAY_OPTIONS.map((day) => {
-                                    const isChecked = workHours.selectedWorkdays[day.key];
+                            <div className="row weekdaysRow">
+                                <div className="label">Werkdagen:</div>
+                                <div className="weekdays" role="group" aria-label="Selecteer werkdagen">
+                                    {WEEKDAY_OPTIONS.map((day) => {
+                                        const isChecked = workHours.selectedWorkdays[day.key];
 
-                                    return (
-                                        <label key={day.key} className="weekdayOption">
-                                            <span className="weekdayLabel">{day.label}</span>
-                                            <input
-                                                type="checkbox"
-                                                className="weekdayCheckbox"
-                                                checked={isChecked}
-                                                onChange={() => toggleWorkday(day.key)}
-                                            />
-                                        </label>
-                                    );
-                                })}
+                                        return (
+                                            <label key={day.key} className="weekdayOption">
+                                                <span className="weekdayLabel">{day.label}</span>
+                                                <input
+                                                    type="checkbox"
+                                                    className="weekdayCheckbox checkbox"
+                                                    checked={isChecked}
+                                                    onChange={() => toggleWorkday(day.key)}
+                                                />
+                                            </label>
+                                        );
+                                    })}
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="row">
-                            <div className="label">Officieel startuur op werkdagen:</div>
-                            <div className="value">
-                                <input
-                                    aria-label="Officieel startuur"
-                                    type="time"
-                                    value={workHours.startTime}
-                                    onChange={(event) => updateWorkHours("startTime", event.target.value)}
-                                />
+                            <div className="row">
+                                <div className="label">Officieel startuur op werkdagen:</div>
+                                <div className="value">
+                                    <input
+                                        aria-label="Officieel startuur"
+                                        type="time"
+                                        value={workHours.startTime}
+                                        onChange={(event) => updateWorkHours("startTime", event.target.value)}
+                                    />
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="row">
-                            <div className="label">Officieel einduur op werkdagen:</div>
-                            <div className="value">
-                                <input
-                                    aria-label="Officieel einduur"
-                                    type="time"
-                                    value={workHours.endTime}
-                                    onChange={(event) => updateWorkHours("endTime", event.target.value)}
-                                />
+                            <div className="row">
+                                <div className="label">Officieel einduur op werkdagen:</div>
+                                <div className="value">
+                                    <input
+                                        aria-label="Officieel einduur"
+                                        type="time"
+                                        value={workHours.endTime}
+                                        onChange={(event) => updateWorkHours("endTime", event.target.value)}
+                                    />
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="row toggleRow">
-                            <div className="label">Middagpauze instellen:</div>
-                            <div className="value">
-                                <button
-                                    className="toggle"
-                                    type="button"
-                                    aria-pressed={workHours.lunchPauseEnabled}
-                                    onClick={() => updateWorkHours("lunchPauseEnabled", !workHours.lunchPauseEnabled)}
-                                >
-                                    <span className="knob" />
-                                </button>
+                            <div className="row toggleRow">
+                                <div className="label">Middagpauze instellen:</div>
+                                <div className="value">
+                                    <button
+                                        className="toggle"
+                                        type="button"
+                                        aria-pressed={workHours.lunchPauseEnabled}
+                                        onClick={() => updateWorkHours("lunchPauseEnabled", !workHours.lunchPauseEnabled)}
+                                    >
+                                        <span className="knob" />
+                                    </button>
+                                </div>
                             </div>
-                        </div>
 
-                        <div className={`row ${!workHours.lunchPauseEnabled ? "rowDisabled" : ""}`}>
-                            <div className="label">Officiële start middagpauze op werkdagen:</div>
-                            <div className="value">
-                                <input
-                                    aria-label="Start middagpauze"
-                                    type="time"
-                                    value={workHours.lunchStart}
-                                    disabled={!workHours.lunchPauseEnabled}
-                                    onChange={(event) => updateWorkHours("lunchStart", event.target.value)}
-                                />
+                            <div className={`row ${!workHours.lunchPauseEnabled ? "rowDisabled" : ""}`}>
+                                <div className="label">Officiële start middagpauze op werkdagen:</div>
+                                <div className="value">
+                                    <input
+                                        aria-label="Start middagpauze"
+                                        type="time"
+                                        value={workHours.lunchStart}
+                                        disabled={!workHours.lunchPauseEnabled}
+                                        onChange={(event) => updateWorkHours("lunchStart", event.target.value)}
+                                    />
+                                </div>
                             </div>
-                        </div>
 
-                        <div className={`row ${!workHours.lunchPauseEnabled ? "rowDisabled" : ""}`}>
-                            <div className="label">Officieel einde middagpauze op werkdagen:</div>
-                            <div className="value">
-                                <input
-                                    aria-label="Einde middagpauze"
-                                    type="time"
-                                    value={workHours.lunchEnd}
-                                    disabled={!workHours.lunchPauseEnabled}
-                                    onChange={(event) => updateWorkHours("lunchEnd", event.target.value)}
-                                />
+                            <div className={`row ${!workHours.lunchPauseEnabled ? "rowDisabled" : ""}`}>
+                                <div className="label">Officieel einde middagpauze op werkdagen:</div>
+                                <div className="value">
+                                    <input
+                                        aria-label="Einde middagpauze"
+                                        type="time"
+                                        value={workHours.lunchEnd}
+                                        disabled={!workHours.lunchPauseEnabled}
+                                        onChange={(event) => updateWorkHours("lunchEnd", event.target.value)}
+                                    />
+                                </div>
                             </div>
-                        </div>
                         </section>
                     </section>
 
-                    {activeError ? <p className="signupError" role="alert">{activeError}</p> : null}
-                    {!isConfigured ? <p className="signupError" role="alert">Supabase is nog niet geconfigureerd.</p> : null}
+                    {activeError ? <p className="errorMessage" role="alert">{activeError}</p> : null}
+                    {!isConfigured ? <p className="errorMessage" role="alert">Supabase is nog niet geconfigureerd.</p> : null}
 
-                    <div className="signupFooter">
-                        <div className="signupStepCounter">Stap {step} van 5</div>
-                        <button className="signupPrimaryAction" type="submit" disabled={isSubmitting || !isConfigured}>
-                            Start
-                        </button>
-                    </div>
+                    <button className="signupPrimaryAction" type="submit" disabled={isSubmitting || !isConfigured}>
+                        Start
+                    </button>
                 </form>
             ) : (
                 <section className="signupCenterStage">
@@ -317,39 +310,52 @@ export default function SignupPage({ onCreateAccount, onSaveNotifications, onSav
                         <h1 className="signupTitle">
                             {step === 1 ? "Registreren" : step === 2 ? "Hoe heb je Re:Mind gevonden?" : step === 3 ? "Waarom wil je Re:Mind gebruiken?" : "Wil je meldingen voor check-ins inschakelen?"}
                         </h1>
-                        <p className="signupSubtitle">
+                        <p className="subtitle">
                             {step === 1
-                                ? "Vul je accountgegevens in."
+                                ? (
+                                    <>
+                                        Heb je al een account?{' '}
+                                        <button
+                                            className="signupReturnAction"
+                                            role="button"
+                                            tabIndex={0}
+                                            onClick={onNavigateToLogin}
+                                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onNavigateToLogin(); }}
+                                        >
+                                            Log in.
+                                        </button>
+                                    </>
+                                )
                                 : step === 2 || step === 3
                                     ? "(Gelieve minstens één optie aan te duiden)"
-                                    : "Deze check-ins vragen naar je stress- en energieniveaus op dat moment."}
+                                    : "Deze check-ins vragen naar je stress- en energielevels op dat moment. Deze data geeft een beter inzicht in hoe je stress en energie evolueert doorheen de tijd."}
                         </p>
                     </div>
 
                     <form className="signupForm" onSubmit={handlePrimaryAction}>
                         {step === 1 ? (
                             <>
-                                <label className="signupField">
+                                <label className="inputField">
                                     <span>E-mail *</span>
                                     <input type="email" autoComplete="email" placeholder="E-mail" value={account.email} onChange={(event) => updateAccount("email", event.target.value)} required />
                                 </label>
 
-                                <label className="signupField">
+                                <label className="inputField">
                                     <span>Bedrijfsnaam</span>
                                     <input type="text" autoComplete="organization" placeholder="Bedrijfsnaam" value={account.bedrijfsnaam} onChange={(event) => updateAccount("bedrijfsnaam", event.target.value)} />
                                 </label>
 
-                                <label className="signupField">
+                                <label className="inputField">
                                     <span>Gebruikersnaam *</span>
                                     <input type="text" autoComplete="username" placeholder="Gebruikersnaam" value={account.username} onChange={(event) => updateAccount("username", event.target.value)} required />
                                 </label>
 
-                                <label className="signupField">
+                                <label className="inputField">
                                     <span>Wachtwoord *</span>
                                     <input type="password" autoComplete="new-password" placeholder="Wachtwoord" value={account.password} onChange={(event) => updateAccount("password", event.target.value)} required />
                                 </label>
 
-                                <label className="signupField">
+                                <label className="inputField">
                                     <span>Wachtwoord bevestigen *</span>
                                     <input type="password" autoComplete="new-password" placeholder="Wachtwoord" value={account.confirmPassword} onChange={(event) => updateAccount("confirmPassword", event.target.value)} required />
                                 </label>
@@ -360,7 +366,7 @@ export default function SignupPage({ onCreateAccount, onSaveNotifications, onSav
                             <div className="signupQuestionCard">
                                 {SOURCE_OPTIONS.map((option) => (
                                     <label key={option.key} className="signupChoiceRow">
-                                        <input type="checkbox" checked={foundHow[option.key]} onChange={() => toggleOption(setFoundHow, foundHow, option.key)} />
+                                        <input type="checkbox" className="checkbox" checked={foundHow[option.key]} onChange={() => toggleOption(setFoundHow, foundHow, option.key)} />
                                         <span>{option.label}</span>
                                     </label>
                                 ))}
@@ -376,7 +382,7 @@ export default function SignupPage({ onCreateAccount, onSaveNotifications, onSav
                             <div className="signupQuestionCard">
                                 {REASON_OPTIONS.map((option) => (
                                     <label key={option.key} className="signupChoiceRow">
-                                        <input type="checkbox" checked={whyUse[option.key]} onChange={() => toggleOption(setWhyUse, whyUse, option.key)} />
+                                        <input type="checkbox" className="checkbox" checked={whyUse[option.key]} onChange={() => toggleOption(setWhyUse, whyUse, option.key)} />
                                         <span>{option.label}</span>
                                     </label>
                                 ))}
@@ -389,34 +395,43 @@ export default function SignupPage({ onCreateAccount, onSaveNotifications, onSav
                         ) : null}
 
                         {step === 4 ? (
-                            <div className="signupQuestionCard signupNotificationsCard">
-                                <button type="button" className={`signupBinaryOption ${checkinNotificationsOn === true ? "isActive" : ""}`} onClick={() => setCheckinNotificationsOn(true)}>
-                                    <span>Inschakelen</span>
-                                    <small>(Je ontvangt doorheen je werkdag enkele check-ins in verband met je stress en energie)</small>
-                                </button>
-                                <button type="button" className={`signupBinaryOption ${checkinNotificationsOn === false ? "isActive" : ""}`} onClick={() => setCheckinNotificationsOn(false)}>
-                                    <span>Niet inschakelen</span>
-                                    <small>(Je kan deze instelling altijd aanpassen bij Instellingen &gt; Notificatie-voorkeuren)</small>
-                                </button>
+                            <div className="signupQuestionCard">
+                                <label className={`signupBinaryOption ${checkinNotificationsOn === true ? "isActive" : ""}`}>
+                                    <input
+                                        type="checkbox"
+                                        className="checkbox"
+                                        checked={checkinNotificationsOn === true}
+                                        onChange={() => setCheckinNotificationsOn(true)}
+                                    />
+                                    <div className="signupBinaryCopy">
+                                        <span>Inschakelen</span>
+                                        <small>(Je ontvangt doorheen je werkdag enkele check-ins in verband met je stress en energie)</small>
+                                    </div>
+                                </label>
+                                <label className={`signupBinaryOption ${checkinNotificationsOn === false ? "isActive" : ""}`}>
+                                    <input
+                                        type="checkbox"
+                                        className="checkbox"
+                                        checked={checkinNotificationsOn === false}
+                                        onChange={() => setCheckinNotificationsOn(false)}
+                                    />
+                                    <div className="signupBinaryCopy">
+                                        <span>Niet inschakelen</span>
+                                        <small>(Je kan deze instelling altijd aanpassen bij Instellingen &gt; Notificatie-voorkeuren)</small>
+                                    </div>
+                                </label>
                             </div>
                         ) : null}
 
-                        {activeError ? <p className="signupError" role="alert">{activeError}</p> : null}
-                        {!isConfigured ? <p className="signupError" role="alert">Supabase is nog niet geconfigureerd.</p> : null}
+                        {activeError ? <p className="errorMessage" role="alert">{activeError}</p> : null}
+                        {!isConfigured ? <p className="errorMessage" role="alert">Supabase is nog niet geconfigureerd.</p> : null}
 
-                        <div className="signupFooter">
-                            <div className="signupStepCounter">Stap {step} van 5</div>
-                            <button className="signupPrimaryAction" type="submit" disabled={isSubmitting || !isConfigured}>
-                                {step === 1 ? "Account aanmaken" : step === 5 ? "Start" : "Volgende"}
-                            </button>
-                        </div>
+                        <button className="signupPrimaryAction" type="submit" disabled={isSubmitting || !isConfigured}>
+                            {step === 1 ? "Account aanmaken" : step === 5 ? "Start" : "Volgende"}
+                        </button>
                     </form>
                 </section>
             )}
-
-            <div className="signupReturnLink">
-                Heb je al een account? <button type="button" onClick={onNavigateToLogin}>Log in.</button>
-            </div>
         </main>
     );
 }

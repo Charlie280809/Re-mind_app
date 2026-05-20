@@ -76,7 +76,6 @@ function buildSettingsPayload(userId, draft) {
 
 export default function SettingsWorkHours({ onBack, userId }) {
     const [selectedWorkdays, setSelectedWorkdays] = useState(() => createDefaultWorkdaySelection());
-
     const [checkinMinutes, setCheckinMinutes] = useState(50);
     const [startTime, setStartTime] = useState("09:00");
     const [endTime, setEndTime] = useState("17:00");

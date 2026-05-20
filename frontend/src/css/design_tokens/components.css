@@ -83,7 +83,7 @@
     --checkbox-default-bg: transparent;
     --checkbox-default-border: var(--primary-400);
 
-    --checkbox-hover-bg: var(--primary-50);
+    --checkbox-hover-bg: var(--primary-200);
     --checkbox-hover-border: var(--border-state-hover);
 
     --checkbox-selected-bg: var(--primary-300);
@@ -120,8 +120,21 @@
     --toggle-focus-ring-color: var(--primary-200);
     --toggle-focus-ring-width: 2px;
 
-    --toggle-animation-duration: 150ms;
-    --toggle-animation-easing: ease-in-out;
+    --toggle-animation: all 150ms ease-in-out;
+
+    /* --toggle-animation-duration: 150ms; */
+    /* --toggle-animation-easing: ease-in-out; */
+
+    /* === INPUTS FIELDS === */
+    --input-border-radius: 10px;
+    --input-border-width: 1px;
+    --input-border-style: solid;
+    --input-border-color: var(--border-300);
+
+    --input-padding: var(--space-12);
+    --input-outline: none;
+
+    --input-transition: all 0.2s ease;
 
     /* === POP UP CARDS === */
     --popupcard-border-radius: 20px;
