@@ -84,6 +84,33 @@ export function buildWorkHoursPayload(userId, draft) {
     };
 }
 
+export function buildSignupNotificationPayload(userId, checkinNotificationsOn) {
+    return {
+        user_id: userId,
+        checkin_notifications_on: Boolean(checkinNotificationsOn),
+    };
+}
+
+export function buildSignupWorkHoursPayload(userId, draft) {
+    const normalizedDuration = normalizeDuration(draft.breakHours, draft.breakMinutes);
+
+    return {
+        user_id: userId,
+        checkin_frequentie: normalizedDuration.totalMinutes,
+        werk_startuur: draft.startTime,
+        werk_einduur: draft.endTime,
+        middag_startuur: draft.lunchPauseEnabled ? draft.lunchStart : null,
+        middag_einduur: draft.lunchPauseEnabled ? draft.lunchEnd : null,
+        mon_isworkday: Boolean(draft.selectedWorkdays?.mon),
+        tue_isworkday: Boolean(draft.selectedWorkdays?.tue),
+        wed_isworkday: Boolean(draft.selectedWorkdays?.wed),
+        thu_isworkday: Boolean(draft.selectedWorkdays?.thu),
+        fri_isworkday: Boolean(draft.selectedWorkdays?.fri),
+        sat_isworkday: Boolean(draft.selectedWorkdays?.sat),
+        sun_isworkday: Boolean(draft.selectedWorkdays?.sun),
+    };
+}
+
 export function draftFromWorkHoursRow(row) {
     if (!row) {
         return createDefaultWorkHoursDraft();

@@ -374,37 +374,25 @@ export default function App() {
         return null;
       }
 
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        setAuthError(error.message);
-        setSignupProvisioning(false);
-        return null;
-      }
-
       return {
         userId: createPayload.user.id,
       };
+    } catch (error) {
+      setAuthError(
+        error instanceof TypeError
+          ? `Kan geen verbinding maken met backend op ${apiBaseUrl}. Controleer of de backend draait.`
+          : error.message || "Kon account niet aanmaken."
+      );
+      setSignupProvisioning(false);
+      return null;
     } finally {
       setSignupSubmitting(false);
     }
   };
 
-  const handleSignupOnboarding = async ({ userId, profileSetup, workHoursSetup }) => {
+  const handleSignupNotifications = async ({ userId, checkinNotificationsOn }) => {
     if (!supabase) {
       setAuthError("Supabase is niet geconfigureerd. Voeg VITE_SUPABASE_URL en VITE_SUPABASE_ANON_KEY toe.");
-      return false;
-    }
-
-    const { data: sessionData } = await supabase.auth.getSession();
-    const accessToken = sessionData?.session?.access_token;
-
-    if (!accessToken) {
-      setAuthError("Je sessie is niet meer actief. Log opnieuw in om je instellingen op te slaan.");
-      setSignupProvisioning(false);
       return false;
     }
 
@@ -412,16 +400,14 @@ export default function App() {
     setSignupSubmitting(true);
 
     try {
-      const response = await fetch(`${apiBaseUrl}/signup/bootstrap`, {
+      const response = await fetch(`${apiBaseUrl}/signup/notifications`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
           userId,
-          profileSetup,
-          workHoursSetup,
+          checkinNotificationsOn,
         }),
       });
 
@@ -431,9 +417,53 @@ export default function App() {
       if (!response.ok) {
         throw new Error(payload.error || "Kon onboarding niet opslaan.");
       }
+      return true;
+    } catch (error) {
+      setAuthError(error.message);
+      return false;
+    } finally {
+      setSignupSubmitting(false);
+    }
+  };
+
+  const handleSignupWorkHours = async ({ userId, workHoursSetup, email, password }) => {
+    if (!supabase) {
+      setAuthError("Supabase is niet geconfigureerd. Voeg VITE_SUPABASE_URL en VITE_SUPABASE_ANON_KEY toe.");
+      return false;
+    }
+
+    setAuthError("");
+    setSignupSubmitting(true);
+
+    try {
+      const response = await fetch(`${apiBaseUrl}/signup/work-hours`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId,
+          workHoursSetup,
+        }),
+      });
+
+      const contentType = response.headers.get("content-type") || "";
+      const payload = contentType.includes("application/json") ? await response.json() : { error: await response.text() };
+
+      if (!response.ok) {
+        throw new Error(payload.error || "Kon werkuren niet opslaan.");
+      }
+
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
 
       setSignupCompleted(true);
-      setAuthView("login");
       return true;
     } catch (error) {
       setAuthError(error.message);
@@ -456,6 +486,21 @@ export default function App() {
     }
   };
 
+  const handleNavigateToSignup = async () => {
+    setAuthError("");
+    setSignupCompleted(false);
+    setSignupProvisioning(false);
+    setProfileLoading(false);
+    setProfile(null);
+    setSession(null);
+
+    if (supabase) {
+      await supabase.auth.signOut();
+    }
+
+    setAuthView("signup");
+  };
+
   if (authLoading || (session && profileLoading)) {
     return (
       <div className="authLoadingState" aria-live="polite">
@@ -471,7 +516,8 @@ export default function App() {
     return authView === "signup" ? (
       <SignupPage
         onCreateAccount={handleSignupAccount}
-        onCompleteOnboarding={handleSignupOnboarding}
+        onSaveNotifications={handleSignupNotifications}
+        onSaveWorkHours={handleSignupWorkHours}
         onNavigateToLogin={() => setAuthView("login")}
         isSubmitting={signupSubmitting}
         error={authError}
@@ -480,7 +526,7 @@ export default function App() {
     ) : (
       <LoginPage
         onLogin={handleLogin}
-        onNavigateToSignup={() => setAuthView("signup")}
+        onNavigateToSignup={handleNavigateToSignup}
         isSubmitting={loginSubmitting}
         error={authError}
         isConfigured={Boolean(supabase)}

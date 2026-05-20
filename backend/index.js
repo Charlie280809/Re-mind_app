@@ -123,46 +123,46 @@ app.post("/checkin", async (req, res) => {
   res.json({ needPause });
 });
 
-app.post("/signup/bootstrap", async (req, res) => {
+app.post("/signup/create-account", async (req, res) => {
   if (!supabase) {
     return res.status(500).json({
       error: "Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in backend/.env.",
     });
   }
 
-  const token = getBearerToken(req);
+  const email = typeof req.body?.email === "string" ? req.body.email.trim().toLowerCase() : "";
+  const password = typeof req.body?.password === "string" ? req.body.password : "";
+  const username = typeof req.body?.username === "string" ? req.body.username.trim() : "";
+  const bedrijfsnaam = typeof req.body?.bedrijfsnaam === "string" ? req.body.bedrijfsnaam.trim() : "";
 
-  if (!token) {
-    return res.status(401).json({
-      error: "Missing Bearer token.",
+  if (!email || !password || !username) {
+    return res.status(400).json({
+      error: "Missing email, password, or username.",
     });
   }
 
-  const { data: userData, error: userError } = await supabase.auth.getUser(token);
+  const { data, error } = await supabase.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+    user_metadata: {
+      username,
+      bedrijfsnaam: bedrijfsnaam || null,
+    },
+  });
 
-  if (userError || !userData?.user) {
-    return res.status(401).json({
-      error: "Invalid or expired session.",
+  if (error || !data?.user?.id) {
+    return res.status(500).json({
+      error: error?.message || "Failed to create user.",
     });
   }
-
-  const requestedUserId = req.body?.userId || null;
-
-  if (requestedUserId && requestedUserId !== userData.user.id) {
-    return res.status(403).json({
-      error: "The supplied user id does not match the authenticated user.",
-    });
-  }
-
-  const profileSetup = req.body?.profileSetup || {};
-  const workHoursSetup = req.body?.workHoursSetup || null;
 
   const { error: profileError } = await supabase.from("profiles").upsert(
     {
-      user_id: userData.user.id,
-      email: userData.user.email || null,
-      username: profileSetup.username || userData.user.user_metadata?.username || userData.user.email?.split("@")[0] || "Gebruiker",
-      bedrijfsnaam: profileSetup.bedrijfsnaam || userData.user.user_metadata?.bedrijfsnaam || null,
+      user_id: data.user.id,
+      email,
+      username,
+      bedrijfsnaam: bedrijfsnaam || null,
       is_premium: false,
     },
     { onConflict: "user_id" }
@@ -175,38 +175,92 @@ app.post("/signup/bootstrap", async (req, res) => {
     });
   }
 
-  if (workHoursSetup) {
-    const { error: workHoursError } = await supabase.from("work_hours").upsert(
-      {
-        user_id: userData.user.id,
-        workdays: workHoursSetup.workdays || [],
-        start_time: workHoursSetup.start_time || null,
-        end_time: workHoursSetup.end_time || null,
-        break_frequency_hours: workHoursSetup.break_frequency_hours ?? 0,
-        break_frequency_minutes_part: workHoursSetup.break_frequency_minutes_part ?? 0,
-        break_frequency_minutes: workHoursSetup.break_frequency_minutes ?? 0,
-        auto_start_work_timer: workHoursSetup.auto_start_work_timer ?? true,
-        lunch_start: workHoursSetup.lunch_start || null,
-        lunch_end: workHoursSetup.lunch_end || null,
-      },
-      { onConflict: "user_id" }
-    );
-
-    if (workHoursError) {
-      return res.status(500).json({
-        error: "Failed to save work hours for the new user.",
-        details: workHoursError.message,
-      });
-    }
-  }
-
   return res.json({
     ok: true,
     user: {
-      id: userData.user.id,
-      email: userData.user.email,
+      id: data.user.id,
+      email,
     },
   });
+});
+
+app.post("/signup/notifications", async (req, res) => {
+  if (!supabase) {
+    return res.status(500).json({
+      error: "Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in backend/.env.",
+    });
+  }
+
+  const userId = typeof req.body?.userId === "string" ? req.body.userId : "";
+  const checkinNotificationsOn = Boolean(req.body?.checkinNotificationsOn);
+
+  if (!userId) {
+    return res.status(400).json({
+      error: "Missing user id.",
+    });
+  }
+
+  const { error } = await supabase.from("settings").upsert(
+    {
+      user_id: userId,
+      checkin_notifications_on: checkinNotificationsOn,
+    },
+    { onConflict: "user_id" }
+  );
+
+  if (error) {
+    return res.status(500).json({
+      error: "Failed to save notification settings.",
+      details: error.message,
+    });
+  }
+
+  return res.json({ ok: true });
+});
+
+app.post("/signup/work-hours", async (req, res) => {
+  if (!supabase) {
+    return res.status(500).json({
+      error: "Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in backend/.env.",
+    });
+  }
+
+  const userId = typeof req.body?.userId === "string" ? req.body.userId : "";
+  const workHoursSetup = req.body?.workHoursSetup || null;
+
+  if (!userId || !workHoursSetup) {
+    return res.status(400).json({
+      error: "Missing user id or work-hours setup.",
+    });
+  }
+
+  const { error } = await supabase.from("settings").upsert(
+    {
+      user_id: userId,
+      checkin_frequentie: workHoursSetup.checkin_frequentie ?? 0,
+      werk_startuur: workHoursSetup.werk_startuur || null,
+      werk_einduur: workHoursSetup.werk_einduur || null,
+      middag_startuur: workHoursSetup.middag_startuur || null,
+      middag_einduur: workHoursSetup.middag_einduur || null,
+      mon_isworkday: Boolean(workHoursSetup.mon_isworkday),
+      tue_isworkday: Boolean(workHoursSetup.tue_isworkday),
+      wed_isworkday: Boolean(workHoursSetup.wed_isworkday),
+      thu_isworkday: Boolean(workHoursSetup.thu_isworkday),
+      fri_isworkday: Boolean(workHoursSetup.fri_isworkday),
+      sat_isworkday: Boolean(workHoursSetup.sat_isworkday),
+      sun_isworkday: Boolean(workHoursSetup.sun_isworkday),
+    },
+    { onConflict: "user_id" }
+  );
+
+  if (error) {
+    return res.status(500).json({
+      error: "Failed to save work-hours settings.",
+      details: error.message,
+    });
+  }
+
+  return res.json({ ok: true });
 });
 
 app.get("/profile/me", async (req, res) => {
@@ -245,73 +299,7 @@ app.get("/profile/me", async (req, res) => {
     });
   }
 
-  let profileRecord = profile;
-
-  if (!profileRecord) {
-    const onboarding = userData.user.user_metadata?.onboarding || {};
-    const username = onboarding.username || userData.user.user_metadata?.username || userData.user.email?.split("@")[0] || "Gebruiker";
-    const bedrijfsnaam = onboarding.bedrijfsnaam || userData.user.user_metadata?.bedrijfsnaam || null;
-
-    const { error: insertError } = await supabase.from("profiles").upsert(
-      {
-        user_id: userData.user.id,
-        email: userData.user.email || null,
-        username,
-        bedrijfsnaam,
-        is_premium: false,
-      },
-      { onConflict: "user_id" }
-    );
-
-    if (insertError) {
-      return res.status(500).json({
-        error: "Failed to create profile for the signed-in user.",
-        details: insertError.message,
-      });
-    }
-
-    if (onboarding.work_hours) {
-      const { error: workHoursError } = await supabase.from("work_hours").upsert(
-        {
-          user_id: userData.user.id,
-          workdays: onboarding.work_hours.workdays || [],
-          start_time: onboarding.work_hours.start_time || null,
-          end_time: onboarding.work_hours.end_time || null,
-          break_frequency_hours: onboarding.work_hours.break_frequency_hours ?? 0,
-          break_frequency_minutes_part: onboarding.work_hours.break_frequency_minutes_part ?? 0,
-          break_frequency_minutes: onboarding.work_hours.break_frequency_minutes ?? 0,
-          auto_start_work_timer: onboarding.work_hours.auto_start_work_timer ?? true,
-          lunch_start: onboarding.work_hours.lunch_start || null,
-          lunch_end: onboarding.work_hours.lunch_end || null,
-        },
-        { onConflict: "user_id" }
-      );
-
-      if (workHoursError) {
-        return res.status(500).json({
-          error: "Failed to create work hours for the signed-in user.",
-          details: workHoursError.message,
-        });
-      }
-    }
-
-    const { data: refreshedProfile, error: refreshError } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("user_id", userData.user.id)
-      .maybeSingle();
-
-    if (refreshError) {
-      return res.status(500).json({
-        error: "Failed to reload profile from Supabase.",
-        details: refreshError.message,
-      });
-    }
-
-    profileRecord = refreshedProfile;
-  }
-
-  if (!profileRecord) {
+  if (!profile) {
     return res.status(404).json({
       error: "No profile found for the signed-in user.",
     });
@@ -322,7 +310,7 @@ app.get("/profile/me", async (req, res) => {
       id: userData.user.id,
       email: userData.user.email,
     },
-    profile: profileRecord,
+    profile,
   });
 });
 

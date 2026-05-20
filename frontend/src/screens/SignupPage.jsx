@@ -1,9 +1,31 @@
 import "../css/LoginPage.css";
+import "../css/settings.css";
 import { useMemo, useState } from "react";
 import logo from "../assets/images/logo.svg";
-import { WEEKDAY_OPTIONS, buildWorkHoursFields, createDefaultWorkHoursDraft } from "../lib/workHours";
+import { WEEKDAY_OPTIONS, buildSignupWorkHoursPayload, createDefaultWorkHoursDraft } from "../lib/workHours";
 
-export default function SignupPage({ onCreateAccount, onCompleteOnboarding, onNavigateToLogin, isSubmitting, error, isConfigured }) {
+const SOURCE_OPTIONS = [
+    { key: "friends", label: "Door vrienden/collega's" },
+    { key: "social", label: "Ik zag het op Facebook/LinkedIn/Instagram" },
+    { key: "search", label: "Ik was op zoek naar een app die mij helpt met stress omgaan" },
+];
+
+const REASON_OPTIONS = [
+    { key: "lessStress", label: "Om minder stress te hebben" },
+    { key: "focus", label: "Om beter te kunnen concentreren/focussen" },
+    { key: "healthyBreaks", label: "Om efficiënter en gezondere pauzes te nemen" },
+    { key: "clearMind", label: "Om mentaal helder te blijven denken" },
+    { key: "productive", label: "Om langer productief te blijven" },
+];
+
+function createOptionState(options) {
+    return options.reduce((accumulator, option) => ({
+        ...accumulator,
+        [option.key]: false,
+    }), {});
+}
+
+export default function SignupPage({ onCreateAccount, onSaveNotifications, onSaveWorkHours, onNavigateToLogin, isSubmitting, error, isConfigured }) {
     const [step, setStep] = useState(1);
     const [formError, setFormError] = useState("");
     const [createdUserId, setCreatedUserId] = useState("");
@@ -14,14 +36,21 @@ export default function SignupPage({ onCreateAccount, onCompleteOnboarding, onNa
         password: "",
         confirmPassword: "",
     });
+    const [foundHow, setFoundHow] = useState(() => createOptionState(SOURCE_OPTIONS));
+    const [foundHowOther, setFoundHowOther] = useState("");
+    const [whyUse, setWhyUse] = useState(() => createOptionState(REASON_OPTIONS));
+    const [whyUseOther, setWhyUseOther] = useState("");
+    const [checkinNotificationsOn, setCheckinNotificationsOn] = useState(null);
     const [workHours, setWorkHours] = useState(() => createDefaultWorkHoursDraft());
 
     const activeError = formError || error;
-    const isLastStep = step === 3;
+
     const stepTitle = useMemo(() => {
-        if (step === 1) return "Je account";
-        if (step === 2) return "Werkritme";
-        return "Snelle setup";
+        if (step === 1) return "Registreren";
+        if (step === 2) return "Formulier vraag 1";
+        if (step === 3) return "Formulier vraag 2";
+        if (step === 4) return "Check-in notificaties";
+        return "Werktijden en pauzes";
     }, [step]);
 
     const updateAccount = (field, value) => {
@@ -29,6 +58,13 @@ export default function SignupPage({ onCreateAccount, onCompleteOnboarding, onNa
             ...currentValue,
             [field]: value,
         }));
+    };
+
+    const toggleOption = (setter, currentState, key) => {
+        setter({
+            ...currentState,
+            [key]: !currentState[key],
+        });
     };
 
     const toggleWorkday = (dayKey) => {
@@ -48,7 +84,10 @@ export default function SignupPage({ onCreateAccount, onCompleteOnboarding, onNa
         }));
     };
 
-    const handleNext = () => {
+    const selectedCount = (state) => Object.values(state).filter(Boolean).length;
+
+    const handlePrimaryAction = async (event) => {
+        event.preventDefault();
         setFormError("");
 
         if (step === 1) {
@@ -61,24 +100,7 @@ export default function SignupPage({ onCreateAccount, onCompleteOnboarding, onNa
                 setFormError("Wachtwoorden komen niet overeen.");
                 return;
             }
-        }
 
-        if (step === 2) {
-            const workdayCount = Object.values(workHours.selectedWorkdays).filter(Boolean).length;
-            if (workdayCount === 0) {
-                setFormError("Selecteer minstens één werkdag.");
-                return;
-            }
-        }
-
-        setStep((currentValue) => Math.min(3, currentValue + 1));
-    };
-
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        setFormError("");
-
-        if (step === 1) {
             const createdAccount = await onCreateAccount({
                 email: account.email.trim(),
                 password: account.password,
@@ -95,268 +117,306 @@ export default function SignupPage({ onCreateAccount, onCompleteOnboarding, onNa
             return;
         }
 
-        if (!isLastStep) {
-            handleNext();
+        if (step === 2) {
+            if (selectedCount(foundHow) === 0 && !foundHowOther.trim()) {
+                setFormError("Kies minstens één optie.");
+                return;
+            }
+
+            setStep(3);
             return;
         }
 
-        const saved = await onCompleteOnboarding({
-            userId: createdUserId,
-            profileSetup: {
-                username: account.username.trim(),
-                bedrijfsnaam: account.bedrijfsnaam.trim(),
-            },
-            workHoursSetup: buildWorkHoursFields(workHours),
-        });
+        if (step === 3) {
+            if (selectedCount(whyUse) === 0 && !whyUseOther.trim()) {
+                setFormError("Kies minstens één optie.");
+                return;
+            }
 
-        if (saved) {
-            setFormError("");
+            setStep(4);
+            return;
+        }
+
+        if (step === 4) {
+            if (checkinNotificationsOn === null) {
+                setFormError("Kies of je check-in notificaties wilt inschakelen.");
+                return;
+            }
+
+            const saved = await onSaveNotifications({
+                userId: createdUserId,
+                checkinNotificationsOn,
+            });
+
+            if (!saved) {
+                return;
+            }
+
+            setStep(5);
+            return;
+        }
+
+        if (step === 5) {
+            const workdayCount = Object.values(workHours.selectedWorkdays).filter(Boolean).length;
+            if (workdayCount === 0) {
+                setFormError("Selecteer minstens één werkdag.");
+                return;
+            }
+
+            const saved = await onSaveWorkHours({
+                userId: createdUserId,
+                workHoursSetup: buildSignupWorkHoursPayload(createdUserId, workHours),
+                email: account.email.trim(),
+                password: account.password,
+            });
+
+            if (!saved) {
+                return;
+            }
         }
     };
 
     return (
-        <main className="signupPage">
-            <section className="signupContent">
-                <div className="signupFormColumn">
+        <main className={`signupPage ${step === 5 ? "signupPageWorkhours" : ""}`}>
+            <img className="signupBrandLogo signupTopLogo" src={logo} alt="Re:Mind" />
+
+            {step === 5 ? (
+                <form className="signupForm signupWorkhoursForm" onSubmit={handlePrimaryAction}>
+                    <section className="workhoursPage signupWorkhoursPage">
+                        <header className="signupStepHeader">
+                            <h1 className="signupTitle">Werkuren en pauzes instellen</h1>
+                            <p className="signupSubtitle">Deze instellingen kunnen altijd aangepast worden in Instellingen &gt; Werktijden en pauzes.</p>
+                        </header>
+
+                        <section className="workhoursContent signupWorkhoursContent">
+                        <div className="row">
+                            <div className="label">Frequentie van pauzeherinneringen:</div>
+                            <div className="value">
+                                <span className="telkensNa">Telkens na</span>
+                                <input
+                                    aria-label="Frequentie uren"
+                                    type="number"
+                                    min={0}
+                                    step={1}
+                                    value={workHours.breakHours}
+                                    onChange={(event) => updateWorkHours("breakHours", Number.parseInt(event.target.value || "0", 10) || 0)}
+                                />
+                                <span className="durationUnit">uur</span>
+                                <input
+                                    aria-label="Frequentie minuten"
+                                    type="number"
+                                    min={0}
+                                    step={1}
+                                    value={workHours.breakMinutes}
+                                    onChange={(event) => updateWorkHours("breakMinutes", Number.parseInt(event.target.value || "0", 10) || 0)}
+                                />
+                                <span className="durationUnit">min</span>
+                            </div>
+                        </div>
+
+                        <div className="row weekdaysRow">
+                            <div className="label">Werkdagen:</div>
+                            <div className="weekdays" role="group" aria-label="Selecteer werkdagen">
+                                {WEEKDAY_OPTIONS.map((day) => {
+                                    const isChecked = workHours.selectedWorkdays[day.key];
+
+                                    return (
+                                        <label key={day.key} className="weekdayOption">
+                                            <span className="weekdayLabel">{day.label}</span>
+                                            <input
+                                                type="checkbox"
+                                                className="weekdayCheckbox"
+                                                checked={isChecked}
+                                                onChange={() => toggleWorkday(day.key)}
+                                            />
+                                        </label>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        <div className="row">
+                            <div className="label">Officieel startuur op werkdagen:</div>
+                            <div className="value">
+                                <input
+                                    aria-label="Officieel startuur"
+                                    type="time"
+                                    value={workHours.startTime}
+                                    onChange={(event) => updateWorkHours("startTime", event.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="row">
+                            <div className="label">Officieel einduur op werkdagen:</div>
+                            <div className="value">
+                                <input
+                                    aria-label="Officieel einduur"
+                                    type="time"
+                                    value={workHours.endTime}
+                                    onChange={(event) => updateWorkHours("endTime", event.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="row toggleRow">
+                            <div className="label">Middagpauze instellen:</div>
+                            <div className="value">
+                                <button
+                                    className="toggle"
+                                    type="button"
+                                    aria-pressed={workHours.lunchPauseEnabled}
+                                    onClick={() => updateWorkHours("lunchPauseEnabled", !workHours.lunchPauseEnabled)}
+                                >
+                                    <span className="knob" />
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className={`row ${!workHours.lunchPauseEnabled ? "rowDisabled" : ""}`}>
+                            <div className="label">Officiële start middagpauze op werkdagen:</div>
+                            <div className="value">
+                                <input
+                                    aria-label="Start middagpauze"
+                                    type="time"
+                                    value={workHours.lunchStart}
+                                    disabled={!workHours.lunchPauseEnabled}
+                                    onChange={(event) => updateWorkHours("lunchStart", event.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className={`row ${!workHours.lunchPauseEnabled ? "rowDisabled" : ""}`}>
+                            <div className="label">Officieel einde middagpauze op werkdagen:</div>
+                            <div className="value">
+                                <input
+                                    aria-label="Einde middagpauze"
+                                    type="time"
+                                    value={workHours.lunchEnd}
+                                    disabled={!workHours.lunchPauseEnabled}
+                                    onChange={(event) => updateWorkHours("lunchEnd", event.target.value)}
+                                />
+                            </div>
+                        </div>
+                        </section>
+                    </section>
+
+                    {activeError ? <p className="signupError" role="alert">{activeError}</p> : null}
+                    {!isConfigured ? <p className="signupError" role="alert">Supabase is nog niet geconfigureerd.</p> : null}
+
+                    <div className="signupFooter">
+                        <div className="signupStepCounter">Stap {step} van 5</div>
+                        <button className="signupPrimaryAction" type="submit" disabled={isSubmitting || !isConfigured}>
+                            Start
+                        </button>
+                    </div>
+                </form>
+            ) : (
+                <section className="signupCenterStage">
                     <div className="signupHeading">
-                        <h1 className="signupTitle">Registreren</h1>
-                        <p className="signupSubtitle">Stap {step} van 3 · {stepTitle}</p>
+                        <h1 className="signupTitle">
+                            {step === 1 ? "Registreren" : step === 2 ? "Hoe heb je Re:Mind gevonden?" : step === 3 ? "Waarom wil je Re:Mind gebruiken?" : "Wil je meldingen voor check-ins inschakelen?"}
+                        </h1>
+                        <p className="signupSubtitle">
+                            {step === 1
+                                ? "Vul je accountgegevens in."
+                                : step === 2 || step === 3
+                                    ? "(Gelieve minstens één optie aan te duiden)"
+                                    : "Deze check-ins vragen naar je stress- en energieniveaus op dat moment."}
+                        </p>
                     </div>
 
-                    {/* <div className="signupStepper" aria-label="Voortgang registratie">
-                        {[1, 2, 3].map((stepNumber) => (
-                            <span key={stepNumber} className={`signupStep ${stepNumber === step ? "active" : stepNumber < step ? "done" : ""}`}>
-                                {stepNumber}
-                            </span>
-                        ))}
-                    </div> */}
-
-                    <form className="signupForm" onSubmit={handleSubmit}>
+                    <form className="signupForm" onSubmit={handlePrimaryAction}>
                         {step === 1 ? (
                             <>
                                 <label className="signupField">
                                     <span>E-mail *</span>
-                                    <input
-                                        type="email"
-                                        name="email"
-                                        autoComplete="email"
-                                        placeholder="E-mail"
-                                        value={account.email}
-                                        onChange={(event) => updateAccount("email", event.target.value)}
-                                        required
-                                    />
+                                    <input type="email" autoComplete="email" placeholder="E-mail" value={account.email} onChange={(event) => updateAccount("email", event.target.value)} required />
                                 </label>
 
                                 <label className="signupField">
                                     <span>Bedrijfsnaam</span>
-                                    <input
-                                        type="text"
-                                        name="bedrijfsnaam"
-                                        autoComplete="organization"
-                                        placeholder="Bedrijfsnaam"
-                                        value={account.bedrijfsnaam}
-                                        onChange={(event) => updateAccount("bedrijfsnaam", event.target.value)}
-                                    />
+                                    <input type="text" autoComplete="organization" placeholder="Bedrijfsnaam" value={account.bedrijfsnaam} onChange={(event) => updateAccount("bedrijfsnaam", event.target.value)} />
                                 </label>
 
                                 <label className="signupField">
                                     <span>Gebruikersnaam *</span>
-                                    <input
-                                        type="text"
-                                        name="username"
-                                        autoComplete="username"
-                                        placeholder="Gebruikersnaam"
-                                        value={account.username}
-                                        onChange={(event) => updateAccount("username", event.target.value)}
-                                        required
-                                    />
+                                    <input type="text" autoComplete="username" placeholder="Gebruikersnaam" value={account.username} onChange={(event) => updateAccount("username", event.target.value)} required />
                                 </label>
 
                                 <label className="signupField">
                                     <span>Wachtwoord *</span>
-                                    <input
-                                        type="password"
-                                        name="password"
-                                        autoComplete="new-password"
-                                        placeholder="Wachtwoord"
-                                        value={account.password}
-                                        onChange={(event) => updateAccount("password", event.target.value)}
-                                        required
-                                    />
+                                    <input type="password" autoComplete="new-password" placeholder="Wachtwoord" value={account.password} onChange={(event) => updateAccount("password", event.target.value)} required />
                                 </label>
 
                                 <label className="signupField">
                                     <span>Wachtwoord bevestigen *</span>
-                                    <input
-                                        type="password"
-                                        name="confirmPassword"
-                                        autoComplete="new-password"
-                                        placeholder="Wachtwoord"
-                                        value={account.confirmPassword}
-                                        onChange={(event) => updateAccount("confirmPassword", event.target.value)}
-                                        required
-                                    />
+                                    <input type="password" autoComplete="new-password" placeholder="Wachtwoord" value={account.confirmPassword} onChange={(event) => updateAccount("confirmPassword", event.target.value)} required />
                                 </label>
-
-                                <button className="signupSubmit signupSubmitFirst" type="submit" disabled={isSubmitting || !isConfigured}>
-                                    {isSubmitting ? "Bezig..." : "Account aanmaken"}
-                                </button>
                             </>
                         ) : null}
 
                         {step === 2 ? (
-                            <div className="signupSection">
-                                <div className="signupSectionHeader">
-                                    <h2>Wanneer werk je meestal?</h2>
-                                    <p>Deze voorkeuren vullen straks automatisch de instellingen in.</p>
-                                </div>
-
-                                <div className="signupWeekdays" role="group" aria-label="Selecteer werkdagen">
-                                    {WEEKDAY_OPTIONS.map((day) => (
-                                        <label key={day.key} className="signupWeekdayOption">
-                                            <span>{day.label}</span>
-                                            <input
-                                                type="checkbox"
-                                                checked={workHours.selectedWorkdays[day.key]}
-                                                onChange={() => toggleWorkday(day.key)}
-                                            />
-                                        </label>
-                                    ))}
-                                </div>
-
-                                <div className="signupGrid">
-                                    <label className="signupField">
-                                        <span>Startuur</span>
-                                        <input
-                                            type="time"
-                                            value={workHours.startTime}
-                                            onChange={(event) => updateWorkHours("startTime", event.target.value)}
-                                        />
+                            <div className="signupQuestionCard">
+                                {SOURCE_OPTIONS.map((option) => (
+                                    <label key={option.key} className="signupChoiceRow">
+                                        <input type="checkbox" checked={foundHow[option.key]} onChange={() => toggleOption(setFoundHow, foundHow, option.key)} />
+                                        <span>{option.label}</span>
                                     </label>
+                                ))}
 
-                                    <label className="signupField">
-                                        <span>Einduur</span>
-                                        <input
-                                            type="time"
-                                            value={workHours.endTime}
-                                            onChange={(event) => updateWorkHours("endTime", event.target.value)}
-                                        />
-                                    </label>
-
-                                    <label className="signupField">
-                                        <span>Pauzeherinnering na</span>
-                                        <div className="signupDurationRow">
-                                            <input
-                                                type="number"
-                                                min="0"
-                                                value={workHours.breakHours}
-                                                onChange={(event) => updateWorkHours("breakHours", Number.parseInt(event.target.value || "0", 10) || 0)}
-                                            />
-                                            <span>uur</span>
-                                            <input
-                                                type="number"
-                                                min="0"
-                                                value={workHours.breakMinutes}
-                                                onChange={(event) => updateWorkHours("breakMinutes", Number.parseInt(event.target.value || "0", 10) || 0)}
-                                            />
-                                            <span>min</span>
-                                        </div>
-                                    </label>
-                                </div>
+                                <label className="signupOtherRow">
+                                    <span>Andere:</span>
+                                    <input type="text" value={foundHowOther} onChange={(event) => setFoundHowOther(event.target.value)} />
+                                </label>
                             </div>
                         ) : null}
 
                         {step === 3 ? (
-                            <div className="signupSection">
-                                <div className="signupSectionHeader">
-                                    <h2>Snelle setup voor pauzes</h2>
-                                    <p>Je kunt dit later altijd aanpassen in de instellingen.</p>
-                                </div>
-
-                                <div className="signupToggleRow">
-                                    <div>
-                                        <strong>Werktimer automatisch starten</strong>
-                                        <p>Start de timer automatisch op je werkdag.</p>
-                                    </div>
-                                    <button
-                                        className="signupToggle"
-                                        type="button"
-                                        aria-pressed={workHours.autoStartWorkTimer}
-                                        onClick={() => updateWorkHours("autoStartWorkTimer", !workHours.autoStartWorkTimer)}
-                                    >
-                                        <span className="signupKnob" />
-                                    </button>
-                                </div>
-
-                                <div className="signupToggleRow">
-                                    <div>
-                                        <strong>Middagpauze instellen</strong>
-                                        <p>Gebruik vaste lunchpauzes in je instellingen.</p>
-                                    </div>
-                                    <button
-                                        className="signupToggle"
-                                        type="button"
-                                        aria-pressed={workHours.lunchPauseEnabled}
-                                        onClick={() => updateWorkHours("lunchPauseEnabled", !workHours.lunchPauseEnabled)}
-                                    >
-                                        <span className="signupKnob" />
-                                    </button>
-                                </div>
-
-                                <div className="signupGrid">
-                                    <label className="signupField">
-                                        <span>Start middagpauze</span>
-                                        <input
-                                            type="time"
-                                            value={workHours.lunchStart}
-                                            disabled={!workHours.lunchPauseEnabled}
-                                            onChange={(event) => updateWorkHours("lunchStart", event.target.value)}
-                                        />
+                            <div className="signupQuestionCard">
+                                {REASON_OPTIONS.map((option) => (
+                                    <label key={option.key} className="signupChoiceRow">
+                                        <input type="checkbox" checked={whyUse[option.key]} onChange={() => toggleOption(setWhyUse, whyUse, option.key)} />
+                                        <span>{option.label}</span>
                                     </label>
+                                ))}
 
-                                    <label className="signupField">
-                                        <span>Einde middagpauze</span>
-                                        <input
-                                            type="time"
-                                            value={workHours.lunchEnd}
-                                            disabled={!workHours.lunchPauseEnabled}
-                                            onChange={(event) => updateWorkHours("lunchEnd", event.target.value)}
-                                        />
-                                    </label>
-                                </div>
+                                <label className="signupOtherRow">
+                                    <span>Andere:</span>
+                                    <input type="text" value={whyUseOther} onChange={(event) => setWhyUseOther(event.target.value)} />
+                                </label>
+                            </div>
+                        ) : null}
 
-                                <article className="signupSummary">
-                                    <h3>Voorbeeld van je setup</h3>
-                                    <p>{account.username || "Je account"} werkt {workHours.startTime} tot {workHours.endTime}.</p>
-                                    <p>De pauzeherinnering staat op {workHours.breakHours} uur en {workHours.breakMinutes} minuten.</p>
-                                </article>
+                        {step === 4 ? (
+                            <div className="signupQuestionCard signupNotificationsCard">
+                                <button type="button" className={`signupBinaryOption ${checkinNotificationsOn === true ? "isActive" : ""}`} onClick={() => setCheckinNotificationsOn(true)}>
+                                    <span>Inschakelen</span>
+                                    <small>(Je ontvangt doorheen je werkdag enkele check-ins in verband met je stress en energie)</small>
+                                </button>
+                                <button type="button" className={`signupBinaryOption ${checkinNotificationsOn === false ? "isActive" : ""}`} onClick={() => setCheckinNotificationsOn(false)}>
+                                    <span>Niet inschakelen</span>
+                                    <small>(Je kan deze instelling altijd aanpassen bij Instellingen &gt; Notificatie-voorkeuren)</small>
+                                </button>
                             </div>
                         ) : null}
 
                         {activeError ? <p className="signupError" role="alert">{activeError}</p> : null}
                         {!isConfigured ? <p className="signupError" role="alert">Supabase is nog niet geconfigureerd.</p> : null}
 
-                        <div className="signupActions">
-                            {step > 1 && isLastStep ? (
-                                <button className="signupSubmit" type="submit" disabled={isSubmitting || !isConfigured}>
-                                    {isSubmitting ? "Opslaan..." : "Setup opslaan"}
-                                </button>
-                            ) : step > 1 ? (
-                                <button className="signupSubmit" type="button" onClick={handleNext} disabled={isSubmitting || !isConfigured}>
-                                    Volgende
-                                </button>
-                            ) : null}
+                        <div className="signupFooter">
+                            <div className="signupStepCounter">Stap {step} van 5</div>
+                            <button className="signupPrimaryAction" type="submit" disabled={isSubmitting || !isConfigured}>
+                                {step === 1 ? "Account aanmaken" : step === 5 ? "Start" : "Volgende"}
+                            </button>
                         </div>
                     </form>
-                </div>
+                </section>
+            )}
 
-                <div className="signupBrandColumn">
-                    <img className="signupBrandLogo" src={logo} alt="" aria-hidden="true" />
-                    <p className="signupBrandText">
-                        Heb je al een account? <button type="button" onClick={onNavigateToLogin}>Log in.</button>
-                    </p>
-                </div>
-            </section>
+            <div className="signupReturnLink">
+                Heb je al een account? <button type="button" onClick={onNavigateToLogin}>Log in.</button>
+            </div>
         </main>
     );
 }
