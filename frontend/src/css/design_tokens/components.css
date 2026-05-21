@@ -33,7 +33,7 @@
     --button-primary-border: var(--primary-700);
     --button-primary-text: var(--text-on-dark);
     --button-primary-font-weight: var(--font-weight-semibold);
-    --button-primary-letter-spacing: 0.02em;
+    --button-primary-letter-spacing: 0.01em;
 
     --button-primary-hover-bg: var(--primary-400);
     --button-primary-hover-border: var(--primary-700);

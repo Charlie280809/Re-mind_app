@@ -49,11 +49,8 @@
 .reportAgendaButton {
     padding: var(--button-padding-y) var(--button-padding-x);
     border-radius: var(--button-radius);
-    /* border: 2px solid var(--border-color-default); */
-    /* background: var(--background-50); */
     color: var(--text-primary);
     padding: var(--button-padding-small-y) var(--button-padding-small-x);
-
 }
 
 .reportNavButton {
@@ -74,21 +71,28 @@
 }
 
 .reportWeekButton {
-    /* padding: var(--button-padding-small-y) var(--button-padding-small-x); */
-    border: 2px solid var(--primary-700);
-    background-color: var(--brand-primary);
+    min-width: var(--button-min-width);
+    min-height: var(--button-min-height);
+    width: 140px;
+    padding: var(--space-4) var(--space-16);
+    border: 2px solid var(--button-primary-border);
+    background-color: var(--button-primary-bg);
     color: var(--text-on-dark);
-    border-radius: var(--button-radius);
-    font-family: var(--text-navigation-default-font-family);
-    font-size: var(--text-navigation-default-font-size);
-    font-weight: var(--text-navigation-default-font-weight);
-    line-height: var(--text-navigation-default-line-height);
+    font-family: var(--font-family-heading);
+    font-size: var(--button-default-font-size);
+    font-weight: var(--button-primary-font-weight);
+    letter-spacing: var(--button-primary-letter-spacing);
     text-align: center;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: var(--space-8);
-    /* padding: var(--space-4) var(--space-16); */
+}
+
+.reportWeekButton:hover {
+    background-color: var(--highlight-300);
+    color: var(--text-on-light);
+    transition: var(--button-default-transition);
 }
 
 .reportMetricsRow {
@@ -262,23 +266,22 @@
 }
 
 .reportAgendaButton {
-    border-radius: 12px;
-    padding: var(--space-8) var(--space-24);
     font-family: var(--button-default-font-family);
-    font-size: var(--font-size-sm);
-    line-height: var(--button-default-line-height);
-    background: var(--background-50);
+    font-size: var(--button-default-font-size);
+    background-color: var(--button-neutral-bg);
+    border: 2px solid var(--button-neutral-border);
+}
+
+.reportAgendaButton:hover {
+    background-color: var(--button-neutral-hover-bg);
+    border-color: var(--button-neutral-hover-border);
+    box-shadow: var(--button-default-hover-shadow);
+    transition: var(--button-default-transition);
 }
 
 .reportAgendaCard {
     min-height: 220px;
     padding: var(--space-20) var(--space-32);
-}
-
-.reportAgendaTime {
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-s);
-    line-height: var(--line-height-sm);
 }
 
 /* @media (max-width: 1024px) {
