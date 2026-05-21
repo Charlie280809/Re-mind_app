@@ -8,6 +8,17 @@ export default function PauseCard({ icon, title, isFavorite, onToggleFavorite, o
     }
   };
 
+  const handleCardKeyDown = (event) => {
+    if (!onClick) {
+      return;
+    }
+
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onClick();
+    }
+  };
+
   const handleFavoriteClick = (e) => {
     e.stopPropagation(); // Voorkom dat de card click event ook getriggerd wordt
     onToggleFavorite();
@@ -17,6 +28,9 @@ export default function PauseCard({ icon, title, isFavorite, onToggleFavorite, o
     <article 
       className={`pause-card ${onClick ? "clickable" : ""}`}
       onClick={handleCardClick}
+      onKeyDown={handleCardKeyDown}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
       style={{ cursor: onClick ? "pointer" : "default" }}
     >
       <div className="pause-iconBox">
