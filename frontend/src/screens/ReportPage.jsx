@@ -4,7 +4,7 @@ import { LuChevronLeft, LuChevronRight, LuZap } from "react-icons/lu";
 import { HiOutlineTrendingUp  } from "react-icons/hi";
 import { TbCrown } from "react-icons/tb";
 
-export default function ReportPage() {
+export default function ReportPage({ isPremium }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [report, setReport] = useState(null);
@@ -62,10 +62,12 @@ export default function ReportPage() {
                     </button>
                 </div>
 
-                <button className="reportWeekButton" type="button">
-                    <TbCrown aria-hidden="true" />
-                    <span>Bekijk weekrapport</span>
-                </button>
+                {!isPremium ? (
+                    <button className="reportWeekButton" type="button">
+                        <TbCrown aria-hidden="true" />
+                        <span>Bekijk weekrapport</span>
+                    </button>
+                ) : null}
             </header>
 
             <section className="reportMetricsRow" aria-label="Samenvatting">
@@ -147,7 +149,7 @@ export default function ReportPage() {
                 </div>
 
                 <article className="reportAgendaCard">
-                    <div className="reportAgendaTime">8:00</div>
+                    {/* agenda integratie */}
                 </article>
             </section>
         </main>
