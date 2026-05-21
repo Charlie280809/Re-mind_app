@@ -4,23 +4,22 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.4);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
+    background-color: var(--backdrop-darken);
     backdrop-filter: var(--backdrop-blur-6);
 }
 
 .checkInModalContent {
     background-color: var(--surface-background);
-    border-radius: 20px;
+    border-radius: var(--popupcard-border-radius);
     padding: var(--space-24);
     min-width: 500px;
     max-width: 1000px;
     width: 90%;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-    /* box-shadow: 0 24px 60px rgba(15, 23, 42, 0.24); */
+    box-shadow: var(--popup-card-box-shadow);
 }
 
 .checkInModalHeader {
@@ -49,7 +48,8 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-12);
-    min-width: 140px;
+    min-width: fit-content;
+    width: 140px;
 }
 
 .checkInSkipButton,
@@ -61,7 +61,7 @@
     font-size: var(--button-default-font-size);
     text-align: var(--button-default-text-align);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: var(--button-default-transition);
 }
 
 .checkInSkipButton {
@@ -102,7 +102,7 @@
 
 .checkInInputCard {
     background-color: var(--surface-card);
-    border-radius: 20px;
+    border-radius: 12px;
     padding: var(--space-20);
     display: flex;
     flex-direction: column;
@@ -130,40 +130,43 @@
 
 .checkInSlider {
     width: 100%;
-    height: 8px;
-    border-radius: var(--space-4);
-    background-color: var(--border-color-default);
-    /* background: linear-gradient(to right, #d0d0d0 0%, #d0d0d0 100%); */
+    height: var(--slider-track-height);
+    border-radius: var(--slider-track-radius);
+    background-color: var(--slider-track-bg);
     -webkit-appearance: none;
     appearance: none;
+    --checkin-slider-thumb-size: var(--slider-thumb-size);
+    --checkin-slider-thumb-radius: var(--slider-thumb-radius);
+    --checkin-slider-thumb-bg: var(--slider-thumb-bg);
 }
 
-.checkInSlider::-webkit-slider-thumb {
+.checkInSlider::-webkit-slider-thumb{
     appearance: none;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background-color: #7a9986;
+    width: var(--checkin-slider-thumb-size);
+    height: var(--checkin-slider-thumb-size);
+    border-radius: var(--checkin-slider-thumb-radius);
+    background-color: var(--checkin-slider-thumb-bg);
     cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .checkInSlider::-moz-range-thumb {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    /* background-color: #7a9986; */
+    appearance: none;
+    width: var(--checkin-slider-thumb-size);
+    height: var(--checkin-slider-thumb-size);
+    border-radius: var(--checkin-slider-thumb-radius);
+    background-color: var(--checkin-slider-thumb-bg);
     cursor: pointer;
     border: none;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .checkInSlider::-webkit-slider-thumb:hover {
-    background-color: #6a8876;
+    background-color: var(--slider-thumb-hover-bg);
+    box-shadow: var(--slider-thumb-hover-shadow);
 }
 
 .checkInSlider::-moz-range-thumb:hover {
-    background-color: #6a8876;
+    background-color: var(--slider-thumb-hover-bg);
+    box-shadow: var(--slider-thumb-hover-shadow);
 }
 
 .checkInSlider:disabled {
