@@ -33,6 +33,7 @@
     --button-primary-border: var(--primary-700);
     --button-primary-text: var(--text-on-dark);
     --button-primary-font-weight: var(--font-weight-semibold);
+    --button-primary-letter-spacing: 0.02em;
 
     --button-primary-hover-bg: var(--primary-400);
     --button-primary-hover-border: var(--primary-700);
@@ -63,14 +64,14 @@
     --button-highlight-active-border: var(--highlight-800);
 
     /* Neutral Button */
-    --button-neutral-default-bg: var(--background-card-50);
-    --button-neutral-default-border: var(--background-400);
-    --button-neutral-default-text: var(--text-on-light);
+    --button-neutral-bg: var(--background-300);
+    --button-neutral-border: var(--background-400);
+    --button-neutral-text: var(--text-on-light);
 
-    --button-neutral-hover-bg: var(--background-200);
+    --button-neutral-hover-bg: var(--background-400);
     --button-neutral-hover-border: var(--background-500);
 
-    --button-neutral-active-bg: var(--background-400);
+    --button-neutral-active-bg: var(--background-500);
     --button-neutral-active-border: var(--background-400);
 
     /* === SELECTION CONTROLS === */
@@ -125,6 +126,16 @@
     /* --toggle-animation-duration: 150ms; */
     /* --toggle-animation-easing: ease-in-out; */
 
+    /* Slider */
+    --slider-track-height: 8px;
+    --slider-track-radius: 4px;
+    --slider-track-bg: var(--border-300);
+    --slider-thumb-size: 24px;
+    --slider-thumb-radius: 50%;
+    --slider-thumb-bg: var(--primary-300);
+    --slider-thumb-hover-bg: var(--primary-400);
+    --slider-thumb-hover-shadow: var(--button-default-hover-shadow);
+
     /* === INPUTS FIELDS === */
     --input-border-radius: 10px;
     --input-border-width: 1px;
@@ -134,12 +145,21 @@
     --input-padding: var(--space-12);
     --input-outline: none;
 
+    --input-focus-box-shadow: 0 0 0 3px var(--border-green-200);
     --input-transition: all 0.2s ease;
 
     /* === POP UP CARDS === */
     --popupcard-border-radius: 20px;
     --popupcard-padding: var(--space-24);
+    --popup-card-box-shadow: 0 28px 64px rgba(0, 0, 0, 0.2);
 
-    /* === DISABLED STATES === */
+    /* === EXTRA'S === */
     --opacity-disabled: 0.6;
+
+    --backdrop-blur-2: blur(2px);
+    --backdrop-blur-4: blur(4px);
+    --backdrop-blur-6: blur(6px);
+    --backdrop-blur-8: blur(8px);
+
+    --backdrop-darken: rgba(0, 0, 0, 0.4);
 }

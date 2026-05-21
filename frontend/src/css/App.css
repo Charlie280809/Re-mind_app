@@ -354,7 +354,7 @@
     font-family: var(--font-family-heading);
     font-size: var(--button-default-font-size);
     font-weight: var(--button-primary-font-weight);
-    letter-spacing: 0.02em;
+    letter-spacing: var(--button-primary-letter-spacing);
     text-align: center;
     display: flex;
     align-items: center;
@@ -365,7 +365,13 @@
 .profile-upgradeBtn svg {
     width: var(--icon-size-28);
     height: var(--icon-size-28);
-    /* transition: all 0.2s ease-in-out; */
+}
+
+.profile-upgradeBtn:hover {
+    background-color: var(--highlight-300);
+    color: var(--text-on-light);
+    /* color: var(--text-on-dark); */
+    transition: var(--button-default-transition);
 }
 
 .profile-upgradeBtnActive {

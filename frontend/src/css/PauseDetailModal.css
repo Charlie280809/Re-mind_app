@@ -23,7 +23,7 @@
     justify-content: center;
     flex-direction: column;
     gap: var(--space-32);
-    background: var(--surface-background);
+    background: var(--surface-card);
     color: var(--text-primary);
     box-shadow: var(--popup-card-box-shadow);
 }
@@ -64,20 +64,6 @@
     margin-top: var(--space-12);
 }
 
-.pauseDetailQuestionButton {
-    height: fit-content;
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-4);
-    padding: 0;
-    border: 0;
-    background: transparent;
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-semibold);
-    cursor: pointer;
-}
-
 .pauseDetailChevron svg{
     display: flex;
     align-items: center;
@@ -91,12 +77,24 @@
     transition: var(--button-default-transition);
 }
 
+.pauseDetailQuestionButton {
+    height: fit-content;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-s);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+}
+
 .pauseDetailDescription {
     margin: 0;
     width: 85%;
     font-family: var(--font-family-body);
-    font-size: var(--font-size-s);
-    line-height: var(--line-height-s);
     padding-left: var(--space-24);
     max-height: 0;
     opacity: 0;
@@ -135,7 +133,7 @@
     background-color: var(--button-secondary-bg);
     color: var(--button-secondary-text);
     font-family: var(--button-default-font-family);
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-s);
     font-weight: var(--font-weight-semibold);
     cursor: pointer;
 }

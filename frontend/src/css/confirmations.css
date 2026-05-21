@@ -9,7 +9,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: var(--backdrop-darken);
 }
 
 .favoriteRemovalTop{
@@ -33,12 +33,12 @@
     margin: 0;
     font-family: var(--text-body-regular-font-family);
     font-size: var(--text-body-regular-font-size);
-    /* font-weight: var(--text-body-regular-font-weight); */
     line-height: var(--text-body-regular-line-height);
     color: var(--text-primary);
 }
 
 .favoriteRemovalClose {
+    margin: 0 0 0 var(--space-8);
     padding: 0;
     background-color: transparent;
     border: none;
@@ -48,17 +48,22 @@
 }
 
 .favoriteRemovalPrimaryButton {
-    min-height: 46px;
-    padding: var(--space-8) var(--space-20);
+    align-self: center;
+    min-width: var(--button-min-width);
+    min-height: var(--button-min-height);
+    width: 140px;
+    padding: var(--button-padding-y) var(--button-padding-x);
     border-radius: var(--button-radius);
-    border: 1px solid var(--border-color-default);
+    border: 2px solid var(--button-neutral-border);
+    background-color: var(--button-neutral-bg);
     font-family: var(--button-default-font-family);
-    font-size: var(--text-body-regular-font-size);
+    font-size: var(--button-default-font-size);
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    transition: var(--button-default-transition);
 }
 
 .favoriteRemovalPrimaryButton:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    background-color: var(--primary-hover);
+    background-color: var(--button-neutral-hover-bg);
+    border-color: var(--button-neutral-hover-border);
+    box-shadow: var(--button-default-hover-shadow);
 }
