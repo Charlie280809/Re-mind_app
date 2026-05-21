@@ -7,6 +7,7 @@ import PauseSuggestions from "./screens/PauseSuggestions";
 import BreathingExerciseDetail from "./screens/BreathingExerciseDetail";
 import ProfilePage from "./screens/ProfilePage";
 import ReportPage from "./screens/ReportPage";
+import WeekReportPage from "./screens/WeekReportPage";
 import CheckInModal from "./components/CheckInModal";
 import FavoriteRemovalModal from "./components/FavoriteRemovalModal";
 import LoginPage from "./screens/LoginPage";
@@ -576,7 +577,9 @@ export default function App() {
           onChangeMethod={() => setCurrentPage("breathing")}
         />
       ) : currentPage === "report" ? (
-        <ReportPage />
+        <ReportPage isPremium={Boolean(profile?.is_premium)} />
+      ) : currentPage === "weekreport" ? (
+        <WeekReportPage />
       ) : currentPage === "profile" ? (
         <ProfilePage
           profile={profile}

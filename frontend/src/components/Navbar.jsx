@@ -19,6 +19,12 @@ export default function Navbar({ currentPage, setCurrentPage, onSettingsNavigate
       onClick: () => setCurrentPage("report"),
     },
     {
+      key: "weekreport",
+      label: "Weekrapport",
+      icon: <HiOutlineChartSquareBar />,
+      onClick: () => setCurrentPage("weekreport"),
+    },
+    {
       key: "pause",
       label: "Pauzes",
       icon: <LuPause />,
@@ -31,6 +37,10 @@ export default function Navbar({ currentPage, setCurrentPage, onSettingsNavigate
       onClick: () => setCurrentPage("profile"),
     },
   ];
+
+  const visibleNavItems = isPremium
+    ? navItems
+    : navItems.filter((item) => item.key !== "weekreport");
 
   const bottomNavItems = [
     {
@@ -53,7 +63,7 @@ export default function Navbar({ currentPage, setCurrentPage, onSettingsNavigate
         </div>
 
         <nav className="sideNavLinks" aria-label="Hoofdnavigatie">
-          {navItems.map((item) => (
+          {visibleNavItems.map((item) => (
             <button
               key={item.key}
               className={`sideNavLink ${currentPage === item.key ? "active" : ""}`}

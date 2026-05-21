@@ -1,0 +1,460 @@
+@import url("./design_tokens/color_tokens.css");
+@import url("./design_tokens/typography_tokens.css");
+@import url("./design_tokens/spacing_tokens.css");
+@import url("./design_tokens/components.css");
+
+.weekReportPage {
+    flex: 1;
+    min-width: 0;
+    padding: var(--layout-container-padding);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-24);
+    color: var(--text-primary);
+}
+
+.weekReportHeader,
+.weekReportTitleGroup,
+.weekReportSectionHeading,
+.weekReportSectionHeadingSplit,
+.weekReportLegend,
+.weekReportStatItem,
+.weekReportInsightDay,
+.weekReportSectionMeta {
+    display: flex;
+    align-items: center;
+}
+
+.weekReportHeader {
+    justify-content: flex-start;
+}
+
+.weekReportTitleGroup {
+    gap: var(--space-12);
+    flex-wrap: wrap;
+}
+
+.weekReportNavButton {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 2px solid var(--border-color-default);
+    background: var(--surface-background);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    color: var(--text-primary);
+}
+
+.weekReportNavButton svg {
+    width: 20px;
+    height: 20px;
+}
+
+.weekReportTitle {
+    margin: 0;
+    font-family: var(--text-heading-2-font-family);
+    font-size: var(--text-heading-2-font-size);
+    line-height: var(--text-heading-2-line-height);
+    font-weight: var(--text-heading-2-font-weight);
+}
+
+.weekReportTopGrid {
+    display: grid;
+    grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+    gap: var(--space-24);
+    align-items: start;
+}
+
+.weekReportStatBlock,
+.weekReportChartBlock,
+.weekReportSection,
+.weekReportInsightsCard,
+.weekReportLineChartCard,
+.weekReportStatsCard,
+.weekReportBarChartCard {
+    display: flex;
+    flex-direction: column;
+}
+
+.weekReportSectionTitle {
+    margin: 0;
+    font-family: var(--text-heading-3-font-family);
+    font-size: var(--font-size-md);
+    line-height: var(--line-height-md);
+    font-weight: var(--font-weight-regular);
+}
+
+.weekReportValueCard {
+    margin: var(--space-12) 0 0;
+    width: fit-content;
+    padding: var(--space-20) var(--space-24);
+    border-radius: 16px;
+    border: 2px solid var(--border-color-default);
+    background: var(--surface-background);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-s);
+    line-height: var(--line-height-sm);
+    color: var(--text-primary);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03);
+}
+
+.weekReportChartBlock,
+.weekReportSection {
+    gap: var(--space-12);
+}
+
+.weekReportSectionHeading,
+.weekReportSectionHeadingSplit {
+    justify-content: space-between;
+    gap: var(--space-16);
+    flex-wrap: wrap;
+}
+
+.weekReportSectionMeta {
+    gap: var(--space-4);
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xxs);
+    line-height: var(--line-height-xs);
+}
+
+.weekReportChartRow {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 190px;
+    gap: var(--space-16);
+    align-items: stretch;
+}
+
+.weekReportLineChartCard,
+.weekReportStatsCard,
+.weekReportBarChartCard,
+.weekReportInsightsCard {
+    border: 1px solid var(--border-color-default);
+    border-radius: 18px;
+    background: var(--surface-background);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+}
+
+.weekReportLineChartCard {
+    padding: var(--space-12) var(--space-16) var(--space-8);
+}
+
+.weekReportLineChart {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.weekReportGrid line {
+    stroke: rgba(118, 147, 130, 0.14);
+    stroke-width: 1;
+    shape-rendering: crispEdges;
+}
+
+.weekReportStressPath,
+.weekReportEnergyPath {
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.weekReportStressPath {
+    stroke: var(--warning-300);
+}
+
+.weekReportEnergyPath {
+    stroke: var(--info-300);
+}
+
+.weekReportStressPoint,
+.weekReportEnergyPoint {
+    stroke: var(--surface-background);
+    stroke-width: 2;
+}
+
+.weekReportStressPoint {
+    fill: var(--warning-300);
+}
+
+.weekReportEnergyPoint {
+    fill: var(--info-300);
+}
+
+.weekReportChartLabel {
+    font-family: var(--font-family-body);
+    font-size: 11px;
+    fill: var(--text-secondary);
+    text-anchor: middle;
+}
+
+.weekReportLegend {
+    justify-content: center;
+    gap: var(--space-24);
+    flex-wrap: wrap;
+    margin-top: var(--space-12);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-xs);
+    color: var(--text-primary);
+}
+
+.weekReportLegend span {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-8);
+}
+
+.weekReportLegendDot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.weekReportLegendDotStress {
+    background: var(--warning-300);
+}
+
+.weekReportLegendDotEnergy {
+    background: var(--info-300);
+}
+
+.weekReportLegendDotTaken {
+    background: var(--highlight-300);
+}
+
+.weekReportLegendDotSkipped {
+    background: var(--error-300);
+}
+
+.weekReportStatsCard {
+    padding: var(--space-20) var(--space-16);
+    justify-content: center;
+    gap: var(--space-20);
+    text-align: center;
+}
+
+.weekReportStatItem {
+    flex-direction: column;
+    gap: var(--space-8);
+}
+
+.weekReportStatIcon {
+    width: 24px;
+    height: 24px;
+    color: var(--text-primary);
+}
+
+.weekReportStatLabel {
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xxs);
+    line-height: var(--line-height-xs);
+    color: var(--text-primary);
+}
+
+.weekReportStatValue {
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-md);
+    line-height: var(--line-height-md);
+    font-weight: var(--font-weight-bold);
+}
+
+.weekReportStatValueStress {
+    color: var(--warning-300);
+}
+
+.weekReportStatValueEnergy {
+    color: var(--info-400);
+}
+
+.weekReportDivider {
+    height: 1px;
+    width: 100%;
+    background: rgba(118, 147, 130, 0.18);
+}
+
+.weekReportBarChartCard {
+    padding: var(--space-16);
+    gap: var(--space-16);
+    background: var(--surface-background);
+}
+
+.weekReportBarChart {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--space-12);
+    align-items: end;
+    min-height: 220px;
+    padding: var(--space-16) var(--space-8) var(--space-8);
+    background: linear-gradient(180deg, rgba(230, 224, 193, 0.22), rgba(230, 224, 193, 0.06));
+    border-radius: 12px;
+}
+
+.weekReportBarGroup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-8);
+}
+
+.weekReportBars {
+    width: 100%;
+    height: 150px;
+    display: flex;
+    align-items: end;
+    justify-content: center;
+    gap: 6px;
+}
+
+.weekReportBar {
+    width: 22px;
+    border-radius: 6px 6px 0 0;
+}
+
+.weekReportBarTaken {
+    background: var(--highlight-300);
+}
+
+.weekReportBarSkipped {
+    background: var(--error-300);
+}
+
+.weekReportBarLabel {
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xxs);
+    line-height: var(--line-height-xs);
+    color: var(--text-secondary);
+}
+
+.weekReportLegendBottom {
+    margin-top: 0;
+}
+
+.weekReportInsightsCard {
+    position: relative;
+    padding: var(--space-20) var(--space-24);
+    overflow: hidden;
+}
+
+.weekReportTimeline {
+    position: absolute;
+    top: var(--space-24);
+    bottom: var(--space-24);
+    left: 52px;
+    width: 2px;
+    background: rgba(118, 147, 130, 0.45);
+}
+
+.weekReportInsightList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-20);
+}
+
+.weekReportInsightRow {
+    display: grid;
+    grid-template-columns: 132px 1fr;
+    gap: var(--space-16);
+    align-items: center;
+}
+
+.weekReportInsightDay {
+    gap: var(--space-8);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xxs);
+    line-height: var(--line-height-xs);
+    color: var(--text-secondary);
+}
+
+.weekReportInsightBadge {
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    background: var(--highlight-200);
+    border: 1px solid rgba(118, 147, 130, 0.18);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    flex: 0 0 auto;
+}
+
+.weekReportInsightBadge svg {
+    width: 14px;
+    height: 14px;
+}
+
+.weekReportInsightText {
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-xs);
+    color: var(--text-primary);
+}
+
+@media (max-width: 1080px) {
+
+    .weekReportTopGrid,
+    .weekReportChartRow,
+    .weekReportInsightRow {
+        grid-template-columns: 1fr;
+    }
+
+    .weekReportStatsCard {
+        flex-direction: row;
+        align-items: stretch;
+    }
+
+    .weekReportDivider {
+        width: 1px;
+        height: auto;
+    }
+
+    .weekReportTimeline {
+        left: 38px;
+    }
+}
+
+@media (max-width: 760px) {
+    .weekReportPage {
+        padding: var(--space-20);
+    }
+
+    .weekReportTitle {
+        font-size: var(--font-size-lg);
+        line-height: var(--line-height-md);
+    }
+
+    .weekReportBarChart {
+        gap: var(--space-8);
+        min-height: 180px;
+    }
+
+    .weekReportBars {
+        height: 120px;
+    }
+
+    .weekReportBar {
+        width: 16px;
+    }
+
+    .weekReportStatsCard {
+        flex-direction: column;
+    }
+
+    .weekReportDivider {
+        width: 100%;
+        height: 1px;
+    }
+
+    .weekReportInsightRow {
+        gap: var(--space-12);
+    }
+
+    .weekReportTimeline {
+        left: 36px;
+    }
+}
