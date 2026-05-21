@@ -60,7 +60,7 @@ export const DATA = [
     icon: trophy,
     layout: "centered",
     intro: "Noem voor jezelf één ding dat vandaag al goed ging.",
-    description: "Even bewust stilstaan bij een succes helpt om je aandacht te verplaatsen en zorgt voor ee, positieve mindset.",
+    description: "Even bewust stilstaan bij een succes helpt om je aandacht te verplaatsen en zorgt voor een positieve mindset.",
   },
   {
     id: "handStretch",

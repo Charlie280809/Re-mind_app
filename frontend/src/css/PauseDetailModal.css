@@ -1,0 +1,172 @@
+.modalOpen {
+    overflow: hidden;
+}
+
+.pauseDetailOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-24);
+    background: var(--backdrop-darken);
+    backdrop-filter: var(--backdrop-blur-2);
+}
+
+.pauseDetailModal {
+    width: 60%;
+    min-height: fit-content;
+    border-radius: var(--popupcard-border-radius);
+    padding: var(--space-64);
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    gap: var(--space-32);
+    background: var(--surface-background);
+    color: var(--text-primary);
+    box-shadow: var(--popup-card-box-shadow);
+}
+
+.pauseDetailContent {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-24);
+}
+
+.pauseDetailTitle {
+    margin: 0;
+    font-family: var(--font-family-heading);
+    font-size: var(--text-heading-1-font-size);
+    font-weight: var(--text-heading-2-font-weight);
+    text-align: center;
+}
+
+.pauseDetailLead {
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-sm);
+    text-align: center;
+}
+
+.pauseDetailSteps {
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-sm);
+    align-self: center;
+}
+
+.pauseDetailSteps li+li {
+    margin-top: var(--space-12);
+}
+
+.pauseDetailQuestionButton {
+    height: fit-content;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+}
+
+.pauseDetailChevron svg{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--icon-size-28);
+    height: var(--icon-size-28);
+}
+
+.pauseDetailChevron.open {
+    transform: rotate(90deg);
+    transition: var(--button-default-transition);
+}
+
+.pauseDetailDescription {
+    margin: 0;
+    width: 85%;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-s);
+    line-height: var(--line-height-s);
+    padding-left: var(--space-24);
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transform: translateY(-4px);
+    pointer-events: none;
+    transition: var(--button-default-transition);
+}
+
+.pauseDetailDescription.open {
+    max-height: 200px;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.pauseDetailFooter {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.pauseDetailFooterActions {
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-16);
+}
+
+.pauseDetailButton {
+    min-width: var(--button-min-width);
+    min-height: var(--button-min-height);
+    padding: var(--button-padding-y) var(--button-padding-x);
+    border-radius: var(--button-radius);
+    border: 2px solid var(--border-color-green);
+    background-color: var(--button-secondary-bg);
+    color: var(--button-secondary-text);
+    font-family: var(--button-default-font-family);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+}
+
+.pauseDetailButton:hover {
+    background-color: var(--button-secondary-hover-bg);
+    border-color: var(--button-secondary-hover-border);
+    box-shadow: var(--button-default-hover-shadow);
+    transition: var(--button-default-transition);
+}
+
+/* @media (max-width: 768px) {
+    .pauseDetailOverlay {
+        padding: var(--space-12);
+    }
+
+    .pauseDetailModal {
+        min-height: auto;
+        border-radius: 22px;
+    }
+
+    .pauseDetailTitle {
+        text-align: left;
+    }
+
+    .pauseDetailFooter {
+        justify-content: stretch;
+    }
+
+    .pauseDetailButton {
+        width: 100%;
+        min-width: 0;
+    }
+} */
