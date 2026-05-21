@@ -586,7 +586,6 @@ export default function App() {
           favorites={pauseFavorites}
           onToggleFavorite={togglePauseFavorite}
           onNavigateToPause={() => setCurrentPage("pause")}
-          onLogout={handleLogout}
           onNavigateToUpgrade={() => {
             setCurrentPage("upgrade");
           }}
@@ -599,6 +598,7 @@ export default function App() {
           initialView={settingsInitialView}
           clearInitialView={() => setSettingsInitialView(null)}
           onNavigateToUpgrade={() => setCurrentPage("upgrade")}
+          onLogout={handleLogout}
         />
       ) : currentPage === "upgrade" ? (
         <UpgradePlan onBack={() => setCurrentPage("home")} isPremium={Boolean(profile?.is_premium)} />

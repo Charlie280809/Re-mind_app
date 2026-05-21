@@ -380,25 +380,6 @@
     color: var(--text-primary);
 }
 
-.profile-logoutBtn {
-    align-self: flex-start;
-    margin-left: auto;
-    border: 2px solid var(--error-200);
-    border-radius: var(--button-radius);
-    cursor: pointer;
-    padding: var(--space-4) var(--space-24);
-    font-size: var(--font-size-s);
-    font-family: var(--button-default-font-family);
-    background-color: var(--error-100);
-    color: var(--text-on-light);
-    transition: all 0.2s ease-in-out;
-}
-
-/* .profile-logoutBtn:hover {
-    background-color: var(--error-200);
-    border-color: var(--error-300);
-} */
-
 .profile-section {
     display: flex;
     flex-direction: column;

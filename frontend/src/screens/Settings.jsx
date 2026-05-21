@@ -6,7 +6,7 @@ import SettingsNotifications from "./SettingsNotifications";
 import SettingsPersonalData from "./SettingsPersonalData";
 import SettingsPrivacy from "./SettingsPrivacy";
 
-export default function Settings({ onBack, resetKey, isPremium, initialView, clearInitialView, onNavigateToUpgrade }) {
+export default function Settings({ onBack, resetKey, isPremium, initialView, clearInitialView, onNavigateToUpgrade, onLogout }) {
     const [view, setView] = useState("list");
 
     useEffect(() => {
@@ -70,6 +70,10 @@ export default function Settings({ onBack, resetKey, isPremium, initialView, cle
                     ))}
                 </ul>
             </section>
+
+            <button className="logoutBtn" type="button" onClick={onLogout}>
+                Afmelden
+            </button>
         </main>
     );
 }

@@ -3,7 +3,7 @@ import { TbCrown } from "react-icons/tb";
 import PauseCard from "../components/PauseCard";
 import { DATA as PAUSE_OPTIONS } from "./PauseSuggestions";
 
-export default function ProfilePage({ profile, favorites, onToggleFavorite, onNavigateToPause, onLogout, onNavigateToUpgrade }) {
+export default function ProfilePage({ profile, favorites, onToggleFavorite, onNavigateToPause, onNavigateToUpgrade }) {
     const name = profile?.username || profile?.email || "Gebruiker";
     const companyName = profile?.bedrijfsnaam || "Geen bedrijfsnaam";
     const isPremium = Boolean(profile?.is_premium);
@@ -42,10 +42,6 @@ export default function ProfilePage({ profile, favorites, onToggleFavorite, onNa
                         </button>
                     )}
                 </div>
-
-                <button className="profile-logoutBtn" type="button" onClick={onLogout}>
-                    Afmelden
-                </button>
             </section>
 
             <section className="profile-section">
