@@ -343,26 +343,29 @@
 }
 
 .profile-upgradeBtn {
-    border: 2px solid var(--primary-700);
-    background-color: var(--brand-primary);
+    min-width: var(--button-min-width);
+    min-height: var(--button-min-height);
+    width: 140px;
+    padding: var(--space-4) var(--space-16);
+    border: 2px solid var(--button-primary-border);
+    background-color: var(--button-primary-bg);
     color: var(--text-on-dark);
     border-radius: var(--button-radius);
-    font-family: var(--text-navigation-default-font-family);
-    font-size: var(--text-navigation-default-font-size);
-    font-weight: var(--text-navigation-default-font-weight);
-    line-height: var(--text-navigation-default-line-height);
+    font-family: var(--font-family-heading);
+    font-size: var(--button-default-font-size);
+    font-weight: var(--button-primary-font-weight);
+    letter-spacing: 0.02em;
     text-align: center;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: var(--space-8);
-    padding: var(--space-4) var(--space-16);
 }
 
 .profile-upgradeBtn svg {
-    width: 28px;
-    height: 28px;
-    transition: all 0.2s ease-in-out;
+    width: var(--icon-size-28);
+    height: var(--icon-size-28);
+    /* transition: all 0.2s ease-in-out; */
 }
 
 .profile-upgradeBtnActive {

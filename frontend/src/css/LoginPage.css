@@ -69,7 +69,7 @@
 
 .inputField input:focus {
     border-color: var(--border-green-300);
-    box-shadow: 0 0 0 3px var(--border-green-200);
+    box-shadow: var(--input-focus-box-shadow);
     transition: var(--input-transition);
 }
 

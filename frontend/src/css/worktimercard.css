@@ -73,19 +73,18 @@
 .breakbtn:hover {
     background-color: var(--button-highlight-hover-bg);
     border-color: var(--button-highlight-hover-border);
-    box-shadow: var(--button-default-hover-shadow);
 }
 
 .endbtn {
-    background-color: var(--background-200);
-    border: 2px solid transparent;
-    color: var(--text-on-light);
+    font-weight: var(--button-default-font-weight);
+    background-color: var(--button-neutral-bg);
+    border: 2px solid var(--button-neutral-border);
+    color: var(--button-neutral-text);
 }
 
 .endbtn:hover {
-    background-color: var(--background-300);
-    border-color: transparent;
-    box-shadow: var(--button-default-hover-shadow);
+    background-color: var(--button-neutral-hover-bg);
+    border-color: var(--button-neutral-hover-border);
 }
 
 .muted {
