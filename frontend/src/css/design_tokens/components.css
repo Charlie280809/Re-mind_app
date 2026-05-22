@@ -74,6 +74,17 @@
     --button-neutral-active-bg: var(--background-500);
     --button-neutral-active-border: var(--background-400);
 
+    /* Delete - Logout button */
+    --button-red-bg: var(--error-100);
+    --button-red-border: var(--error-200);
+    --button-red-text: var(--text-on-light);
+
+    --button-red-hover-bg: var(--error-200);
+    --button-red-hover-border: var(--error-300);
+
+    --button-red-active-bg: var(--error-300);
+    --button-red-active-border: var(--error-400);
+
     /* === SELECTION CONTROLS === */
     /* Checkbox */
     --checkbox-size: 28px;

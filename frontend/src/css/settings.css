@@ -95,24 +95,22 @@
 }
 
 .logoutBtn {
-    align-self: flex-start;
     margin-left: auto;
-    border: 2px solid var(--error-200);
+    width: 140px;
+    padding: var(--button-padding-small-y) var(--button-padding-small-x);
+    border: 2px solid var(--button-red-border);
     border-radius: var(--button-radius);
-    cursor: pointer;
-    padding: var(--space-4) var(--space-24);
-    font-size: var(--font-size-s);
     font-family: var(--button-default-font-family);
-    background-color: var(--error-100);
-    color: var(--text-on-light);
+    font-size: var(--button-default-font-size);
+    background-color: var(--button-red-bg);
+    color: var(--button-red-text);
+    cursor: pointer;
 }
 
 .logoutBtn:hover {
-    background-color: var(--error-200);
-    border-color: var(--error-300);
     box-shadow: var(--button-default-hover-shadow);
     transition: var(--button-default-transition);
-} 
+}
 
 /* === Other pages === */
 
@@ -172,7 +170,7 @@
     color: var(--text-primary);
 }
 
-.weekdayCheckbox{
+.weekdayCheckbox {
     margin: 0;
     appearance: none;
     width: var(--checkbox-size);
@@ -208,20 +206,20 @@
 
 .weekdayCheckbox:checked::after {
     transform: rotate(-45deg) scale(1);
-} 
+}
 
 .value {
     flex: 1;
     display: flex;
     align-items: center;
     gap: var(--space-4);
-    
+
     transition: all 0.2s ease;
 }
 
 .value input[type="number"] {
     width: 64px;
-outline: none;
+    outline: none;
     margin: 0 var(--space-4);
 }
 
@@ -342,7 +340,7 @@ outline: none;
     color: var(--text-secondary, var(--text-primary));
 }
 
-.saveRow{
+.saveRow {
     display: flex;
     flex-direction: row-reverse;
     align-items: flex-end;
@@ -478,17 +476,24 @@ outline: none;
     line-height: 1.2;
 }
 
-.personalDeleteButton {
+.deleteAccountButton {
     margin-top: auto;
-    padding: var(--button-padding-y) var(--button-padding-x);
+    width: var(--button-min-width);
+    padding: var(--button-padding-small-y) var(--button-padding-small-x);
+    border: 2px solid var(--button-red-border);
     border-radius: var(--button-radius);
-    border: 1px solid var(--accent-danger, #d79c9c);
-    background-color: transparent;
-    color: var(--text-primary);
     font-family: var(--button-default-font-family);
-    font-size: var(--font-size-s);
-    font-weight: var(--font-weight-regular);
+    font-size: var(--button-default-font-size);
+    background-color: var(--button-red-bg);
+    color: var(--button-red-text);
     cursor: pointer;
+}
+
+.deleteAccountButton:hover {
+    border-color: var(--button-red-hover-border);
+    background-color: var(--button-red-hover-bg);
+    box-shadow: var(--button-default-hover-shadow);
+    transition: var(--button-default-transition);
 }
 
 .personalSaveButton {
@@ -602,27 +607,37 @@ outline: none;
     font-size: var(--text-body-small-font-size, 0.9rem);
 }
 
-.personalDeleteButton {
-    width: fit-content;
-    padding: var(--button-padding-y) var(--button-padding-x);
+.deletePersonalDataButton {
+    min-width: var(--button-min-width);
+    width: 140px;
+    padding: var(--button-padding-small-y) var(--button-padding-small-x);
+    border: 2px solid var(--button-red-border);
     border-radius: var(--button-radius);
-    border: 1px solid var(--accent-danger, #d79c9c);
-    background-color: transparent;
-    color: var(--text-primary);
     font-family: var(--button-default-font-family);
-    font-size: var(--font-size-s);
+    font-size: var(--button-default-font-size);
+    background-color: var(--button-red-bg);
+    color: var(--button-red-text);
     cursor: pointer;
 }
 
+.deletePersonalDataButton:hover {
+    border-color: var(--button-red-hover-border);
+    background-color: var(--button-red-hover-bg);
+    box-shadow: var(--button-default-hover-shadow);
+    transition: var(--button-default-transition);
+}
+
 .exportButton {
-    width: fit-content;
-    padding: var(--button-padding-y) var(--button-padding-x);
+    min-width: var(--button-min-width);
+    min-height: var(--button-min-height);
+    width: 140px;
+    padding: var(--button-padding-small-y) var(--button-padding-small-x);
     border-radius: var(--button-radius);
-    border: 2px solid var(--primary-700);
-    background-color: var(--highlight-200);
-    color: var(--text-primary);
+    border: 2px solid var(--button-secondary-border);
+    background-color: var(--button-secondary-bg);
+    color: var(--button-secondary-text);
     font-family: var(--button-default-font-family);
-    font-size: var(--font-size-s);
+    font-size: var(--button-default-font-size);
     cursor: pointer;
 }
 

@@ -43,7 +43,7 @@ export default function SettingsPersonalData({ onBack }) {
                     ))}
                 </div>
 
-                <button className="personalDeleteButton" type="button">
+                <button className="deleteAccountButton" type="button">
                     Verwijder account
                 </button>
             </section>

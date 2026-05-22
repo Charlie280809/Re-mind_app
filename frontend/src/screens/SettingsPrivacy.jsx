@@ -216,7 +216,7 @@ export default function SettingsPrivacy({ onBack }) {
                         {saving ? "Bezig met exporteren..." : "Exporteer data"}
                     </button>
 
-                    <button className="personalDeleteButton" type="button" onClick={handleDelete}>
+                    <button className="deletePersonalDataButton" type="button" onClick={handleDelete}>
                         Verwijder data
                     </button>
                 </div>
