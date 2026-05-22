@@ -4,6 +4,12 @@ import { LuChevronLeft, LuChevronRight, LuZap } from "react-icons/lu";
 import { HiOutlineTrendingUp  } from "react-icons/hi";
 import { TbCrown } from "react-icons/tb";
 
+const dateOptions = { day: "numeric", month: "long", year: "numeric" };
+
+function formatDate(date = new Date()) {
+    return new Intl.DateTimeFormat("nl-BE", dateOptions).format(date);
+}
+
 export default function ReportPage({ isPremium }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -36,12 +42,9 @@ export default function ReportPage({ isPremium }) {
     }, []);
 
     const reportTitle = useMemo(() => {
-        if (!report?.date) {
-            return "Rapport van vandaag";
-        }
-
-        const date = new Date(`${report.date}T00:00:00`);
-        return `Rapport van ${date.toLocaleDateString("be-BE")}`;
+        const reportDate = report?.date ? new Date(`${report.date}T00:00:00`) : new Date();
+        const safeDate = Number.isNaN(reportDate.getTime()) ? new Date() : reportDate;
+        return `Rapport van ${formatDate(safeDate)}`;
     }, [report?.date]);
 
     const avgStressLabel = report?.averageStress == null ? "-" : `${report.averageStress}/5`;

@@ -33,6 +33,7 @@ function getTodayRange() {
   return {
     startIso: start.toISOString(),
     endIso: end.toISOString(),
+    localDate: `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, "0")}-${String(start.getDate()).padStart(2, "0")}`,
   };
 }
 
@@ -43,7 +44,7 @@ app.get("/report/today", async (req, res) => {
     });
   }
 
-  const { startIso, endIso } = getTodayRange();
+  const { startIso, endIso, localDate } = getTodayRange();
   const { data, error } = await supabase
     .from("checkins")
     .select("stress, energy, need_pause, created_at")
@@ -62,7 +63,7 @@ app.get("/report/today", async (req, res) => {
 
   if (totalCheckins === 0) {
     return res.json({
-      date: startIso.slice(0, 10),
+      date: localDate,
       totalCheckins: 0,
       averageStress: null,
       averageEnergy: null,
@@ -81,7 +82,7 @@ app.get("/report/today", async (req, res) => {
   );
 
   return res.json({
-    date: startIso.slice(0, 10),
+    date: localDate,
     totalCheckins,
     averageStress: Number((totals.stress / totalCheckins).toFixed(1)),
     averageEnergy: Number((totals.energy / totalCheckins).toFixed(1)),
