@@ -19,6 +19,46 @@ import notitie from "./assets/icons/Afsluitnotitie.svg";
 import spinner from "./assets/images/loadingSpinner.svg";
 import { supabase } from "./lib/supabaseClient";
 
+const NAV_STATE_STORAGE_KEY = "remind-navigation-state";
+
+const getStoredNavigationState = () => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    const rawState = window.sessionStorage.getItem(NAV_STATE_STORAGE_KEY);
+    if (!rawState) {
+      return null;
+    }
+
+    const parsedState = JSON.parse(rawState);
+    const allowedPages = new Set([
+      "home",
+      "report",
+      "weekreport",
+      "profile",
+      "settings",
+      "upgrade",
+      "breathing",
+      "pause",
+      "exercise-detail",
+    ]);
+
+    if (!allowedPages.has(parsedState?.currentPage)) {
+      return null;
+    }
+
+    return {
+      currentPage: parsedState.currentPage,
+      selectedExercise: typeof parsedState.selectedExercise === "string" ? parsedState.selectedExercise : null,
+      settingsInitialView: typeof parsedState.settingsInitialView === "string" ? parsedState.settingsInitialView : null,
+    };
+  } catch {
+    return null;
+  }
+};
+
 export default function App() {
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -33,10 +73,11 @@ export default function App() {
   const [authError, setAuthError] = useState("");
   const [authView, setAuthView] = useState("login");
 
-  const [currentPage, setCurrentPage] = useState("home");
+  const storedNavigationState = getStoredNavigationState();
+  const [currentPage, setCurrentPage] = useState(storedNavigationState?.currentPage || "home");
   const [settingsResetKey, setSettingsResetKey] = useState(0);
-  const [settingsInitialView, setSettingsInitialView] = useState(null);
-  const [selectedExercise, setSelectedExercise] = useState(null);
+  const [settingsInitialView, setSettingsInitialView] = useState(storedNavigationState?.settingsInitialView || null);
+  const [selectedExercise, setSelectedExercise] = useState(storedNavigationState?.selectedExercise || null);
   const [pauseFavorites, setPauseFavorites] = useState(() => new Set());
   const [favoriteRemovalTarget, setFavoriteRemovalTarget] = useState(null);
 
@@ -144,7 +185,6 @@ export default function App() {
 
         if (!isCancelled) {
           setProfile(payload.profile);
-          setCurrentPage("home");
         }
       } catch (error) {
         if (!isCancelled) {
@@ -172,6 +212,23 @@ export default function App() {
 
   const displayName = profile?.username || session?.user?.email?.split("@")[0] || "Gebruiker";
   const companyName = profile?.bedrijfsnaam || "";
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    window.sessionStorage.setItem(
+      NAV_STATE_STORAGE_KEY,
+      JSON.stringify({
+        currentPage,
+        selectedExercise,
+        settingsInitialView,
+      })
+    );
+
+    return undefined;
+  }, [currentPage, selectedExercise, settingsInitialView]);
 
   useEffect(() => {
     let timer = null;

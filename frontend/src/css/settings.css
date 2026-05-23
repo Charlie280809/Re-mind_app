@@ -112,6 +112,35 @@
     transition: var(--button-default-transition);
 }
 
+.settingsLoading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-16);
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--text-body-regular-font-size);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+}
+
+.settingsLoading img {
+    width: var(--space-48);
+    height: auto;
+    object-fit: contain;
+    animation: loadingSpin 1.2s linear infinite;
+    transform-origin: center;
+}
+
+@keyframes loadingSpin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 /* === Other pages === */
 
 /* --- Work hours Page --- */
@@ -353,40 +382,60 @@
 
 .saveButton {
     min-width: var(--button-min-width);
+    min-height: var(--button-min-height);
+    width: 140px;
     padding: var(--button-padding-y) var(--button-padding-x);
     border-radius: var(--button-radius);
     border: 2px solid var(--border-color-green);
-    color: var(--button-default-text);
     cursor: pointer;
     font-family: var(--button-default-font-family);
-    /* margin: 0 0 0 auto; */
-
-    font-size: var(--font-size-s);
-    font-family: var(--button-default-font-family);
+    font-size: var(--button-default-font-size);
     font-weight: var(--font-weight-regular);
-
-    border: 2px solid var(--highlight-300);
-    background-color: var(--highlight-200);
-
-    /* position: absolute;
+    color: var(--button-highlight-text);
+    border: 2px solid var(--button-highlight-border);
+    background-color: var(--button-highlight-bg);
+    position: absolute;
     right: var(--layout-container-padding);
-    bottom: var(--layout-container-padding); */
+    bottom: var(--layout-container-padding);
 }
 
 .saveButton:hover {
     background-color: var(--highlight-300);
     border-color: var(--highlight-400);
+    box-shadow: var(--button-default-hover-shadow);
     transition: all 0.2s ease;
 }
 
-.saveMessage {
+.savedMessage,
+.saveWarning {
     font-family: var(--text-body-small-font-family);
     font-size: var(--text-body-small-font-size);
-    color: var(--text-secondary);
-    /* position: absolute;
+    color: var(--text-primary);
+    padding: var(--space-8) var(--space-12);
+    border-radius: var(--button-radius);
+    position: absolute;
     right: var(--layout-container-padding);
-    bottom: var(--layout-container-padding);
-    padding: 0  0 0; */
+    top: var(--layout-container-padding);
+    opacity: 0;
+    transform: translateY(-8px);
+}
+
+.saveWarning {
+    border: 2px solid var(--error-300);
+    background-color: var(--error-200);
+}
+
+.savedMessage {
+    border-left: 4px solid var(--success-500);
+    border-right: 4px solid var(--success-500);
+    background-color: var(--success-200);
+}
+
+.savedMessage.visible,
+.saveWarning.visible {
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 0.2s ease;
 }
 
 /* --- Personal Data Page --- */
