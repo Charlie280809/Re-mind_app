@@ -373,7 +373,6 @@
     width: 140px;
     padding: var(--button-padding-y) var(--button-padding-x);
     border-radius: var(--button-radius);
-    border: 2px solid var(--border-color-green);
     cursor: pointer;
     font-family: var(--button-default-font-family);
     font-size: var(--button-default-font-size);
@@ -448,7 +447,7 @@
 
 .personalAvatarRow {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     gap: var(--space-12);
 }
 
@@ -475,32 +474,33 @@
 }
 
 .personalFields {
-    width: min(520px, 100%);
+    width: fit-content;
+    /* width: min(520px, 100%); */
     display: flex;
     flex-direction: column;
+    /* align-items: flex-start; */
     gap: var(--space-24);
 }
 
 .personalFieldRow {
+    width: 100%;
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: var(--space-12);
 }
 
 .personalFieldLabel {
-    min-width: 150px;
-    text-align: right;
+    /* min-width: 150px; */
+    width: fit-content;
     font-family: var(--text-body-regular-font-family);
     font-size: var(--text-body-regular-font-size);
-    font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-bold);
     color: var(--text-primary);
 }
 
 .personalFieldValueWrap {
-    min-width: 200px;
     display: inline-flex;
-    align-items: center;
+    align-items: flex-end;
     gap: var(--space-8);
 }
 
@@ -508,41 +508,45 @@
     color: var(--text-primary);
     font-family: var(--text-body-regular-font-family);
     font-size: var(--text-body-regular-font-size);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.35);
+    /* border-bottom: 1px solid rgba(0, 0, 0, 0.35); */
     line-height: 1.2;
 }
 
-.personalPasswordRow {
-    width: min(520px, 100%);
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-16);
+.personalFieldInput {
+    width: fit-content;
+    /* width: 100px; */
+    padding: var(--space-4) var(--space-8);
+    border-radius: var(--button-radius);
+    border: 2px solid var(--button-neutral-border);
+    background: transparent;
+    color: var(--text-primary);
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--text-body-regular-font-size);
+}
+
+.personalFieldInput:hover {
+    background-color: var(--button-neutral-hover-bg);
+    transition: var(--input-transition);
 }
 
 .personalPasswordChangeButton {
-    align-self: center;
+    align-self: flex-start;
     min-width: var(--button-min-width);
     padding: var(--button-padding-small-y) var(--button-padding-small-x);
-    border: 2px solid var(--button-secondary-border);
+    border: 2px solid var(--button-neutral-border);
     border-radius: var(--button-radius);
-    background-color: var(--button-secondary-bg);
-    color: var(--text-primary);
-    font-family: var(--button-default-font-family);
+    background-color: var(--button-neutral-bg);
+    color: var(--button-neutral-text);
+    font-family: var(--font-family-body);
     font-size: var(--button-default-font-size);
     cursor: pointer;
 }
 
 .personalPasswordChangeButton:hover {
-    background-color: var(--button-secondary-hover-bg);
-    border-color: var(--button-secondary-hover-border);
+    background-color: var(--button-neutral-hover-bg);
+    border-color: var(--button-neutral-hover-border);
     box-shadow: var(--button-default-hover-shadow);
     transition: var(--button-default-transition);
-}
-
-.personalPasswordNote {
-    color: var(--text-secondary);
-    font-family: var(--text-body-small-font-family, var(--text-body-regular-font-family));
-    font-size: var(--text-body-small-font-size, 0.9rem);
 }
 
 .passwordModalOverlay {
@@ -552,45 +556,42 @@
     display: grid;
     place-items: center;
     padding: var(--layout-container-padding);
-    background: rgba(24, 24, 24, 0.38);
-    backdrop-filter: blur(6px);
+    background-color: var(--backdrop-darken);
 }
 
 .passwordModal {
-    width: min(980px, 100%);
-    border-radius: 36px;
-    background: var(--surface-background);
+    min-width: fit-content;
+    border-radius: var(--popupcard-border-radius);
+    background: var(--surface-card);
     box-shadow: var(--popup-card-box-shadow, 0 28px 64px rgba(0, 0, 0, 0.2));
-    padding: clamp(24px, 4vw, 48px);
+    padding: var(--popupcard-padding);
     display: flex;
     flex-direction: column;
-    gap: var(--space-32);
+    gap: var(--space-8);
 }
 
 .passwordModalHeader {
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: var(--space-24);
+    align-items: center;
 }
 
 .passwordModalTitle {
+    width: 100%;
     margin: 0;
     text-align: center;
-    flex: 1;
-    font-family: var(--text-heading-2-font-family);
-    font-size: clamp(2rem, 3vw, 3.25rem);
-    font-weight: var(--font-weight-regular);
+    font-family: var(--font-family-heading);
+    font-size: var(--text-heading-3-font-size);
+    font-weight: var(--text-heading-3-font-weight);
     color: var(--text-primary);
 }
 
 .passwordModalCloseButton {
+    line-height: 0.6;
     padding: 0;
-    border: 0;
-    background: transparent;
+    background-color: transparent;
+    border: none;
     color: var(--text-primary);
-    font-size: clamp(2.5rem, 4vw, 4rem);
-    line-height: 1;
+    font-size: var(--font-size-lg);
     cursor: pointer;
 }
 
@@ -598,7 +599,6 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-24);
-    width: min(760px, 100%);
     margin: 0 auto;
 }
 
@@ -622,62 +622,68 @@
 }
 
 .passwordModalField {
+    width: fit-content;
     display: flex;
     flex-direction: column;
-    gap: var(--space-12);
-    font-family: var(--text-body-regular-font-family);
-    font-size: var(--text-body-regular-font-size);
+    gap: var(--space-8);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-s);
     font-weight: var(--font-weight-semibold);
     color: var(--text-primary);
 }
 
 .passwordModalField input {
-    width: 100%;
-    min-height: 74px;
-    padding: 0 var(--space-24);
-    border-radius: 18px;
-    border: 2px solid rgba(0, 0, 0, 0.14);
-    background: var(--surface-card, #fff);
+    width: 420px;
+    border: 1px solid var(--input-border-color);
+    border-radius: var(--input-border-radius);
+    background-color: var(--background-100);
+    padding: var(--input-padding);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-regular);
     color: var(--text-primary);
-    font-family: var(--text-input-value-font-family);
-    font-size: 1.2rem;
-    outline: none;
+    outline: var(--input-outline);
 }
 
 .passwordModalField input::placeholder {
-    color: rgba(0, 0, 0, 0.45);
+    color: var(--text-placeholder);
 }
 
 .passwordModalField input:focus {
-    border-color: var(--primary-700);
-    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
+    border-color: var(--border-green-300);
+    box-shadow: 0 0 0 3px var(--border-300);
+    transition: var(--input-transition);
 }
 
 .passwordForgotLink {
     width: fit-content;
-    margin-top: calc(var(--space-4) * -1);
+    margin: 0 0 var(--space-8) var(--space-4);
     color: var(--text-primary);
     font-family: var(--text-body-regular-font-family);
-    font-size: var(--text-body-regular-font-size);
+    font-weight: var(--font-weight-regular);
+    font-size: var(--text-body-small-font-size);
     text-decoration: underline;
 }
 
 .passwordModalSubmitButton {
     align-self: center;
-    min-width: 340px;
+    min-width: var(--button-min-width);
+    min-height: var(--button-min-height);
+    width: 140px;
     padding: var(--button-padding-y) var(--button-padding-x);
+    background-color: var(--button-highlight-bg);
     border-radius: var(--button-radius);
-    border: 2px solid var(--button-secondary-border);
-    background: var(--button-secondary-bg);
-    color: var(--text-primary);
+    border: 2px solid var(--button-highlight-border);
+    color: var(--button-highlight-text);
     font-family: var(--button-default-font-family);
-    font-size: 1.8rem;
+    font-size: var(--button-default-font-size);
+    font-weight: var(--font-weight-regular);
     cursor: pointer;
 }
 
 .passwordModalSubmitButton:hover {
-    background: var(--button-secondary-hover-bg);
-    border-color: var(--button-secondary-hover-border);
+    background-color: var(--highlight-300);
+    border-color: var(--highlight-400);
     box-shadow: var(--button-default-hover-shadow);
     transition: var(--button-default-transition);
 }
