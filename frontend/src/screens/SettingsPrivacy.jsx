@@ -6,17 +6,12 @@ import { supabase } from "../lib/supabaseClient";
 export default function SettingsPrivacy({ onBack }) {
     const [syncCalendar, setSyncCalendar] = useState(false);
     const [saving, setSaving] = useState(false);
+    const [savingSync, setSavingSync] = useState(false);
     const [message, setMessage] = useState("");
 
     useEffect(() => {
-        if (!message) {
-            return undefined;
-        }
-
-        const timeoutId = setTimeout(() => {
-            setMessage("");
-        }, 5000);
-
+        if (!message) return;
+        const timeoutId = setTimeout(() => setMessage(""), 5000);
         return () => clearTimeout(timeoutId);
     }, [message]);
 
@@ -63,9 +58,9 @@ export default function SettingsPrivacy({ onBack }) {
                 exported_at: new Date().toISOString(),
                 user: user
                     ? {
-                          id: user.id,
-                          email: user.email || null,
-                      }
+                        id: user.id,
+                        email: user.email || null,
+                    }
                     : null,
                 privacy_settings: {
                     sync_calendar: syncCalendar,
@@ -111,6 +106,75 @@ export default function SettingsPrivacy({ onBack }) {
 
         // Placeholder until backend delete endpoint is added.
         setMessage("Verwijderen bevestigd. Koppeling volgt later.");
+    }
+
+    useEffect(() => {
+        let mounted = true;
+        async function loadSetting() {
+            try {
+                if (!supabase?.auth?.getUser) return;
+                const { data: userData, error: userError } = await supabase.auth.getUser();
+                if (userError || !userData?.user) return;
+                const user = userData.user;
+
+                const { data, error } = await supabase
+                    .from("settings")
+                    .select("allow_agenda_sync")
+                    .eq("user_id", user.id)
+                    .maybeSingle();
+
+                if (error) {
+                    console.warn("Kon privacy-instelling niet ophalen:", error.message);
+                    return;
+                }
+
+                if (mounted && data && typeof data.allow_agenda_sync === "boolean") {
+                    setSyncCalendar(Boolean(data.allow_agenda_sync));
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        loadSetting();
+        return () => { mounted = false; };
+    }, []);
+
+    async function handleToggleSync() {
+        const previous = syncCalendar;
+        const next = !previous;
+        // optimistic UI
+        setSyncCalendar(next);
+        setSavingSync(true);
+        setMessage("");
+
+        try {
+            if (!supabase?.auth?.getUser) throw new Error("Auth not available");
+            const { data: userData, error: userError } = await supabase.auth.getUser();
+            if (userError || !userData?.user) throw new Error(userError?.message || "Geen ingelogde gebruiker");
+            const user = userData.user;
+
+            const payload = {
+                user_id: user.id,
+                allow_agenda_sync: next,
+            };
+
+            const { error: upsertError } = await supabase
+                .from("settings")
+                .upsert(payload, { onConflict: "user_id" });
+
+            if (upsertError) {
+                throw upsertError;
+            }
+
+            setMessage("Instellingen opgeslagen.");
+        } catch (e) {
+            console.error(e);
+            setSyncCalendar(previous); // revert
+            setMessage("Fout bij opslaan. Probeer het opnieuw.");
+        } finally {
+            setSavingSync(false);
+        }
     }
 
     const accordionItems = [
@@ -202,7 +266,9 @@ export default function SettingsPrivacy({ onBack }) {
                             className="toggle"
                             type="button"
                             aria-pressed={syncCalendar}
-                            onClick={() => setSyncCalendar((v) => !v)}
+                            aria-busy={savingSync}
+                            onClick={handleToggleSync}
+                            disabled={savingSync}
                         >
                             <span className="knob" />
                         </button>
@@ -210,18 +276,17 @@ export default function SettingsPrivacy({ onBack }) {
                 </div>
 
                 <div className="privacyActions">
-                    <p className="privacyHint">Exporteer al je gegevens met één klik (JSON)</p>
-
                     <button className="exportButton" type="button" onClick={handleExport} disabled={saving}>
                         {saving ? "Bezig met exporteren..." : "Exporteer data"}
                     </button>
+                    <p className="privacyHint">Exporteer al je gegevens met één klik (JSON)</p>
 
                     <button className="deletePersonalDataButton" type="button" onClick={handleDelete}>
                         Verwijder data
                     </button>
+                    <p className="privacyHint">Verwijder al je persoonlijke gegevens uit de database</p>
                 </div>
-
-                {message && <div className="saveMessage">{message}</div>}
+                <div className={`savedMessage ${message ? "visible" : ""}`}>{message}</div>
             </section>
         </main>
     );
