@@ -6,7 +6,7 @@ import SettingsNotifications from "./SettingsNotifications";
 import SettingsPersonalData from "./SettingsPersonalData";
 import SettingsPrivacy from "./SettingsPrivacy";
 
-export default function Settings({ onBack, resetKey, isPremium, initialView, clearInitialView, onNavigateToUpgrade, onLogout }) {
+export default function Settings({ onBack, resetKey, isPremium, initialView, clearInitialView, onNavigateToUpgrade, onLogout, profile }) {
     const [view, setView] = useState("list");
 
     useEffect(() => {
@@ -32,7 +32,7 @@ export default function Settings({ onBack, resetKey, isPremium, initialView, cle
     }
 
     if (view === "personal") {
-        return <SettingsPersonalData onBack={() => setView("list")} />;
+        return <SettingsPersonalData onBack={() => setView("list")} profile={profile} />;
     }
 
     if (view === "privacy") {

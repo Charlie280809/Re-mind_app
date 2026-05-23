@@ -347,9 +347,7 @@
 }
 
 .notificationRow .label {
-    /* width: 360px; */
-    width: fit-content;
-    width: 60%;
+    width: 560px;
     display: flex;
     flex-direction: column;
 }
@@ -367,17 +365,6 @@
     font-family: var(--text-body-small-font-family, var(--text-body-regular-font-family));
     font-size: var(--text-body-small-font-size, 0.9rem);
     color: var(--text-secondary, var(--text-primary));
-}
-
-.saveRow {
-    display: flex;
-    flex-direction: row-reverse;
-    align-items: flex-end;
-    gap: var(--space-12);
-
-    position: absolute;
-    right: var(--layout-container-padding);
-    bottom: var(--layout-container-padding);
 }
 
 .saveButton {
@@ -525,6 +512,183 @@
     line-height: 1.2;
 }
 
+.personalPasswordRow {
+    width: min(520px, 100%);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-16);
+}
+
+.personalPasswordChangeButton {
+    align-self: center;
+    min-width: var(--button-min-width);
+    padding: var(--button-padding-small-y) var(--button-padding-small-x);
+    border: 2px solid var(--button-secondary-border);
+    border-radius: var(--button-radius);
+    background-color: var(--button-secondary-bg);
+    color: var(--text-primary);
+    font-family: var(--button-default-font-family);
+    font-size: var(--button-default-font-size);
+    cursor: pointer;
+}
+
+.personalPasswordChangeButton:hover {
+    background-color: var(--button-secondary-hover-bg);
+    border-color: var(--button-secondary-hover-border);
+    box-shadow: var(--button-default-hover-shadow);
+    transition: var(--button-default-transition);
+}
+
+.personalPasswordNote {
+    color: var(--text-secondary);
+    font-family: var(--text-body-small-font-family, var(--text-body-regular-font-family));
+    font-size: var(--text-body-small-font-size, 0.9rem);
+}
+
+.passwordModalOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: grid;
+    place-items: center;
+    padding: var(--layout-container-padding);
+    background: rgba(24, 24, 24, 0.38);
+    backdrop-filter: blur(6px);
+}
+
+.passwordModal {
+    width: min(980px, 100%);
+    border-radius: 36px;
+    background: var(--surface-background);
+    box-shadow: var(--popup-card-box-shadow, 0 28px 64px rgba(0, 0, 0, 0.2));
+    padding: clamp(24px, 4vw, 48px);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-32);
+}
+
+.passwordModalHeader {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-24);
+}
+
+.passwordModalTitle {
+    margin: 0;
+    text-align: center;
+    flex: 1;
+    font-family: var(--text-heading-2-font-family);
+    font-size: clamp(2rem, 3vw, 3.25rem);
+    font-weight: var(--font-weight-regular);
+    color: var(--text-primary);
+}
+
+.passwordModalCloseButton {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--text-primary);
+    font-size: clamp(2.5rem, 4vw, 4rem);
+    line-height: 1;
+    cursor: pointer;
+}
+
+.passwordModalForm {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-24);
+    width: min(760px, 100%);
+    margin: 0 auto;
+}
+
+.passwordMessage {
+    width: fit-content;
+    padding: var(--space-8) var(--space-12);
+    border-radius: var(--button-radius);
+    border: 2px solid var(--error-300);
+    background-color: var(--error-200);
+    color: var(--text-primary);
+    font-family: var(--text-body-small-font-family);
+    font-size: var(--text-body-small-font-size);
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: all 0.2s ease;
+}
+
+.passwordMessage.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.passwordModalField {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-12);
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--text-body-regular-font-size);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+}
+
+.passwordModalField input {
+    width: 100%;
+    min-height: 74px;
+    padding: 0 var(--space-24);
+    border-radius: 18px;
+    border: 2px solid rgba(0, 0, 0, 0.14);
+    background: var(--surface-card, #fff);
+    color: var(--text-primary);
+    font-family: var(--text-input-value-font-family);
+    font-size: 1.2rem;
+    outline: none;
+}
+
+.passwordModalField input::placeholder {
+    color: rgba(0, 0, 0, 0.45);
+}
+
+.passwordModalField input:focus {
+    border-color: var(--primary-700);
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
+}
+
+.passwordForgotLink {
+    width: fit-content;
+    margin-top: calc(var(--space-4) * -1);
+    color: var(--text-primary);
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--text-body-regular-font-size);
+    text-decoration: underline;
+}
+
+.passwordModalSubmitButton {
+    align-self: center;
+    min-width: 340px;
+    padding: var(--button-padding-y) var(--button-padding-x);
+    border-radius: var(--button-radius);
+    border: 2px solid var(--button-secondary-border);
+    background: var(--button-secondary-bg);
+    color: var(--text-primary);
+    font-family: var(--button-default-font-family);
+    font-size: 1.8rem;
+    cursor: pointer;
+}
+
+.passwordModalSubmitButton:hover {
+    background: var(--button-secondary-hover-bg);
+    border-color: var(--button-secondary-hover-border);
+    box-shadow: var(--button-default-hover-shadow);
+    transition: var(--button-default-transition);
+}
+
+.passwordModalSubmitButton:disabled,
+.passwordModalCloseButton:disabled,
+.personalPasswordChangeButton:disabled {
+    opacity: var(--opacity-disabled);
+    cursor: not-allowed;
+}
+
 .deleteAccountButton {
     margin-top: auto;
     width: var(--button-min-width);
@@ -583,7 +747,7 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: var(--space-20);
+    gap: var(--space-32);
     font-family: var(--text-body-regular-font-family);
     font-size: var(--text-body-regular-font-size);
     color: var(--text-primary);
@@ -592,16 +756,16 @@
 .privacyAccordion {
     display: flex;
     flex-direction: column;
-    gap: var(--space-12);
+    gap: var(--space-20);
 }
 
 .accordionRow {
+    padding: 0;
     display: flex;
     align-items: center;
     gap: var(--space-12);
     background: transparent;
     border: 0;
-    padding: var(--space-8) 0;
     text-align: left;
     font-family: var(--text-body-regular-font-family);
     font-weight: var(--font-weight-semibold);
@@ -611,9 +775,10 @@
 
 .accordionPanel {
     max-height: 0;
+    margin: 0 0 0 var(--space-16);
     overflow: hidden;
-    transition: max-height 0.2s ease, opacity 0.15s ease;
     opacity: 0;
+    transition: all 0.2s ease;
 }
 
 .accordionPanel.open {
@@ -622,21 +787,20 @@
 }
 
 .accordionList {
-    margin: var(--space-8) 0 var(--space-12) 0;
-    padding-left: var(--space-16);
+    margin: var(--space-4) 0 0 0;
+    font-size: var(--text-body-small-font-size);
     color: var(--text-secondary);
 }
 
 .accordionList li {
-    margin-bottom: var(--space-6);
+    margin-bottom: var(--space-4);
 }
 
 .accordionChevron {
     font-size: var(--font-size-lg);
-    transition: transform 0.18s ease;
+    transition: all 0.2s ease;
     transform-origin: center;
     display: inline-block;
-    margin-right: var(--space-8);
 }
 
 .accordionRow.open .accordionChevron {
@@ -647,7 +811,6 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-12);
-    margin-top: var(--space-8);
 }
 
 .privacyHint {
@@ -656,40 +819,80 @@
     font-size: var(--text-body-small-font-size, 0.9rem);
 }
 
+.exportButton,
 .deletePersonalDataButton {
-    min-width: var(--button-min-width);
-    width: 140px;
-    padding: var(--button-padding-small-y) var(--button-padding-small-x);
-    border: 2px solid var(--button-red-border);
-    border-radius: var(--button-radius);
-    font-family: var(--button-default-font-family);
-    font-size: var(--button-default-font-size);
-    background-color: var(--button-red-bg);
-    color: var(--button-red-text);
-    cursor: pointer;
-}
-
-.deletePersonalDataButton:hover {
-    border-color: var(--button-red-hover-border);
-    background-color: var(--button-red-hover-bg);
-    box-shadow: var(--button-default-hover-shadow);
-    transition: var(--button-default-transition);
-}
-
-.exportButton {
     min-width: var(--button-min-width);
     min-height: var(--button-min-height);
     width: 140px;
     padding: var(--button-padding-small-y) var(--button-padding-small-x);
     border-radius: var(--button-radius);
-    border: 2px solid var(--button-secondary-border);
-    background-color: var(--button-secondary-bg);
-    color: var(--button-secondary-text);
     font-family: var(--button-default-font-family);
     font-size: var(--button-default-font-size);
+    color: var(--text-on-light);
     cursor: pointer;
 }
 
-.exportButton:hover {
-    background-color: var(--highlight-300);
+.deletePersonalDataButton {
+    margin: var(--space-24) 0 0 0;
+    border: 2px solid var(--button-red-border);
+    background-color: var(--button-red-bg);
 }
+
+.deletePersonalDataButton:hover {
+    background-color: var(--button-red-hover-bg);
+    border-color: var(--button-red-hover-border);
+    box-shadow: var(--button-default-hover-shadow);
+    transition: var(--button-default-transition);
+}
+
+.exportButton {
+    border: 2px solid var(--button-secondary-border);
+    background-color: var(--button-secondary-bg);
+}
+
+.exportButton:hover {
+    background-color: var(--button-secondary-hover-bg);
+    border-color: var(--button-secondary-hover-border);
+    box-shadow: var(--button-default-hover-shadow);
+    transition: var(--button-default-transition);
+}
+
+/* @media (max-width: 720px) {
+    .personalFieldRow {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .personalFieldLabel {
+        min-width: 120px;
+        text-align: left;
+    }
+
+    .personalPasswordChangeButton {
+        align-self: flex-start;
+    }
+
+    .passwordModal {
+        border-radius: 24px;
+        padding: var(--space-20);
+        gap: var(--space-24);
+    }
+
+    .passwordModalHeader {
+        align-items: center;
+    }
+
+    .passwordModalTitle {
+        font-size: 1.8rem;
+    }
+
+    .passwordModalField input {
+        min-height: 60px;
+        border-radius: 14px;
+    }
+
+    .passwordModalSubmitButton {
+        min-width: 220px;
+        font-size: 1.4rem;
+    }
+} */
