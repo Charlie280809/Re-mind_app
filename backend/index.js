@@ -315,6 +315,97 @@ app.get("/profile/me", async (req, res) => {
   });
 });
 
+app.put("/profile/me", async (req, res) => {
+  if (!supabase) {
+    return res.status(500).json({
+      error: "Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in backend/.env.",
+    });
+  }
+
+  const token = getBearerToken(req);
+
+  if (!token) {
+    return res.status(401).json({
+      error: "Missing Bearer token.",
+    });
+  }
+
+  const email = typeof req.body?.email === "string" ? req.body.email.trim().toLowerCase() : "";
+  const username = typeof req.body?.username === "string" ? req.body.username.trim() : "";
+  const bedrijfsnaam = typeof req.body?.bedrijfsnaam === "string" ? req.body.bedrijfsnaam.trim() : "";
+
+  if (!email || !username) {
+    return res.status(400).json({
+      error: "Missing email or username.",
+    });
+  }
+
+  const { data: userData, error: userError } = await supabase.auth.getUser(token);
+
+  if (userError || !userData?.user) {
+    return res.status(401).json({
+      error: "Invalid or expired session.",
+    });
+  }
+
+  const { error: authError } = await supabase.auth.admin.updateUserById(userData.user.id, {
+    email,
+    user_metadata: {
+      username,
+      bedrijfsnaam: bedrijfsnaam || null,
+    },
+  });
+
+  if (authError) {
+    return res.status(500).json({
+      error: "Failed to update auth user.",
+      details: authError.message,
+    });
+  }
+
+  const { data: existingProfile, error: existingProfileError } = await supabase
+    .from("profiles")
+    .select("is_premium")
+    .eq("user_id", userData.user.id)
+    .maybeSingle();
+
+  if (existingProfileError) {
+    return res.status(500).json({
+      error: "Failed to load existing profile state.",
+      details: existingProfileError.message,
+    });
+  }
+
+  const { error: profileError } = await supabase.from("profiles").upsert(
+    {
+      user_id: userData.user.id,
+      email,
+      username,
+      bedrijfsnaam: bedrijfsnaam || null,
+      is_premium: existingProfile?.is_premium ?? false,
+    },
+    { onConflict: "user_id" }
+  );
+
+  if (profileError) {
+    return res.status(500).json({
+      error: "Failed to update profile.",
+      details: profileError.message,
+    });
+  }
+
+  return res.json({
+    ok: true,
+    profile: {
+      user_id: userData.user.id,
+      email,
+      username,
+      bedrijfsnaam: bedrijfsnaam || null,
+      is_premium: existingProfile?.is_premium ?? false,
+    },
+  });
+});
+
 app.listen(3000, () => {
   console.log("Backend running on http://localhost:3000");
 });
