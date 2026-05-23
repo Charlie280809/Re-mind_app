@@ -657,6 +657,7 @@ export default function App() {
           onNavigateToUpgrade={() => setCurrentPage("upgrade")}
           onLogout={handleLogout}
           profile={profile}
+          onProfileUpdated={setProfile}
         />
       ) : currentPage === "upgrade" ? (
         <UpgradePlan onBack={() => setCurrentPage("home")} isPremium={Boolean(profile?.is_premium)} />
