@@ -1,21 +1,37 @@
 import "../css/settings.css";
 import { LuArrowLeft } from "react-icons/lu";
+import spinner from "../assets/images/loadingSpinner.svg";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 
+function createDefaultNotificationState() {
+    return {
+        notificationsEnabled: true,
+        checkInEnabled: true,
+        suggestFavoritesEnabled: false,
+        endOfDayNoteEnabled: true,
+    };
+}
+
 export default function SettingsNotifications({ onBack }) {
-    const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-    const [checkInEnabled, setCheckInEnabled] = useState(true);
-    const [suggestFavoritesEnabled, setSuggestFavoritesEnabled] = useState(false);
-    const [endOfDayNoteEnabled, setEndOfDayNoteEnabled] = useState(true);
+    const [notificationSettings, setNotificationSettings] = useState(() => createDefaultNotificationState());
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState("");
+    const [savedMessage, setSavedMessage] = useState("");
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (!savedMessage) return;
+        const timer = setTimeout(() => setSavedMessage(""), 5000);
+        return () => clearTimeout(timer);
+    }, [savedMessage]);
 
     useEffect(() => {
         let isCancelled = false;
 
         const loadNotificationSettings = async () => {
             if (!supabase?.auth?.getUser) {
+                setLoading(false);
                 return;
             }
 
@@ -27,26 +43,37 @@ export default function SettingsNotifications({ onBack }) {
 
             const { data: settingsRow, error: settingsError } = await supabase
                 .from("settings")
-                .select("checkin_notifications_on, werktimer_autostart, favorite_pauses_suggest_on, afsluitnotitie_popup_on")
+                .select("checkin_notifications_on, favorite_pauses_suggest_on, afsluitnotitie_popup_on")
                 .eq("user_id", data.user.id)
                 .maybeSingle();
 
-            if (settingsError || isCancelled || !settingsRow) {
+            if (settingsError || isCancelled) {
+                setLoading(false);
                 return;
             }
 
-            if (typeof settingsRow.checkin_notifications_on === "boolean") {
-                setNotificationsEnabled(settingsRow.checkin_notifications_on);
+            if (!settingsRow) {
+                setNotificationSettings(createDefaultNotificationState());
+                setLoading(false);
+                return;
             }
-            if (typeof settingsRow.werktimer_autostart === "boolean") {
-                setCheckInEnabled(settingsRow.werktimer_autostart);
-            }
-            if (typeof settingsRow.favorite_pauses_suggest_on === "boolean") {
-                setSuggestFavoritesEnabled(settingsRow.favorite_pauses_suggest_on);
-            }
-            if (typeof settingsRow.afsluitnotitie_popup_on === "boolean") {
-                setEndOfDayNoteEnabled(settingsRow.afsluitnotitie_popup_on);
-            }
+
+            setNotificationSettings((prev) => ({
+                notificationsEnabled: prev.notificationsEnabled,
+                checkInEnabled:
+                    typeof settingsRow.checkin_notifications_on === "boolean"
+                        ? settingsRow.checkin_notifications_on
+                        : prev.checkInEnabled,
+                suggestFavoritesEnabled:
+                    typeof settingsRow.favorite_pauses_suggest_on === "boolean"
+                        ? settingsRow.favorite_pauses_suggest_on
+                        : prev.suggestFavoritesEnabled,
+                endOfDayNoteEnabled:
+                    typeof settingsRow.afsluitnotitie_popup_on === "boolean"
+                        ? settingsRow.afsluitnotitie_popup_on
+                        : prev.endOfDayNoteEnabled,
+            }));
+            setLoading(false);
         };
 
         loadNotificationSettings();
@@ -55,6 +82,23 @@ export default function SettingsNotifications({ onBack }) {
             isCancelled = true;
         };
     }, []);
+
+    if (loading) {
+        return (
+            <main className="notificationsPage">
+                <header className="settingsHeader">
+                    <button className="settingsBack" type="button" onClick={onBack} aria-label="Terug">
+                        <LuArrowLeft />
+                    </button>
+                    <h1 className="settingsTitle">Notificatie-voorkeuren</h1>
+                </header>
+                <div className="settingsLoading">
+                    Bezig met laden...
+                    <img src={spinner} alt="Bezig met laden" />
+                </div>
+            </main>
+        );
+    }
 
     async function handleSave() {
         setSaving(true);
@@ -78,10 +122,9 @@ export default function SettingsNotifications({ onBack }) {
 
             const payload = {
                 user_id: uid,
-                checkin_notifications_on: notificationsEnabled,
-                werktimer_autostart: checkInEnabled,
-                favorite_pauses_suggest_on: suggestFavoritesEnabled,
-                afsluitnotitie_popup_on: endOfDayNoteEnabled,
+                checkin_notifications_on: notificationSettings.checkInEnabled,
+                favorite_pauses_suggest_on: notificationSettings.suggestFavoritesEnabled,
+                afsluitnotitie_popup_on: notificationSettings.endOfDayNoteEnabled,
             };
 
             const { error } = await supabase.from("settings").upsert(payload, { onConflict: "user_id" });
@@ -90,7 +133,7 @@ export default function SettingsNotifications({ onBack }) {
                 console.error("Supabase save error:", error);
                 setMessage("Opslaan niet gelukt.");
             } else {
-                setMessage("Instellingen opgeslagen.");
+                setSavedMessage("Instellingen opgeslagen.");
             }
         } catch (e) {
             console.error(e);
@@ -119,8 +162,13 @@ export default function SettingsNotifications({ onBack }) {
                         <button
                             className="toggle"
                             type="button"
-                            aria-pressed={notificationsEnabled}
-                            onClick={() => setNotificationsEnabled((v) => !v)}
+                            aria-pressed={notificationSettings.notificationsEnabled}
+                            onClick={() =>
+                                setNotificationSettings((prev) => ({
+                                    ...prev,
+                                    notificationsEnabled: !prev.notificationsEnabled,
+                                }))
+                            }
                         >
                             <span className="knob" />
                         </button>
@@ -129,15 +177,20 @@ export default function SettingsNotifications({ onBack }) {
 
                 <div className="row notificationRow">
                     <div className="label">
-                        <div className="notificationTitle">Werktimer automatisch starten</div>
-                        <div className="notificationDescription">Start de werktimer automatisch wanneer je werkdag begint.</div>
+                        <div className="notificationTitle">Check-in meldingen inschakelen</div>
+                        <div className="notificationDescription">Ontvange meldingen die doorheen de dag naar je stress en energie vragen. Deze meldingen zijn nodig om data te verzamelen voor het dag-/weekrapport.</div>
                     </div>
                     <div className="value">
                         <button
                             className="toggle"
                             type="button"
-                            aria-pressed={checkInEnabled}
-                            onClick={() => setCheckInEnabled((v) => !v)}
+                            aria-pressed={notificationSettings.checkInEnabled}
+                            onClick={() =>
+                                setNotificationSettings((prev) => ({
+                                    ...prev,
+                                    checkInEnabled: !prev.checkInEnabled,
+                                }))
+                            }
                         >
                             <span className="knob" />
                         </button>
@@ -153,8 +206,13 @@ export default function SettingsNotifications({ onBack }) {
                         <button
                             className="toggle"
                             type="button"
-                            aria-pressed={suggestFavoritesEnabled}
-                            onClick={() => setSuggestFavoritesEnabled((v) => !v)}
+                            aria-pressed={notificationSettings.suggestFavoritesEnabled}
+                            onClick={() =>
+                                setNotificationSettings((prev) => ({
+                                    ...prev,
+                                    suggestFavoritesEnabled: !prev.suggestFavoritesEnabled,
+                                }))
+                            }
                         >
                             <span className="knob" />
                         </button>
@@ -164,14 +222,19 @@ export default function SettingsNotifications({ onBack }) {
                 <div className="row notificationRow">
                     <div className="label">
                         <div className="notificationTitle">Afsluitnotitie invullen</div>
-                        <div className="notificationDescription">Op het einde van je werkdag krijg je de optie om een ‘afsluitnotitie’ in te vullen.</div>
+                        <div className="notificationDescription">Op het einde van je werkdag kan je een ‘afsluitnotitie’ voor jezelf invullen.</div>
                     </div>
                     <div className="value">
                         <button
                             className="toggle"
                             type="button"
-                            aria-pressed={endOfDayNoteEnabled}
-                            onClick={() => setEndOfDayNoteEnabled((v) => !v)}
+                            aria-pressed={notificationSettings.endOfDayNoteEnabled}
+                            onClick={() =>
+                                setNotificationSettings((prev) => ({
+                                    ...prev,
+                                    endOfDayNoteEnabled: !prev.endOfDayNoteEnabled,
+                                }))
+                            }
                         >
                             <span className="knob" />
                         </button>
@@ -179,12 +242,11 @@ export default function SettingsNotifications({ onBack }) {
                 </div>
             </section>
 
-            <div className="saveRow">
-                <button className="saveButton" type="button" onClick={handleSave} disabled={saving}>
-                    {saving ? "Opslaan..." : "Opslaan"}
-                </button>
-                {message && <div className="saveMessage">{message}</div>}
-            </div>
+            <button className="saveButton" type="button" onClick={handleSave} disabled={saving}>
+                {saving ? "Opslaan..." : "Opslaan"}
+            </button>
+            <div className={`saveWarning ${message ? "visible" : ""}`}>{message}</div>
+            <div className={`savedMessage ${savedMessage ? "visible" : ""}`}>{savedMessage}</div>
         </main>
     );
 }
