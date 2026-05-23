@@ -177,7 +177,7 @@ export default function SettingsWorkHours({ onBack, userId }) {
                 </header>
                 <div className="settingsLoading">
                     Bezig met laden...
-                    <img src={spinner} alt="Ladens..." />
+                    <img src={spinner} alt="Bezig met laden" />
                 </div>
             </main>
         );
