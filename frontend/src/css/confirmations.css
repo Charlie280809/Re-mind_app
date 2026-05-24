@@ -43,7 +43,7 @@
     background-color: transparent;
     border: none;
     color: var(--text-primary);
-    font-size: var(--font-size-lg);
+    font-size: var(--close-button-size);
     cursor: pointer;
 }
 
