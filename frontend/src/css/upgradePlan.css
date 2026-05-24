@@ -10,122 +10,154 @@
     padding: var(--layout-container-padding);
     background-color: var(--surface-background);
     max-width: 100%;
-    gap: var(--space-24);
+    gap: var(--space-32);
+    font-family: var(--text-body-regular-font-family);
+    color: var(--text-primary);
 }
 
 .upgradeHeader {
-    display: grid;
-    grid-template-columns: auto auto 1fr;
+    display: flex;
     align-items: center;
+    gap: var(--space-12);
+}
+
+.upgradeTitle {
+    margin: 0;
+    font-family: var(--text-heading-2-font-family);
+    font-size: var(--text-heading-2-font-size);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
 }
 
 .upgradeBillingToggle {
-    margin-left: auto;
-    display: inline-flex;
-    border: 1px solid var(--border-color-default);
-    border-radius: 14px;
-    background-color: var(--surface-card, #d6dedb);
-    padding: 2px;
-    gap: 2px;
+    margin: 0 0 0 auto;
+    border: 1px solid var(--primary-400);
+    border-radius: var(--button-radius);
+    background-color: var(--primary-200);
+    padding: var(--space-4);
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: hidden;
+}
+
+.upgradeBillingToggle::before {
+    content: "";
+    position: absolute;
+    top: var(--space-4);
+    bottom: var(--space-4);
+    left: var(--space-4);
+    width: calc(50% - var(--space-4));
+    border-radius: calc(var(--button-radius) - 4px);
+    background-color: var(--primary-400);
+    transition: transform 0.25s ease;
+    will-change: transform;
+}
+
+.upgradeBillingToggle[data-billing-cycle="yearly"]::before {
+    transform: translateX(100%);
 }
 
 .upgradeBillingOption {
-    border: 0;
+    border: none;
     background: transparent;
-    min-width: 170px;
-    padding: var(--space-10) var(--space-16);
-    border-radius: 12px;
-    font-family: var(--text-body-regular-font-family);
+    min-width: 140px;
+    padding: var(--space-4);
+    border-radius: 8px;
     font-size: var(--text-body-regular-font-size);
-    font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-regular);
     color: var(--text-primary);
     cursor: pointer;
+    position: relative;
+    z-index: 1;
+    transition: color 0.2s ease, font-weight 0.2s ease;
 }
 
 .upgradeBillingOption.active {
-    background-color: var(--primary-700);
-    color: var(--text-on-dark, #f2f2f0);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-on-dark);
 }
 
 .upgradeGrid {
-    width: min(1120px, 100%);
     margin: 0 auto;
     display: grid;
-    grid-template-columns: repeat(2, minmax(320px, 1fr));
+    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: var(--space-24);
 }
 
 .upgradeCard {
-    border-radius: 18px;
-    border: 1px solid var(--border-color-default);
-    padding: var(--space-24);
+    min-width: 340px;
+    max-width: 480px;
+    /* width: 100%; */
+    min-height: fit-content;
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-height: 255px;
+    border-radius: var(--popupcard-border-radius);
+    border: 1px solid var(--border-color-default);
+    padding: var(--premium-card-padding);
+    box-shadow: var(--premium-card-shadow);
 }
 
 .upgradeCardTop {
-    background-color: var(--surface-card, #edf2f0);
+    background: var(--premium-card-background);
 }
 
 .upgradeCardBottom {
-    background-color: var(--surface-alt, #f1ead8);
-    min-height: 170px;
+    background-color: var(--surface-card);
+    padding: var(--space-20) var(--space-32);
+    gap: var(--space-8);
+
+    .upgradePrice {
+        margin: 0;
+    }
 }
 
 .upgradeCardTitle {
     width: 100%;
     margin: 0;
-    padding-bottom: var(--space-8);
-    border-bottom: 2px solid var(--primary-700);
+    padding: 0 0 var(--space-8) 0;
+    border-bottom: 2px solid var(--primary-300);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: var(--space-8);
     font-family: var(--text-heading-2-font-family);
     font-size: var(--text-heading-2-font-size);
-    color: var(--text-primary);
-}
-
-.upgradeCardTitleCentered {
+    font-weight: var(--font-weight-semibold);
     text-align: center;
-    display: block;
+
+    svg {
+        font-size: var(--font-size-2xl);
+    }
 }
 
 .upgradePrice {
     margin: var(--space-8) 0 0;
-    font-family: var(--text-heading-1-font-family, var(--text-heading-2-font-family));
-    font-size: clamp(2rem, 3.2vw, 3rem);
-    line-height: 1.05;
-    color: var(--text-primary);
-}
-
-.upgradePriceCentered {
-    text-align: center;
+    font-family: var(--font-family-heading);
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-lg);
 }
 
 .upgradeSubPrice {
     margin: var(--space-2) 0 var(--space-12);
-    font-family: var(--text-body-regular-font-family);
-    font-size: var(--font-size-s);
-    font-weight: var(--font-weight-semibold);
-    color: var(--text-primary);
+    font-family: var(--font-family-heading);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
 }
 
 .upgradeList {
-    width: 100%;
     list-style: none;
-    margin: var(--space-8) 0 var(--space-16);
+    margin: var(--space-20) 0;
     padding: 0;
     display: grid;
     gap: var(--space-8);
-    font-family: var(--text-body-regular-font-family);
     font-size: var(--text-body-regular-font-size);
-    color: var(--text-primary);
 }
 
 .upgradeList li {
+    width: fit-content;
     display: inline-flex;
     align-items: center;
     gap: var(--space-8);
@@ -133,46 +165,65 @@
 
 .upgradeListCompact {
     grid-template-columns: 1fr 1fr;
-    margin-bottom: var(--space-16);
+    row-gap: var(--space-8);
+    column-gap: var(--space-16);
+    margin: 0 0 var(--space-16) 0;
 }
 
 .upgradePrimaryBtn {
-    margin-top: auto;
-    border: 2px solid var(--primary-700);
-    background-color: var(--primary-700);
-    color: var(--text-on-dark, #f2f2f0);
+    min-width: var(--button-min-width);
+    min-height: var(--button-min-height);
+    width: 140px;
+    border: 2px solid var(--button-primary-border);
+    background-color: var(--button-primary-bg);
+    color: var(--button-primary-text);
     border-radius: var(--button-radius);
     padding: var(--button-padding-y) var(--button-padding-x);
     font-family: var(--button-default-font-family);
-    font-size: var(--font-size-s);
-    font-weight: var(--font-weight-semibold);
+    font-size: var(--button-default-font-size);
+    font-weight: var(--button-primary-font-weight);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: var(--space-8);
+
+    svg {
+        font-size: var(--font-size-md);
+    }
 }
 
-.upgradeCurrentPlan {
-    margin-top: var(--space-12);
-    border-radius: 12px;
+.upgradePrimaryBtn:hover {
+    background-color: var(--button-primary-hover-bg);
+    border-color: var(--button-primary-hover-border);
+    box-shadow: var(--button-default-hover-shadow);
+    transition: var(--button-default-transition);
+}
+
+.currentPlanLabel {
+    border-radius: var(--button-radius);
+    border: 2px solid var(--border-color-default);
     background-color: var(--surface-background);
-    padding: var(--space-8) var(--space-16);
-    font-family: var(--text-body-regular-font-family);
-    font-size: var(--text-body-regular-font-size);
-    color: var(--text-primary);
+    padding: var(--button-padding-y) var(--button-padding-x);
+    font-size: var(--text-body-small-font-size);
+}
+
+.supportTitle {
+    width: 95%;
+    font-size: var(--font-size-lg);
+    border-bottom: none;
 }
 
 .upgradeSupportText {
-    width: 100%;
-    margin: var(--space-16) 0 var(--space-20);
-    font-family: var(--text-body-regular-font-family);
+    /* width: 100%; */
+    margin: 0 0 var(--space-16) 0;
     font-size: var(--text-body-regular-font-size);
-    color: var(--text-primary);
     text-align: left;
 }
 
-/* @media (max-width: 1060px) {
-    .upgradeHeader {
+@media (max-width: 1078px) {
+
+    /* .upgradeHeader {
         grid-template-columns: auto 1fr;
         row-gap: var(--space-12);
     }
@@ -184,13 +235,13 @@
     .upgradeBillingToggle {
         grid-column: 1 / -1;
         justify-self: end;
-    }
+    } */
 
     .upgradeGrid {
-        grid-template-columns: 1fr;
+        margin: 0;
     }
 
     .upgradeListCompact {
         grid-template-columns: 1fr;
     }
-} */
+}
