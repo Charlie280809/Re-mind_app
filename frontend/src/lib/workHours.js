@@ -57,6 +57,29 @@ export function normalizeDuration(hoursValue, minutesValue) {
     };
 }
 
+function parseTimeToMinutes(value) {
+    if (typeof value !== "string") {
+        return NaN;
+    }
+
+    const [hoursPart, minutesPart] = value.split(":");
+    const hours = Number.parseInt(hoursPart, 10);
+    const minutes = Number.parseInt(minutesPart, 10);
+
+    if (!Number.isFinite(hours) || !Number.isFinite(minutes)) {
+        return NaN;
+    }
+
+    return hours * 60 + minutes;
+}
+
+export function isValidWorkdayTimeRange(startTime, endTime) {
+    const startMinutes = parseTimeToMinutes(startTime);
+    const endMinutes = parseTimeToMinutes(endTime);
+
+    return Number.isFinite(startMinutes) && Number.isFinite(endMinutes) && startMinutes < endMinutes;
+}
+
 export function buildWorkDays(selectedWorkdays) {
     return WEEKDAY_OPTIONS.filter((day) => selectedWorkdays?.[day.key]).map((day) => day.key);
 }

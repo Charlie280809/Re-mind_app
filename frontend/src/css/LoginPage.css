@@ -76,8 +76,8 @@
 .errorMessage {
     margin: 0;
     font-family: var(--font-family-body);
-    font-size: var(--font-size-xxs);
-    color: var(--text-error);
+    font-size: var(--font-size-xs);
+    color: var(--error-400);
 }
 
 .loginSubmit {
@@ -311,8 +311,8 @@
     width: min(580px, 100%);
     margin: 0;
     font-family: var(--font-family-body);
-    font-size: var(--font-size-xxs);
-    color: var(--text-error);
+    font-size: var(--font-size-xs);
+    color: var(--error-400);
 }
 
 /* === Sign up Workhours Page (step 5) === */

@@ -2,7 +2,7 @@ import "../css/LoginPage.css";
 import "../css/settings.css";
 import { useState } from "react";
 import logo from "../assets/images/logo.svg";
-import { WEEKDAY_OPTIONS, buildSignupWorkHoursPayload, createDefaultWorkHoursDraft } from "../lib/workHours";
+import { WEEKDAY_OPTIONS, buildSignupWorkHoursPayload, createDefaultWorkHoursDraft, isValidWorkdayTimeRange, normalizeDuration } from "../lib/workHours";
 
 const SOURCE_OPTIONS = [
     { key: "friends", label: "Door vrienden/collega's" },
@@ -152,6 +152,18 @@ export default function SignupPage({ onCreateAccount, onSaveNotifications, onSav
             const workdayCount = Object.values(workHours.selectedWorkdays).filter(Boolean).length;
             if (workdayCount === 0) {
                 setFormError("Selecteer minstens één werkdag.");
+                return;
+            }
+
+            const normalizedDuration = normalizeDuration(workHours.breakHours, workHours.breakMinutes);
+
+            if (normalizedDuration.totalMinutes <= 0) {
+                setFormError("❗Voer een geldige duur voor pauzeherinnering in.");
+                return;
+            }
+
+            if (!isValidWorkdayTimeRange(workHours.startTime, workHours.endTime)) {
+                setFormError("❗Het startuur moet vroeger zijn dan het einduur.");
                 return;
             }
 
