@@ -32,7 +32,14 @@ export default function Settings({ onBack, resetKey, isPremium, initialView, cle
     }
 
     if (view === "personal") {
-        return <SettingsPersonalData onBack={() => setView("list")} profile={profile} onProfileUpdated={onProfileUpdated} />;
+        return (
+            <SettingsPersonalData
+                onBack={() => setView("list")}
+                profile={profile}
+                onProfileUpdated={onProfileUpdated}
+                onNavigateToUpgrade={onNavigateToUpgrade}
+            />
+        );
     }
 
     if (view === "privacy") {

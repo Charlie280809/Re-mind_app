@@ -1,16 +1,20 @@
 import "../css/settings.css";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LuArrowLeft, LuPencil, LuUser, LuX } from "react-icons/lu";
+import { TbCrown } from "react-icons/tb";
 import { supabase } from "../lib/supabaseClient";
 
-export default function SettingsPersonalData({ onBack, profile, onProfileUpdated }) {
+export default function SettingsPersonalData({ onBack, profile, onProfileUpdated, onNavigateToUpgrade }) {
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "http://localhost:3000";
+    const fileRef = useRef(null);
+    const isPremium = Boolean(profile?.is_premium);
     const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+    const [premiumModalOpen, setPremiumModalOpen] = useState(false);
     const [passwordForm, setPasswordForm] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
     const [savingPassword, setSavingPassword] = useState(false);
     const [passwordMessage, setPasswordMessage] = useState("");
     const [savedMessage, setSavedMessage] = useState("");
-    const [profileForm, setProfileForm] = useState({ email: "", username: "", bedrijfsnaam: "" });
+    const [profileForm, setProfileForm] = useState({ email: "", username: "", bedrijfsnaam: "", avatarDataUrl: "" });
     const [activeField, setActiveField] = useState(null);
     const [savingProfile, setSavingProfile] = useState(false);
 
@@ -25,6 +29,7 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
             email: profile?.email || "",
             username: profile?.username || "",
             bedrijfsnaam: profile?.bedrijfsnaam || "",
+            avatarDataUrl: profile?.avatarDataUrl || "",
         });
         setActiveField(null);
     }, [profile]);
@@ -48,6 +53,70 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
 
     function updatePasswordForm(field, value) {
         setPasswordForm((prev) => ({ ...prev, [field]: value }));
+    }
+
+    function openAvatarPicker() {
+        if (!isPremium) {
+            setPremiumModalOpen(true);
+            return;
+        }
+
+        fileRef.current?.click();
+    }
+
+    function closePremiumModal() {
+        setPremiumModalOpen(false);
+    }
+
+    function handlePremiumUpgrade() {
+        setPremiumModalOpen(false);
+
+        if (onNavigateToUpgrade) {
+            onNavigateToUpgrade();
+        }
+    }
+
+    function handleAvatarFileChange(event) {
+        const nextFile = event.target.files?.[0];
+
+        if (!nextFile) {
+            return;
+        }
+
+        if (!isPremium) {
+            setPremiumModalOpen(true);
+            event.target.value = "";
+            return;
+        }
+
+        if (!nextFile.type.startsWith("image/")) {
+            setSavedMessage("Kies een afbeeldingsbestand.");
+            event.target.value = "";
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = () => {
+            const avatarDataUrl = typeof reader.result === "string" ? reader.result : "";
+
+            setProfileForm((prev) => ({ ...prev, avatarDataUrl }));
+            setSavedMessage("Profielfoto bijgewerkt.");
+
+            if (onProfileUpdated) {
+                onProfileUpdated({
+                    ...profile,
+                    avatarDataUrl,
+                });
+            }
+        };
+
+        reader.onerror = () => {
+            setSavedMessage("Kon de afbeelding niet laden.");
+        };
+
+        reader.readAsDataURL(nextFile);
+        event.target.value = "";
     }
 
     function openPasswordModal() {
@@ -107,7 +176,10 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
             }
 
             if (payload?.profile && onProfileUpdated) {
-                onProfileUpdated(payload.profile);
+                onProfileUpdated({
+                    ...payload.profile,
+                    avatarDataUrl: profileForm.avatarDataUrl || profile?.avatarDataUrl || "",
+                });
             }
 
             setActiveField(null);
@@ -165,7 +237,9 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
             }
 
             setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
-            setPasswordMessage("Wachtwoord succesvol gewijzigd.");
+            setPasswordModalOpen(false);
+            setPasswordMessage("");
+            setSavedMessage("Wachtwoord succesvol gewijzigd.");
         } catch (error) {
             console.error(error);
             setPasswordMessage(error?.message || "Fout bij wijzigen van het wachtwoord.");
@@ -185,13 +259,58 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
 
             <section className="personalContent">
                 <div className="personalAvatarRow">
-                    <button className="personalAvatarButton" type="button" aria-label="Profielfoto bewerken">
-                        <LuUser className="personalAvatarIcon" />
+                    <button className="personalAvatarButton" type="button" aria-label="Profielfoto bewerken" onClick={openAvatarPicker}>
+                        {profileForm.avatarDataUrl ? (
+                            <img className="personalAvatarImage" src={profileForm.avatarDataUrl} alt="Geselecteerde profielfoto" />
+                        ) : (
+                            <LuUser className="personalAvatarIcon" />
+                        )}
                     </button>
-                    <button className="personalInlineEdit" type="button" aria-label="Profielfoto bewerken">
+                    <button className="personalInlineEdit" type="button" aria-label="Profielfoto bewerken" onClick={openAvatarPicker}>
                         <LuPencil />
                     </button>
+                    <input
+                        ref={fileRef}
+                        onChange={handleAvatarFileChange}
+                        type="file"
+                        accept="image/*"
+                        style={{ display: "none" }}
+                    />
                 </div>
+
+                {premiumModalOpen ? (
+                    <div className="passwordModalOverlay" role="presentation" onClick={closePremiumModal}>
+                        <div
+                            className="premiumModal"
+                            role="dialog"
+                            aria-modal="true"
+                            aria-labelledby="premium-modal-title"
+                            onClick={(event) => event.stopPropagation()}
+                        >
+                            <header className="passwordModalHeader premiumModalHeader">
+                                <h2 id="premium-modal-title" className="passwordModalTitle">
+                                    <TbCrown />
+                                    Premium functie
+                                </h2>
+                                <button className="passwordModalCloseButton" type="button" onClick={closePremiumModal} aria-label="Sluiten">
+                                    <LuX />
+                                </button>
+                            </header>
+
+                            <p className="premiumModalMessage">
+                                Profielfoto&apos;s uploaden is alleen beschikbaar met een Premium account.
+                                <br />
+                                Upgrade naar Premium om deze functie te gebruiken.
+                            </p>
+
+                            <div className="premiumModalActions">
+                                <button className="passwordModalSubmitButton" type="button" onClick={handlePremiumUpgrade}>
+                                    Upgrade plan
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                ) : null}
 
                 <div className="personalFields">
                     {fields.map((field) => (

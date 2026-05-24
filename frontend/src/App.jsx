@@ -20,6 +20,61 @@ import spinner from "./assets/images/loadingSpinner.svg";
 import { supabase } from "./lib/supabaseClient";
 
 const NAV_STATE_STORAGE_KEY = "remind-navigation-state";
+const PROFILE_AVATAR_STORAGE_KEY_PREFIX = "remind-profile-avatar-";
+
+const getProfileAvatarStorageKey = (userId) =>
+  userId ? `${PROFILE_AVATAR_STORAGE_KEY_PREFIX}${userId}` : null;
+
+const readStoredAvatar = (userId) => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const storageKey = getProfileAvatarStorageKey(userId);
+  if (!storageKey) {
+    return null;
+  }
+
+  try {
+    return window.localStorage.getItem(storageKey);
+  } catch {
+    return null;
+  }
+};
+
+const writeStoredAvatar = (userId, avatarDataUrl) => {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const storageKey = getProfileAvatarStorageKey(userId);
+  if (!storageKey) {
+    return;
+  }
+
+  try {
+    if (avatarDataUrl) {
+      window.localStorage.setItem(storageKey, avatarDataUrl);
+    } else {
+      window.localStorage.removeItem(storageKey);
+    }
+  } catch {
+    // Ignore storage failures; the avatar still works in memory.
+  }
+};
+
+const mergeProfileWithStoredAvatar = (profileData, userId) => {
+  if (!profileData) {
+    return profileData;
+  }
+
+  const storedAvatar = readStoredAvatar(userId);
+
+  return {
+    ...profileData,
+    avatarDataUrl: profileData.avatarDataUrl || storedAvatar || null,
+  };
+};
 
 const getStoredNavigationState = () => {
   if (typeof window === "undefined") {
@@ -80,6 +135,7 @@ export default function App() {
   const [selectedExercise, setSelectedExercise] = useState(storedNavigationState?.selectedExercise || null);
   const [pauseFavorites, setPauseFavorites] = useState(() => new Set());
   const [favoriteRemovalTarget, setFavoriteRemovalTarget] = useState(null);
+  const sessionUserId = session?.user?.id || null;
 
   // Persistent work timer state lifted here so the timer keeps running
   // even when `WorkTimerCard` unmounts during navigation.
@@ -184,7 +240,7 @@ export default function App() {
         }
 
         if (!isCancelled) {
-          setProfile(payload.profile);
+          setProfile(mergeProfileWithStoredAvatar(payload.profile, session.user.id));
         }
       } catch (error) {
         if (!isCancelled) {
@@ -208,10 +264,26 @@ export default function App() {
     return () => {
       isCancelled = true;
     };
-  }, [apiBaseUrl, session, signupProvisioning, authView, signupCompleted]);
+  }, [apiBaseUrl, sessionUserId, signupProvisioning, authView, signupCompleted]);
 
   const displayName = profile?.username || session?.user?.email?.split("@")[0] || "Gebruiker";
   const companyName = profile?.bedrijfsnaam || "";
+
+  const handleProfileUpdated = (nextProfile) => {
+    setProfile((currentProfile) => {
+      const mergedProfile = mergeProfileWithStoredAvatar(
+        {
+          ...currentProfile,
+          ...nextProfile,
+        },
+        sessionUserId
+      );
+
+      writeStoredAvatar(sessionUserId, mergedProfile?.avatarDataUrl || null);
+
+      return mergedProfile;
+    });
+  };
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -657,7 +729,7 @@ export default function App() {
           onNavigateToUpgrade={() => setCurrentPage("upgrade")}
           onLogout={handleLogout}
           profile={profile}
-          onProfileUpdated={setProfile}
+          onProfileUpdated={handleProfileUpdated}
         />
       ) : currentPage === "upgrade" ? (
         <UpgradePlan onBack={() => setCurrentPage("home")} isPremium={Boolean(profile?.is_premium)} />

@@ -17,12 +17,16 @@ export default function ProfilePage({ profile, favorites, onToggleFavorite, onNa
         <main className="profile-page">
             <section className="profile-hero">
                 <div className="profile-avatar" aria-hidden="true">
-                    {name
-                        .split(" ")
-                        .filter(Boolean)
-                        .map((part) => part[0])
-                        .slice(0, 2)
-                        .join("")}
+                    {profile?.avatarDataUrl ? (
+                        <img className="profile-avatarImage" src={profile.avatarDataUrl} alt="Profielfoto" />
+                    ) : (
+                        name
+                            .split(" ")
+                            .filter(Boolean)
+                            .map((part) => part[0])
+                            .slice(0, 2)
+                            .join("")
+                    )}
                 </div>
 
                 <div className="profile-heroCopy">
