@@ -463,10 +463,26 @@
     justify-content: center;
 }
 
+.personalAvatarButton {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--primary-200);
+    border: 4px solid var(--primary-600);
+}
+
 .personalAvatarIcon {
     width: 96px;
     height: 96px;
     color: var(--highlight-400);
+}
+
+.personalAvatarImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
 .personalInlineEdit {
@@ -549,7 +565,7 @@
     transition: var(--button-default-transition);
 }
 
-.passwordModalOverlay {
+.popupCardOverlay {
     position: fixed;
     inset: 0;
     z-index: 50;
@@ -585,16 +601,6 @@
     color: var(--text-primary);
 }
 
-.passwordModalCloseButton {
-    line-height: 0.6;
-    padding: 0;
-    background-color: transparent;
-    border: none;
-    color: var(--text-primary);
-    font-size: var(--font-size-lg);
-    cursor: pointer;
-}
-
 .passwordModalForm {
     display: flex;
     flex-direction: column;
@@ -603,7 +609,8 @@
 }
 
 .passwordMessage {
-    width: fit-content;
+    width: 100%;
+    text-align: center;
     padding: var(--space-8) var(--space-12);
     border-radius: var(--button-radius);
     border: 2px solid var(--error-300);
@@ -632,17 +639,45 @@
     color: var(--text-primary);
 }
 
-.passwordModalField input {
+.passwordInputWrap {
+    position: relative;
     width: 420px;
+}
+
+.passwordModalField input {
+    width: 100%;
     border: 1px solid var(--input-border-color);
     border-radius: var(--input-border-radius);
     background-color: var(--background-100);
     padding: var(--input-padding);
+    padding-right: 56px;
     font-family: var(--font-family-body);
     font-size: var(--font-size-xs);
     font-weight: var(--font-weight-regular);
     color: var(--text-primary);
     outline: var(--input-outline);
+}
+
+.passwordVisibilityButton {
+    padding: 0;
+    position: absolute;
+    top: 50%;
+    right: var(--space-8);
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--icon-size-36);
+    height: var(--icon-size-36);
+    border: none;
+    background-color: transparent;
+    color: var(--text-primary);
+    cursor: pointer;
+}
+
+.passwordVisibilityButton:disabled {
+    opacity: var(--opacity-disabled);
+    cursor: not-allowed;
 }
 
 .passwordModalField input::placeholder {
@@ -693,6 +728,64 @@
 .personalPasswordChangeButton:disabled {
     opacity: var(--opacity-disabled);
     cursor: not-allowed;
+}
+
+.premiumModal {
+    width: var(--premium-card-width);
+    background: var(--premium-card-background);
+    border-radius: var(--premium-card-border-radius);
+    box-shadow: var(--popup-card-box-shadow);
+    padding: var(--premium-card-padding);
+}
+
+.passwordModalCloseButton {
+    margin: 0 0 0 94%;
+    background-color: transparent;
+    padding: 0;
+    height: var(--icon-size-32);
+    border: none;
+    color: var(--text-primary);
+    font-size: var(--close-button-size);
+    cursor: pointer;
+}
+
+.premiumModalContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-20);
+}
+
+.premiumModalMessage {
+    margin: 0 0 var(--space-12) 0;
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--text-body-regular-font-size);
+    color: var(--text-primary);
+    line-height: var(--text-body-regular-line-height);
+    text-align: center;
+}
+
+.upgradeButton {
+    min-width: var(--button-min-width);
+    min-height: var(--button-min-height);
+    padding: var(--button-padding-y) var(--button-padding-x);
+    border: 2px solid var(--button-primary-border);
+    border-radius: var(--button-radius);
+    font-family: var(--button-default-font-family);
+    font-size: var(--button-default-font-size);
+    font-weight: var(--button-primary-font-weight);
+    letter-spacing: var(--button-primary-letter-spacing);
+    background-color: var(--button-primary-bg);
+    color: var(--button-primary-text);
+    cursor: pointer;
+}
+
+.upgradeButton:hover {
+    background-color: var(--highlight-300);
+    color: var(--text-on-light);
+    box-shadow: var(--button-default-hover-shadow);
+    transform: translateY(-2px);
+    transition: var(--button-default-transition);
 }
 
 .deleteAccountButton {
@@ -882,10 +975,6 @@
         border-radius: 24px;
         padding: var(--space-20);
         gap: var(--space-24);
-    }
-
-    .passwordModalHeader {
-        align-items: center;
     }
 
     .passwordModalTitle {

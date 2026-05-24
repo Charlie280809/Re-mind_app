@@ -1,14 +1,20 @@
 import "../css/LoginPage.css";
 import { useState } from "react";
+import { LuEye, LuEyeOff  } from "react-icons/lu";
 import logo from "../assets/images/logo.svg";
 
 export default function LoginPage({ onLogin, onNavigateToSignup, isSubmitting, error, isConfigured }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordVisible, setPasswordVisible] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     await onLogin({ email, password });
+  };
+
+  const togglePasswordVisibility = () => {
+    setPasswordVisible((currentValue) => !currentValue);
   };
 
   return (
@@ -33,15 +39,25 @@ export default function LoginPage({ onLogin, onNavigateToSignup, isSubmitting, e
 
             <label className="inputField">
               <span>Wachtwoord</span>
-              <input
-                type="password"
-                name="password"
-                autoComplete="current-password"
-                placeholder="Wachtwoord"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                required
-              />
+              <div className="passwordInputWrap">
+                <input
+                  type={passwordVisible ? "text" : "password"}
+                  name="password"
+                  autoComplete="current-password"
+                  placeholder="Wachtwoord"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  required
+                />
+                <button
+                  className="passwordVisibilityButton"
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  aria-label={passwordVisible ? "Wachtwoord verbergen" : "Wachtwoord tonen"}
+                >
+                  {passwordVisible ? <LuEye /> : <LuEyeOff />}
+                </button>
+              </div>
             </label>
 
             {error ? <p className="errorMessage" role="alert">{error}</p> : null}

@@ -1,6 +1,7 @@
 import "../css/LoginPage.css";
 import "../css/settings.css";
 import { useState } from "react";
+import { LuEye, LuEyeOff  } from "react-icons/lu";
 import logo from "../assets/images/logo.svg";
 import { WEEKDAY_OPTIONS, buildSignupWorkHoursPayload, createDefaultWorkHoursDraft, isValidWorkdayTimeRange, normalizeDuration } from "../lib/workHours";
 
@@ -29,6 +30,10 @@ export default function SignupPage({ onCreateAccount, onSaveNotifications, onSav
     const [step, setStep] = useState(1);
     const [formError, setFormError] = useState("");
     const [createdUserId, setCreatedUserId] = useState("");
+    const [passwordVisibility, setPasswordVisibility] = useState({
+        password: false,
+        confirmPassword: false,
+    });
     const [account, setAccount] = useState({
         email: "",
         bedrijfsnaam: "",
@@ -73,6 +78,13 @@ export default function SignupPage({ onCreateAccount, onSaveNotifications, onSav
         setWorkHours((currentValue) => ({
             ...currentValue,
             [field]: value,
+        }));
+    };
+
+    const togglePasswordVisibility = (field) => {
+        setPasswordVisibility((currentValue) => ({
+            ...currentValue,
+            [field]: !currentValue[field],
         }));
     };
 
@@ -364,12 +376,46 @@ export default function SignupPage({ onCreateAccount, onSaveNotifications, onSav
 
                                 <label className="inputField">
                                     <span>Wachtwoord *</span>
-                                    <input type="password" autoComplete="new-password" placeholder="Wachtwoord" value={account.password} onChange={(event) => updateAccount("password", event.target.value)} required />
+                                    <div className="passwordInputWrap">
+                                        <input
+                                            type={passwordVisibility.password ? "text" : "password"}
+                                            autoComplete="new-password"
+                                            placeholder="Wachtwoord"
+                                            value={account.password}
+                                            onChange={(event) => updateAccount("password", event.target.value)}
+                                            required
+                                        />
+                                        <button
+                                            className="passwordVisibilityButton"
+                                            type="button"
+                                            onClick={() => togglePasswordVisibility("password")}
+                                            aria-label={passwordVisibility.password ? "Wachtwoord verbergen" : "Wachtwoord tonen"}
+                                        >
+                                            {passwordVisibility.password ? <LuEye /> : <LuEyeOff />}
+                                        </button>
+                                    </div>
                                 </label>
 
                                 <label className="inputField">
                                     <span>Wachtwoord bevestigen *</span>
-                                    <input type="password" autoComplete="new-password" placeholder="Wachtwoord" value={account.confirmPassword} onChange={(event) => updateAccount("confirmPassword", event.target.value)} required />
+                                    <div className="passwordInputWrap">
+                                        <input
+                                            type={passwordVisibility.confirmPassword ? "text" : "password"}
+                                            autoComplete="new-password"
+                                            placeholder="Wachtwoord"
+                                            value={account.confirmPassword}
+                                            onChange={(event) => updateAccount("confirmPassword", event.target.value)}
+                                            required
+                                        />
+                                        <button
+                                            className="passwordVisibilityButton"
+                                            type="button"
+                                            onClick={() => togglePasswordVisibility("confirmPassword")}
+                                            aria-label={passwordVisibility.confirmPassword ? "Wachtwoord verbergen" : "Wachtwoord tonen"}
+                                        >
+                                            {passwordVisibility.confirmPassword ? <LuEye /> : <LuEyeOff />}
+                                        </button>
+                                    </div>
                                 </label>
                             </>
                         ) : null}

@@ -1,8 +1,8 @@
 import "../css/settings.css";
 import { useEffect, useRef, useState } from "react";
-import { LuArrowLeft, LuPencil, LuUser, LuX } from "react-icons/lu";
-import { TbCrown } from "react-icons/tb";
+import { LuArrowLeft, LuPencil, LuUser, LuX, LuEye, LuEyeOff } from "react-icons/lu";
 import { supabase } from "../lib/supabaseClient";
+import crown from "../assets/icons/crown_filled.svg";
 
 export default function SettingsPersonalData({ onBack, profile, onProfileUpdated, onNavigateToUpgrade }) {
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "http://localhost:3000";
@@ -13,6 +13,11 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
     const [passwordForm, setPasswordForm] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
     const [savingPassword, setSavingPassword] = useState(false);
     const [passwordMessage, setPasswordMessage] = useState("");
+    const [passwordVisibility, setPasswordVisibility] = useState({
+        currentPassword: false,
+        newPassword: false,
+        confirmPassword: false,
+    });
     const [savedMessage, setSavedMessage] = useState("");
     const [profileForm, setProfileForm] = useState({ email: "", username: "", bedrijfsnaam: "", avatarDataUrl: "" });
     const [activeField, setActiveField] = useState(null);
@@ -55,6 +60,13 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
         setPasswordForm((prev) => ({ ...prev, [field]: value }));
     }
 
+    function togglePasswordVisibility(field) {
+        setPasswordVisibility((prev) => ({
+            ...prev,
+            [field]: !prev[field],
+        }));
+    }
+
     function openAvatarPicker() {
         if (!isPremium) {
             setPremiumModalOpen(true);
@@ -68,7 +80,7 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
         setPremiumModalOpen(false);
     }
 
-    function handlePremiumUpgrade() {
+    function handlePremiumUpgrade() { /* check of dit niet korter kan, op button zelf bv */
         setPremiumModalOpen(false);
 
         if (onNavigateToUpgrade) {
@@ -122,6 +134,11 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
     function openPasswordModal() {
         setPasswordModalOpen(true);
         setPasswordMessage("");
+        setPasswordVisibility({
+            currentPassword: false,
+            newPassword: false,
+            confirmPassword: false,
+        });
     }
 
     function closePasswordModal() {
@@ -132,6 +149,11 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
         setPasswordModalOpen(false);
         setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
         setPasswordMessage("");
+        setPasswordVisibility({
+            currentPassword: false,
+            newPassword: false,
+            confirmPassword: false,
+        });
     }
 
     async function handleProfileSave() {
@@ -201,17 +223,17 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
         }
 
         if (!passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmPassword) {
-            setPasswordMessage("Vul alle wachtwoordvelden in.");
+            setPasswordMessage("❗Vul alle wachtwoordvelden in.");
             return;
         }
 
         if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-            setPasswordMessage("Nieuwe wachtwoorden komen niet overeen.");
+            setPasswordMessage("❗Nieuwe wachtwoorden komen niet overeen.");
             return;
         }
 
         if (passwordForm.newPassword.length < 6) {
-            setPasswordMessage("Nieuw wachtwoord moet minstens 6 tekens zijn.");
+            setPasswordMessage("❗Nieuw wachtwoord moet minstens 6 tekens zijn.");
             return;
         }
 
@@ -279,7 +301,7 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
                 </div>
 
                 {premiumModalOpen ? (
-                    <div className="passwordModalOverlay" role="presentation" onClick={closePremiumModal}>
+                    <div className="popupCardOverlay" role="presentation" onClick={closePremiumModal}>
                         <div
                             className="premiumModal"
                             role="dialog"
@@ -287,27 +309,25 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
                             aria-labelledby="premium-modal-title"
                             onClick={(event) => event.stopPropagation()}
                         >
-                            <header className="passwordModalHeader premiumModalHeader">
+                            <button className="passwordModalCloseButton" type="button" onClick={closePremiumModal} aria-label="Sluiten">
+                                <LuX />
+                            </button>
+                            <div className="premiumModalContent">
+                                <img src={crown} alt="Premium" className="premiumIcon" />
+
                                 <h2 id="premium-modal-title" className="passwordModalTitle">
-                                    <TbCrown />
-                                    Premium functie
+                                    Ontgrendel profielfoto
                                 </h2>
-                                <button className="passwordModalCloseButton" type="button" onClick={closePremiumModal} aria-label="Sluiten">
-                                    <LuX />
-                                </button>
-                            </header>
 
-                            <p className="premiumModalMessage">
-                                Profielfoto&apos;s uploaden is alleen beschikbaar met een Premium account.
-                                <br />
-                                Upgrade naar Premium om deze functie te gebruiken.
-                            </p>
+                                <p className="premiumModalMessage">
+                                    Upgrade naar Premium om een profielfoto te kunnen uploaden/aanpassen.
+                                </p>
 
-                            <div className="premiumModalActions">
-                                <button className="passwordModalSubmitButton" type="button" onClick={handlePremiumUpgrade}>
-                                    Upgrade plan
+                                <button className="upgradeButton" type="button" onClick={handlePremiumUpgrade}>
+                                    Upgrade naar Premium
                                 </button>
                             </div>
+
                         </div>
                     </div>
                 ) : null}
@@ -357,7 +377,7 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
             </section>
 
             {passwordModalOpen ? (
-                <div className="passwordModalOverlay" role="presentation" onClick={closePasswordModal}>
+                <div className="popupCardOverlay" role="presentation" onClick={closePasswordModal}>
                     <div
                         className="passwordModal"
                         role="dialog"
@@ -379,14 +399,25 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
                         <form className="passwordModalForm" onSubmit={handlePasswordSave}>
                             <label className="passwordModalField">
                                 <span>Vul je huidig wachtwoord in</span>
-                                <input
-                                    type="password"
-                                    autoComplete="current-password"
-                                    value={passwordForm.currentPassword}
-                                    onChange={(event) => updatePasswordForm("currentPassword", event.target.value)}
-                                    placeholder="Huidig wachtwoord"
-                                    disabled={savingPassword}
-                                />
+                                <div className="passwordInputWrap">
+                                    <input
+                                        type={passwordVisibility.currentPassword ? "text" : "password"}
+                                        autoComplete="current-password"
+                                        value={passwordForm.currentPassword}
+                                        onChange={(event) => updatePasswordForm("currentPassword", event.target.value)}
+                                        placeholder="Huidig wachtwoord"
+                                        disabled={savingPassword}
+                                    />
+                                    <button
+                                        className="passwordVisibilityButton"
+                                        type="button"
+                                        onClick={() => togglePasswordVisibility("currentPassword")}
+                                        aria-label={passwordVisibility.currentPassword ? "Wachtwoord verbergen" : "Wachtwoord tonen"}
+                                        disabled={savingPassword}
+                                    >
+                                        {passwordVisibility.currentPassword ? <LuEye /> : <LuEyeOff />}
+                                    </button>
+                                </div>
                                 <a className="passwordForgotLink" href="#">
                                     Wachtwoord vergeten?
                                 </a>
@@ -394,26 +425,48 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
 
                             <label className="passwordModalField">
                                 <span>Nieuw wachtwoord</span>
-                                <input
-                                    type="password"
-                                    autoComplete="new-password"
-                                    value={passwordForm.newPassword}
-                                    onChange={(event) => updatePasswordForm("newPassword", event.target.value)}
-                                    placeholder="Nieuw wachtwoord"
-                                    disabled={savingPassword}
-                                />
+                                <div className="passwordInputWrap">
+                                    <input
+                                        type={passwordVisibility.newPassword ? "text" : "password"}
+                                        autoComplete="new-password"
+                                        value={passwordForm.newPassword}
+                                        onChange={(event) => updatePasswordForm("newPassword", event.target.value)}
+                                        placeholder="Nieuw wachtwoord"
+                                        disabled={savingPassword}
+                                    />
+                                    <button
+                                        className="passwordVisibilityButton"
+                                        type="button"
+                                        onClick={() => togglePasswordVisibility("newPassword")}
+                                        aria-label={passwordVisibility.newPassword ? "Wachtwoord verbergen" : "Wachtwoord tonen"}
+                                        disabled={savingPassword}
+                                    >
+                                        {passwordVisibility.newPassword ? <LuEye /> : <LuEyeOff />}
+                                    </button>
+                                </div>
                             </label>
 
                             <label className="passwordModalField">
                                 <span>Bevestig nieuw wachtwoord</span>
-                                <input
-                                    type="password"
-                                    autoComplete="new-password"
-                                    value={passwordForm.confirmPassword}
-                                    onChange={(event) => updatePasswordForm("confirmPassword", event.target.value)}
-                                    placeholder="Nieuw wachtwoord"
-                                    disabled={savingPassword}
-                                />
+                                <div className="passwordInputWrap">
+                                    <input
+                                        type={passwordVisibility.confirmPassword ? "text" : "password"}
+                                        autoComplete="new-password"
+                                        value={passwordForm.confirmPassword}
+                                        onChange={(event) => updatePasswordForm("confirmPassword", event.target.value)}
+                                        placeholder="Nieuw wachtwoord"
+                                        disabled={savingPassword}
+                                    />
+                                    <button
+                                        className="passwordVisibilityButton"
+                                        type="button"
+                                        onClick={() => togglePasswordVisibility("confirmPassword")}
+                                        aria-label={passwordVisibility.confirmPassword ? "Wachtwoord verbergen" : "Wachtwoord tonen"}
+                                        disabled={savingPassword}
+                                    >
+                                        {passwordVisibility.confirmPassword ? <LuEye /> : <LuEyeOff />}
+                                    </button>
+                                </div>
                             </label>
 
                             <button className="passwordModalSubmitButton" type="submit" disabled={savingPassword}>

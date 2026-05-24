@@ -16,7 +16,7 @@
 .loginContent {
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(2, minmax(320px, 420px));
+    grid-template-columns: repeat(2, minmax(320px, 400px));
     align-items: center;
     justify-content: center;
     gap: var(--space-40);
@@ -51,7 +51,7 @@
 }
 
 .inputField input {
-    width: 420px;
+    width: 400px;
     border: 1px solid var(--input-border-color);
     border-radius: var(--input-border-radius);
     background-color: var(--background-100);
@@ -71,6 +71,41 @@
     border-color: var(--border-green-300);
     box-shadow: var(--input-focus-box-shadow);
     transition: var(--input-transition);
+}
+
+.passwordInputWrap {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+}
+
+.passwordInputWrap input {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding-right: 56px;
+}
+
+.passwordVisibilityButton {
+    padding: 0;
+    position: absolute;
+    top: 50%;
+    right: var(--space-8);
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--icon-size-36);
+    height: var(--icon-size-36);
+    border: none;
+    background-color: transparent;
+    color: var(--text-primary);
+    cursor: pointer;
+}
+
+.passwordVisibilityButton:disabled {
+    opacity: var(--opacity-disabled);
+    cursor: not-allowed;
 }
 
 .errorMessage {
