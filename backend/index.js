@@ -406,6 +406,74 @@ app.put("/profile/me", async (req, res) => {
   });
 });
 
+app.put("/profile/me/premium", async (req, res) => {
+  if (!supabase) {
+    return res.status(500).json({
+      error: "Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in backend/.env.",
+    });
+  }
+
+  const token = getBearerToken(req);
+
+  if (!token) {
+    return res.status(401).json({
+      error: "Missing Bearer token.",
+    });
+  }
+
+  const isPremium = Boolean(req.body?.is_premium);
+
+  const { data: userData, error: userError } = await supabase.auth.getUser(token);
+
+  if (userError || !userData?.user) {
+    return res.status(401).json({
+      error: "Invalid or expired session.",
+    });
+  }
+
+  const { data: existingProfile, error: existingProfileError } = await supabase
+    .from("profiles")
+    .select("email, username, bedrijfsnaam")
+    .eq("user_id", userData.user.id)
+    .maybeSingle();
+
+  if (existingProfileError) {
+    return res.status(500).json({
+      error: "Failed to load existing profile state.",
+      details: existingProfileError.message,
+    });
+  }
+
+  const { error: profileError } = await supabase.from("profiles").upsert(
+    {
+      user_id: userData.user.id,
+      email: existingProfile?.email || userData.user.email,
+      username: existingProfile?.username || userData.user.user_metadata?.username || "",
+      bedrijfsnaam: existingProfile?.bedrijfsnaam || userData.user.user_metadata?.bedrijfsnaam || null,
+      is_premium: isPremium,
+    },
+    { onConflict: "user_id" }
+  );
+
+  if (profileError) {
+    return res.status(500).json({
+      error: "Failed to update profile premium status.",
+      details: profileError.message,
+    });
+  }
+
+  return res.json({
+    ok: true,
+    profile: {
+      user_id: userData.user.id,
+      email: existingProfile?.email || userData.user.email,
+      username: existingProfile?.username || userData.user.user_metadata?.username || "",
+      bedrijfsnaam: existingProfile?.bedrijfsnaam || userData.user.user_metadata?.bedrijfsnaam || null,
+      is_premium: isPremium,
+    },
+  });
+});
+
 app.listen(3000, () => {
   console.log("Backend running on http://localhost:3000");
 });

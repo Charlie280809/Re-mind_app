@@ -732,7 +732,11 @@ export default function App() {
           onProfileUpdated={handleProfileUpdated}
         />
       ) : currentPage === "upgrade" ? (
-        <UpgradePlan onBack={() => setCurrentPage("home")} isPremium={Boolean(profile?.is_premium)} />
+        <UpgradePlan
+          onBack={() => setCurrentPage("home")}
+          isPremium={Boolean(profile?.is_premium)}
+          onProfileUpdated={handleProfileUpdated}
+        />
       ) : currentPage === "breathing" ? (
         <BreathingExercises
           onBack={() => setCurrentPage("pause")}
