@@ -238,7 +238,7 @@ app.post("/signup/work-hours", async (req, res) => {
   const { error } = await supabase.from("settings").upsert(
     {
       user_id: userId,
-      checkin_frequentie: workHoursSetup.checkin_frequentie ?? 0,
+      pause_reminder: workHoursSetup.pause_reminder ?? 0,
       werk_startuur: workHoursSetup.werk_startuur || null,
       werk_einduur: workHoursSetup.werk_einduur || null,
       middag_startuur: workHoursSetup.middag_startuur || null,

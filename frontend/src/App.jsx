@@ -9,6 +9,7 @@ import ProfilePage from "./screens/ProfilePage";
 import ReportPage from "./screens/ReportPage";
 import WeekReportPage from "./screens/WeekReportPage";
 import CheckInModal from "./components/CheckInModal";
+import PauseReminderModal from "./components/PauseReminderModal";
 import FavoriteRemovalModal from "./components/FavoriteRemovalModal";
 import LoginPage from "./screens/LoginPage";
 import SignupPage from "./screens/SignupPage";
@@ -21,6 +22,7 @@ import { DATA as PAUSE_OPTIONS } from "./screens/PauseSuggestions";
 import { supabase } from "./lib/supabaseClient";
 import { getApiBaseUrl } from "./api/apiBaseUrl";
 import { createSignupAccount, fetchProfile, saveSignupNotifications, saveSignupWorkHours } from "./api/backendApi";
+import { calculateWorkdayDurationSeconds } from "./lib/workHours";
 
 const NAV_STATE_STORAGE_KEY = "remind-navigation-state";
 const PROFILE_AVATAR_STORAGE_KEY_PREFIX = "remind-profile-avatar-";
@@ -130,6 +132,7 @@ export default function App() {
   const [profileLoading, setProfileLoading] = useState(false);
   const [authError, setAuthError] = useState("");
   const [authView, setAuthView] = useState("login");
+  const [workSettings, setWorkSettings] = useState(null);
 
   const storedNavigationState = getStoredNavigationState();
   const [currentPage, setCurrentPage] = useState(storedNavigationState?.currentPage || "home");
@@ -149,13 +152,11 @@ export default function App() {
   const [workSeconds, setWorkSeconds] = useState(0);
   const [breakSeconds, setBreakSeconds] = useState(0);
 
-  // Check-in modal state: show every ~2 hours of work (3-4 times per 8-hour day)
-  const [showCheckInModal, setShowCheckInModal] = useState(false);
-  const [lastCheckInPromptIndex, setLastCheckInPromptIndex] = useState(0);
+  // Pause reminder modal state
+  const [showPauseReminderModal, setShowPauseReminderModal] = useState(false);
+  const [nextPauseReminderTriggerWorkSecond, setNextPauseReminderTriggerWorkSecond] = useState(null);
 
-  // reference target for progress (kept small for demo; original used 8*60)
-  const dayTargetSeconds = 8 * 60;
-  const checkInIntervalSeconds = 0.5 * 60; // Show check-in every 2 minutes of work (demo; normally 2 hours)
+  const pauseReminderIntervalSeconds = Math.max(1, Number(workSettings?.pause_reminder ?? 120)) * 60;
 
   useEffect(() => {
     if (!supabase) {
@@ -247,6 +248,37 @@ export default function App() {
     };
   }, [apiBaseUrl, sessionUserId, signupProvisioning, authView, signupCompleted]);
 
+  useEffect(() => {
+    if (!session || !supabase) {
+      setWorkSettings(null);
+      return undefined;
+    }
+
+    let isCancelled = false;
+
+    const loadWorkSettings = async () => {
+      const { data, error } = await supabase
+        .from("settings")
+        .select("werk_startuur, werk_einduur, pause_reminder, checkin_notifications_on")
+        .eq("user_id", session.user.id)
+        .maybeSingle();
+
+      if (!isCancelled) {
+        if (error) {
+          setWorkSettings(null);
+        } else {
+          setWorkSettings(data || null);
+        }
+      }
+    };
+
+    loadWorkSettings();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [session]);
+
   const displayName = profile?.username || session?.user?.email?.split("@")[0] || "Gebruiker";
   const companyName = profile?.bedrijfsnaam || "";
 
@@ -332,15 +364,29 @@ export default function App() {
     };
   }, [session]);
 
-  // Check-in modal trigger: show every ~checkInIntervalSeconds of work time
+  // Pause reminder trigger: first after the configured interval, then after each dismissal.
   useEffect(() => {
-    if (workStarted && !finished && !onBreak && !showCheckInModal) {
-      const currentPromptIndex = Math.floor(workSeconds / checkInIntervalSeconds);
-      if (currentPromptIndex > lastCheckInPromptIndex) {
-        setShowCheckInModal(true);
-      }
+    if (workStarted && !finished && nextPauseReminderTriggerWorkSecond == null) {
+      setNextPauseReminderTriggerWorkSecond(pauseReminderIntervalSeconds);
+      return;
     }
-  }, [workSeconds, workStarted, finished, onBreak, showCheckInModal, lastCheckInPromptIndex, checkInIntervalSeconds]);
+
+    if (!workStarted || finished || onBreak || showPauseReminderModal || nextPauseReminderTriggerWorkSecond == null) {
+      return;
+    }
+
+    if (workSeconds >= nextPauseReminderTriggerWorkSecond) {
+      setShowPauseReminderModal(true);
+    }
+  }, [
+    finished,
+    nextPauseReminderTriggerWorkSecond,
+    onBreak,
+    pauseReminderIntervalSeconds,
+    showPauseReminderModal,
+    workSeconds,
+    workStarted,
+  ]);
 
   const persistFavoriteToggle = async (id, previouslyHad) => {
     setPauseFavorites((prev) => {
@@ -404,8 +450,8 @@ export default function App() {
     setOnBreak(false);
     setWorkSeconds(0);
     setBreakSeconds(0);
-    setShowCheckInModal(false);
-    setLastCheckInPromptIndex(0);
+    setShowPauseReminderModal(false);
+    setNextPauseReminderTriggerWorkSecond(pauseReminderIntervalSeconds);
   };
 
   const endDay = () => {
@@ -413,18 +459,25 @@ export default function App() {
     setOnBreak(false);
   };
 
-  const takeBreak = () => setOnBreak(true);
+  const takeBreak = () => {
+    setOnBreak(true);
+    setCurrentPage("pause");
+  };
   const endBreak = () => setOnBreak(false);
 
-  const closeCheckInModal = () => {
-    const currentPromptIndex = Math.floor(workSeconds / checkInIntervalSeconds);
-
-    setShowCheckInModal(false);
-    setLastCheckInPromptIndex(currentPromptIndex);
+  const closePauseReminderModal = () => {
+    setShowPauseReminderModal(false);
+    setNextPauseReminderTriggerWorkSecond(workSeconds + pauseReminderIntervalSeconds);
   };
 
-  const handleCheckInSubmit = () => {
-    closeCheckInModal();
+  const handlePauseReminderDismiss = () => {
+    // Future hook: persist that the reminder was dismissed before closing the modal.
+    closePauseReminderModal();
+  };
+
+  const handlePauseReminderTakeBreak = () => {
+    closePauseReminderModal();
+    takeBreak();
   };
 
   const handleLogin = async ({ email, password }) => {
@@ -569,6 +622,8 @@ export default function App() {
     setAuthView("signup");
   };
 
+  const dayTargetSeconds = calculateWorkdayDurationSeconds(workSettings?.werk_startuur, workSettings?.werk_einduur) ?? 8 * 60;
+
   if (authLoading || (session && profileLoading)) {
     return (
       <div className="authLoadingState" aria-live="polite">
@@ -613,11 +668,15 @@ export default function App() {
 
   return (
     <div className="appShell">
-      {showCheckInModal && (
-        <CheckInModal
-          onClose={closeCheckInModal}
-          onSubmitCheckIn={handleCheckInSubmit}
-        />
+      <CheckInModal
+        workStarted={workStarted}
+        onBreak={onBreak}
+        finished={finished}
+        workSeconds={workSeconds}
+        checkInNotificationsEnabled={Boolean(workSettings?.checkin_notifications_on)}
+      />
+      {showPauseReminderModal && (
+        <PauseReminderModal onDismiss={handlePauseReminderDismiss} onTakeBreak={handlePauseReminderTakeBreak} />
       )}
       {favoriteRemovalTarget ? (
         <FavoriteRemovalModal
@@ -714,6 +773,7 @@ export default function App() {
               endDay={endDay}
               takeBreak={takeBreak}
               endBreak={endBreak}
+              dayTargetSeconds={dayTargetSeconds}
             />
           </section>
 

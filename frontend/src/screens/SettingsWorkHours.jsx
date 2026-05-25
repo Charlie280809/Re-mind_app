@@ -27,7 +27,7 @@ function settingsStateFromRow(row) {
         }
     });
 
-    const totalMinutes = Number(row.checkin_frequentie);
+    const totalMinutes = Number(row.pause_reminder);
     const hasTotalMinutes = Number.isFinite(totalMinutes) && totalMinutes >= 0;
 
     return {
@@ -49,7 +49,7 @@ function buildSettingsPayload(userId, settings) {
 
     return {
         user_id: userId,
-        checkin_frequentie: normalizedDuration.totalMinutes,
+        pause_reminder: normalizedDuration.totalMinutes,
         werk_startuur: settings.startTime,
         werk_einduur: settings.endTime,
         werktimer_autostart: Boolean(settings.autoStartWorkTimer),

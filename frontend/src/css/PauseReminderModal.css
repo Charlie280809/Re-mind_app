@@ -1,0 +1,146 @@
+@import url("./design_tokens/color_tokens.css");
+@import url("./design_tokens/typography_tokens.css");
+@import url("./design_tokens/spacing_tokens.css");
+
+.pauseReminderOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--layout-container-padding);
+    background-color: var(--backdrop-darken);
+    backdrop-filter: var(--backdrop-blur-4);
+}
+
+.pauseReminderModal {
+    position: relative;
+    min-width: 320px;
+    min-height: 360px;
+    border: 2px solid var(--border-green-300);
+    border-radius: var(--popupcard-border-radius);
+    padding: var(--space-32) var(--space-48);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-32);
+    background: var(--surface-section);
+    box-shadow: var(--popupcard-box-shadow);
+}
+
+.pauseReminderCloseButton {
+    position: absolute;
+    top: var(--space-32);
+    right: var(--space-48);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--text-primary);
+    font-size: var(--close-button-size);
+    cursor: pointer;
+}
+
+.pauseReminderIconWrap {
+    display: grid;
+    place-items: center;
+    width: 100px;
+    height: 100px;
+    color: var(--text-primary);
+}
+
+.pauseReminderIconWrap svg {
+    width: 100%;
+    height: 100%;
+    stroke-width: 1.8px;
+}
+
+.pauseReminderTitle {
+    margin: 0;
+    text-align: center;
+    font-family: var(--text-heading-2-font-family);
+    font-size: var(--text-heading-2-font-size);
+    font-weight: var(--text-heading-2-font-weight);
+    line-height: var(--text-heading-2-line-height);
+    color: var(--text-primary);
+}
+
+.pauseReminderActions {
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-16);
+}
+
+.pauseReminderPrimaryButton,
+.pauseReminderSecondaryButton {
+    min-width: var(--button-min-width);
+    min-height: var(--button-min-height);
+    border-radius: var(--button-radius);
+    font-family: var(--button-default-font-family);
+    cursor: pointer;
+    transition: var(--button-default-transition);
+}
+
+.pauseReminderPrimaryButton {
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-semibold);
+    padding: var(--button-padding-y) var(--button-padding-x);
+    background-color: var(--button-primary-bg);
+    border: 2px solid var(--button-primary-border);
+    color: var(--button-primary-text);
+}
+
+.pauseReminderPrimaryButton:hover {
+    border-color: var(--button-primary-hover-border);
+    background-color: var(--button-primary-hover-bg);
+    box-shadow: var(--button-default-hover-shadow);
+}
+
+.pauseReminderSecondaryButton {
+    align-self: center;
+    width: 80%;
+    padding: var(--button-padding-small-y) var(--button-padding-small-x);
+    font-size: var(--font-size-sm);
+    background-color: var(--button-neutral-bg);
+    border: 2px solid var(--button-neutral-border);
+    color: var(--button-neutral-text);
+}
+
+.pauseReminderSecondaryButton:hover {
+    box-shadow: var(--button-default-hover-shadow);
+    background-color: var(--button-neutral-hover-bg);
+    border-color: var(--button-neutral-hover-border);
+}
+
+/* @media (max-width: 720px) {
+    .pauseReminderModal {
+        min-height: 0;
+        padding: 24px 18px;
+        border-radius: 22px;
+        gap: 20px;
+    }
+
+    .pauseReminderCloseButton {
+        font-size: 3rem;
+        top: 10px;
+        right: 12px;
+    }
+
+    .pauseReminderIconWrap {
+        width: 92px;
+        height: 92px;
+    }
+
+    .pauseReminderActions {
+        gap: 16px;
+    }
+
+    .pauseReminderPrimaryButton,
+    .pauseReminderSecondaryButton {
+        min-height: 58px;
+        padding: 14px 20px;
+        border-radius: 14px;
+    }
+} */

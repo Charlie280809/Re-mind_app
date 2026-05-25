@@ -73,6 +73,17 @@ function parseTimeToMinutes(value) {
     return hours * 60 + minutes;
 }
 
+export function calculateWorkdayDurationSeconds(startTime, endTime) {
+    const startMinutes = parseTimeToMinutes(startTime);
+    const endMinutes = parseTimeToMinutes(endTime);
+
+    if (!Number.isFinite(startMinutes) || !Number.isFinite(endMinutes) || endMinutes <= startMinutes) {
+        return null;
+    }
+
+    return (endMinutes - startMinutes) * 60;
+}
+
 export function isValidWorkdayTimeRange(startTime, endTime) {
     const startMinutes = parseTimeToMinutes(startTime);
     const endMinutes = parseTimeToMinutes(endTime);
@@ -119,7 +130,7 @@ export function buildSignupWorkHoursPayload(userId, draft) {
 
     return {
         user_id: userId,
-        checkin_frequentie: normalizedDuration.totalMinutes,
+        pause_reminder: normalizedDuration.totalMinutes,
         werk_startuur: draft.startTime,
         werk_einduur: draft.endTime,
         middag_startuur: draft.lunchPauseEnabled ? draft.lunchStart : null,
