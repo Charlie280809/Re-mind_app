@@ -13,7 +13,7 @@
     width: var(--premium-card-width);
     background: var(--premium-card-background);
     border-radius: var(--premium-card-border-radius);
-    box-shadow: var(--popup-card-box-shadow);
+    box-shadow: var(--popupcard-box-shadow);
     padding: var(--premium-card-padding);
 }
 

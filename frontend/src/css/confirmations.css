@@ -22,7 +22,7 @@
     flex-direction: column;
     gap: var(--space-20);
     background-color: var(--surface-card);
-    box-shadow: var(--popup-card-box-shadow);
+    box-shadow: var(--popupcard-box-shadow);
     font-family: var(--text-body-regular-font-family);
     font-size: var(--text-body-regular-font-size);
     color: var(--text-primary);
