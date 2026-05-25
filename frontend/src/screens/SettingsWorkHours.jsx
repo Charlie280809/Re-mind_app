@@ -36,6 +36,7 @@ function settingsStateFromRow(row) {
         checkinMinutes: hasTotalMinutes ? totalMinutes % 60 : 50,
         startTime: row.werk_startuur || "09:00",
         endTime: row.werk_einduur || "17:00",
+        autoStartWorkTimer: typeof row.werktimer_autostart === "boolean" ? row.werktimer_autostart : true,
         lunchPauseEnabled:
             typeof row.lunch_enabled === "boolean" ? row.lunch_enabled : Boolean(row.middag_startuur || row.middag_einduur),
         lunchStart: row.middag_startuur || "12:00",
@@ -51,6 +52,7 @@ function buildSettingsPayload(userId, settings) {
         checkin_frequentie: normalizedDuration.totalMinutes,
         werk_startuur: settings.startTime,
         werk_einduur: settings.endTime,
+        werktimer_autostart: Boolean(settings.autoStartWorkTimer),
         lunch_enabled: Boolean(settings.lunchPauseEnabled),
         middag_startuur: settings.lunchPauseEnabled ? settings.lunchStart : null,
         middag_einduur: settings.lunchPauseEnabled ? settings.lunchEnd : null,
@@ -70,6 +72,7 @@ function createEmptySettingsState() {
         checkinMinutes: null,
         startTime: "",
         endTime: "",
+        autoStartWorkTimer: null,
         checkinHours: null,
         lunchStart: "",
         lunchEnd: "",
@@ -267,6 +270,20 @@ export default function SettingsWorkHours({ onBack, userId }) {
                 </div>
 
                 <div className="row toggleRow">
+                    <div className="label">Werktimer automatisch starten op startuur:</div>
+                    <div className="value">
+                        <button
+                            className="toggle"
+                            type="button"
+                            aria-pressed={Boolean(settings.autoStartWorkTimer)}
+                            onClick={() => updateSetting("autoStartWorkTimer", (currentValue) => !Boolean(currentValue))}
+                        >
+                            <span className="knob" />
+                        </button>
+                    </div>
+                </div>
+
+                <div className="row toggleRow">
                     <div className="label">Middagpauze instellen:</div>
                     <div className="value">
                         <button
@@ -359,6 +376,7 @@ export default function SettingsWorkHours({ onBack, userId }) {
             checkinMinutes: normalizedDuration.minutes,
             startTime: settings.startTime,
             endTime: settings.endTime,
+            autoStartWorkTimer: Boolean(settings.autoStartWorkTimer),
             lunchPauseEnabled: Boolean(settings.lunchPauseEnabled),
             lunchStart: settings.lunchStart,
             lunchEnd: settings.lunchEnd,
