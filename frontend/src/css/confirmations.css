@@ -2,7 +2,7 @@
     overflow: hidden;
 }
 
-.favoriteRemovalOverlay {
+.popupOverlay {
     position: fixed;
     inset: 0;
     z-index: 1200;
@@ -12,33 +12,24 @@
     background-color: var(--backdrop-darken);
 }
 
-.favoriteRemovalTop{
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: flex-start;
-}
-
-.favoriteRemovalModal {
-    width: min(100%, 500px);
-    border-radius: 20px;
-    padding: var(--space-24);
+.favoriteRemovalModal,
+.deleteConfirmationModal {
+    width: 480px;
+    max-width: 520px;
+    border-radius: var(--popupcard-border-radius);
+    padding: var(--popupcard-padding);
     display: flex;
     flex-direction: column;
     gap: var(--space-20);
     background-color: var(--surface-card);
-}
-
-.favoriteRemovalTitle {
-    margin: 0;
+    box-shadow: var(--popup-card-box-shadow);
     font-family: var(--text-body-regular-font-family);
     font-size: var(--text-body-regular-font-size);
-    line-height: var(--text-body-regular-line-height);
     color: var(--text-primary);
 }
 
-.favoriteRemovalClose {
-    margin: 0 0 0 var(--space-8);
+.closeOverlayButton {
+    /* margin: 0 0 0 var(--space-8); */
     padding: 0;
     background-color: transparent;
     border: none;
@@ -47,23 +38,95 @@
     cursor: pointer;
 }
 
-.favoriteRemovalPrimaryButton {
-    align-self: center;
+.confirmationHeader {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.favoriteRemovalTitle,
+.deleteConfirmationMessage {
+    margin: 0;
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--text-body-regular-font-size);
+    line-height: var(--text-body-regular-line-height);
+}
+
+.favoriteRemovalPrimaryButton,
+.deleteConfirmationButton,
+.cancelButton {
     min-width: var(--button-min-width);
     min-height: var(--button-min-height);
     width: 140px;
     padding: var(--button-padding-y) var(--button-padding-x);
     border-radius: var(--button-radius);
-    border: 2px solid var(--button-neutral-border);
-    background-color: var(--button-neutral-bg);
     font-family: var(--button-default-font-family);
     font-size: var(--button-default-font-size);
     cursor: pointer;
+}
+
+.favoriteRemovalPrimaryButton:hover,
+.deleteConfirmationButton:hover,
+.cancelButton:hover {
+    box-shadow: var(--button-default-hover-shadow);
     transition: var(--button-default-transition);
+}
+
+/* --- favorite removal --- */
+.favoriteRemovalPrimaryButton {
+    align-self: center;
+    border: 2px solid var(--button-neutral-border);
+    background-color: var(--button-neutral-bg);
 }
 
 .favoriteRemovalPrimaryButton:hover {
     background-color: var(--button-neutral-hover-bg);
     border-color: var(--button-neutral-hover-border);
-    box-shadow: var(--button-default-hover-shadow);
+}
+
+/* --- delete confirmation --- */
+.deleteConfirmationTitle {
+    margin: 0 auto 0 37%;
+    font-family: var(--text-heading-3-font-family);
+    font-size: var(--text-heading-3-font-size);
+    font-weight: var(--text-heading-3-font-weight);
+    line-height: var(--text-heading-3-line-height);
+}
+
+.deleteConfirmationContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-20);
+}
+
+.deleteConfirmationMessage {
+    text-align: center;
+}
+
+.deleteConfirmationActions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--duo-buttons-column-gap);
+}
+
+.deleteConfirmationButton {
+    border: 2px solid var(--button-red-hover-border);
+    background-color: var(--button-red-hover-bg);
+}
+
+.deleteConfirmationButton:hover {
+    background-color: var(--button-red-active-bg);
+    border-color: var(--button-red-active-border);
+}
+
+.cancelButton {
+    border: 2px solid var(--button-secondary-border);
+    background-color: var(--button-secondary-bg);
+}
+
+.cancelButton:hover {
+    background-color: var(--button-secondary-hover-bg);
+    border-color: var(--button-secondary-hover-border);
 }

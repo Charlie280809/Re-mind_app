@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { LuArrowLeft, LuPencil, LuUser, LuX, LuEye, LuEyeOff } from "react-icons/lu";
 import { supabase } from "../lib/supabaseClient";
 import PremiumModal from "../components/PremiumModal";
+import DeleteConfirmationModal from "../components/deleteConfirmationModal";
 
 export default function SettingsPersonalData({ onBack, profile, onProfileUpdated, onNavigateToUpgrade }) {
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "http://localhost:3000";
@@ -22,6 +23,7 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
     const [profileForm, setProfileForm] = useState({ email: "", username: "", bedrijfsnaam: "", avatarDataUrl: "" });
     const [activeField, setActiveField] = useState(null);
     const [savingProfile, setSavingProfile] = useState(false);
+    const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
 
     useEffect(() => {
         if (!savedMessage) return undefined;
@@ -78,6 +80,19 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
 
     function closePremiumModal() {
         setPremiumModalOpen(false);
+    }
+
+    function openDeleteConfirmation() {
+        setDeleteConfirmationOpen(true);
+    }
+
+    function closeDeleteConfirmation() {
+        setDeleteConfirmationOpen(false);
+    }
+
+    function handleDeleteAccountConfirm() {
+        setDeleteConfirmationOpen(false);
+        setSavedMessage("Verwijderen bevestigd. Koppeling volgt later.");
     }
 
     function handleAvatarFileChange(event) {
@@ -340,7 +355,7 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
                     </button>
                 </div>
 
-                <button className="deleteAccountButton" type="button">
+                <button className="deleteAccountButton" type="button" onClick={openDeleteConfirmation}>
                     Verwijder account
                 </button>
             </section>
@@ -444,6 +459,16 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
                         </form>
                     </div>
                 </div>
+            ) : null}
+
+            {deleteConfirmationOpen ? (
+                <DeleteConfirmationModal
+                    description="Je staat op het punt om je account te verwijderen. Wil je doorgaan?"
+                    onClose={closeDeleteConfirmation}
+                    deleteConfirmationButtonLabel="Ja, verwijder mijn account"
+                    cancelButtonLabel="Nee, behoud mijn account"
+                    onConfirm={handleDeleteAccountConfirm}
+                />
             ) : null}
 
             <button className="saveButton personalSaveButton" type="button" onClick={handleProfileSave} disabled={savingProfile}>

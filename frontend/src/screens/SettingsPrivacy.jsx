@@ -2,12 +2,14 @@ import "../css/settings.css";
 import { LuArrowLeft, LuChevronRight } from "react-icons/lu";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
+import DeleteConfirmationModal from "../components/deleteConfirmationModal";
 
 export default function SettingsPrivacy({ onBack }) {
     const [syncCalendar, setSyncCalendar] = useState(false);
     const [saving, setSaving] = useState(false);
     const [savingSync, setSavingSync] = useState(false);
     const [message, setMessage] = useState("");
+    const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
 
     useEffect(() => {
         if (!message) return;
@@ -98,13 +100,15 @@ export default function SettingsPrivacy({ onBack }) {
     }
 
     async function handleDelete() {
-        const confirmed = window.confirm("Weet je zeker dat je je gegevens wilt verwijderen?");
-        if (!confirmed) {
-            setMessage("Verwijderen geannuleerd.");
-            return;
-        }
+        setDeleteConfirmationOpen(true);
+    }
 
-        // Placeholder until backend delete endpoint is added.
+    function closeDeleteConfirmation() {
+        setDeleteConfirmationOpen(false);
+    }
+
+    function handleDeleteConfirmation() {
+        setDeleteConfirmationOpen(false);
         setMessage("Verwijderen bevestigd. Koppeling volgt later.");
     }
 
@@ -284,8 +288,17 @@ export default function SettingsPrivacy({ onBack }) {
                     <button className="deletePersonalDataButton" type="button" onClick={handleDelete}>
                         Verwijder data
                     </button>
-                    <p className="privacyHint">Verwijder al je persoonlijke gegevens uit de database</p>
+                    <p className="privacyHint">Verwijder je persoonlijke gegevens uit de database</p>
                 </div>
+                {deleteConfirmationOpen ? (
+                    <DeleteConfirmationModal
+                        description="Je staat op het punt je data te verwijderen. Als je dit doet zul je je vorige dag- en weekrapporten niet meer kunnen bekijken. Wil je doorgaan?"
+                        onClose={closeDeleteConfirmation}
+                        deleteConfirmationButtonLabel="Ja, verwijder mijn gegevens"
+                        cancelButtonLabel="Nee, behoud mijn gegevens"
+                        onConfirm={handleDeleteConfirmation}
+                    />
+                ) : null}
                 <div className={`savedMessage ${message ? "visible" : ""}`}>{message}</div>
             </section>
         </main>

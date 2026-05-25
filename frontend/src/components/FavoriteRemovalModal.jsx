@@ -19,7 +19,7 @@ export default function FavoriteRemovalModal({ pauseTitle, onConfirm, onCancel }
     }, [onCancel]);
 
     return (
-        <div className="favoriteRemovalOverlay" onClick={onCancel} role="presentation">
+        <div className="popupOverlay" onClick={onCancel} role="presentation">
             <div
                 className="favoriteRemovalModal"
                 role="dialog"
@@ -29,11 +29,11 @@ export default function FavoriteRemovalModal({ pauseTitle, onConfirm, onCancel }
                 onClick={(event) => event.stopPropagation()}
             >
 
-                <div className="favoriteRemovalTop">
+                <div className="confirmationHeader">
                     <p className="favoriteRemovalTitle">
                         Ben je zeker dat je {pauseTitle} uit je favoriete pauzes wil verwijderen?
                     </p>
-                    <button className="favoriteRemovalClose" type="button" onClick={onCancel} aria-label="Sluiten">
+                    <button className="closeOverlayButton" type="button" onClick={onCancel} aria-label="Sluiten">
                         <LuX />
                     </button>
                 </div>
