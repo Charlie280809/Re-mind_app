@@ -59,10 +59,8 @@ export default function WorkTimerCard({
   endDay,
   takeBreak,
   endBreak,
+  dayTargetSeconds = 8 * 60,
 }) {
-  // Voor de cirkel: neem bijvoorbeeld een “dag” van 8 uur als referentie
-  const dayTargetSeconds = 8 * 60; //*60
-
   const mainTime = useMemo(() => formatTime(workSeconds), [workSeconds]);
 
   const progress = useMemo(() => {
