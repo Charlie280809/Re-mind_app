@@ -2,7 +2,7 @@ import "../css/settings.css";
 import { useEffect, useRef, useState } from "react";
 import { LuArrowLeft, LuPencil, LuUser, LuX, LuEye, LuEyeOff } from "react-icons/lu";
 import { supabase } from "../lib/supabaseClient";
-import crown from "../assets/icons/crown_filled.svg";
+import PremiumModal from "../components/PremiumModal";
 
 export default function SettingsPersonalData({ onBack, profile, onProfileUpdated, onNavigateToUpgrade }) {
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "http://localhost:3000";
@@ -78,14 +78,6 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
 
     function closePremiumModal() {
         setPremiumModalOpen(false);
-    }
-
-    function handlePremiumUpgrade() { /* check of dit niet korter kan, op button zelf bv */
-        setPremiumModalOpen(false);
-
-        if (onNavigateToUpgrade) {
-            onNavigateToUpgrade();
-        }
     }
 
     function handleAvatarFileChange(event) {
@@ -301,35 +293,12 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
                 </div>
 
                 {premiumModalOpen ? (
-                    <div className="popupCardOverlay" role="presentation" onClick={closePremiumModal}>
-                        <div
-                            className="premiumModal"
-                            role="dialog"
-                            aria-modal="true"
-                            aria-labelledby="premium-modal-title"
-                            onClick={(event) => event.stopPropagation()}
-                        >
-                            <button className="passwordModalCloseButton" type="button" onClick={closePremiumModal} aria-label="Sluiten">
-                                <LuX />
-                            </button>
-                            <div className="premiumModalContent">
-                                <img src={crown} alt="Premium" className="premiumIcon" />
-
-                                <h2 id="premium-modal-title" className="passwordModalTitle">
-                                    Ontgrendel profielfoto
-                                </h2>
-
-                                <p className="premiumModalMessage">
-                                    Upgrade naar Premium om een profielfoto te kunnen uploaden/aanpassen.
-                                </p>
-
-                                <button className="upgradeButton" type="button" onClick={handlePremiumUpgrade}>
-                                    Upgrade naar Premium
-                                </button>
-                            </div>
-
-                        </div>
-                    </div>
+                    <PremiumModal
+                        title="Ontgrendel profielfoto"
+                        description="Upgrade naar Premium om een profielfoto te kunnen uploaden/aanpassen."
+                        onClose={closePremiumModal}
+                        onUpgrade={onNavigateToUpgrade}
+                    />
                 ) : null}
 
                 <div className="personalFields">
@@ -377,7 +346,7 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
             </section>
 
             {passwordModalOpen ? (
-                <div className="popupCardOverlay" role="presentation" onClick={closePasswordModal}>
+                <div className="passwordModalOverlay" role="presentation" onClick={closePasswordModal}>
                     <div
                         className="passwordModal"
                         role="dialog"

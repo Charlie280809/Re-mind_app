@@ -109,6 +109,7 @@
 
 .logoutBtn:hover {
     box-shadow: var(--button-default-hover-shadow);
+    background-color: var(--button-red-hover-bg);
     transition: var(--button-default-transition);
 }
 
@@ -565,7 +566,7 @@
     transition: var(--button-default-transition);
 }
 
-.popupCardOverlay {
+.passwordModalOverlay {
     position: fixed;
     inset: 0;
     z-index: 50;
@@ -730,16 +731,7 @@
     cursor: not-allowed;
 }
 
-.premiumModal {
-    width: var(--premium-card-width);
-    background: var(--premium-card-background);
-    border-radius: var(--premium-card-border-radius);
-    box-shadow: var(--popup-card-box-shadow);
-    padding: var(--premium-card-padding);
-}
-
 .passwordModalCloseButton {
-    margin: 0 0 0 94%;
     background-color: transparent;
     padding: 0;
     height: var(--icon-size-32);
@@ -747,45 +739,6 @@
     color: var(--text-primary);
     font-size: var(--close-button-size);
     cursor: pointer;
-}
-
-.premiumModalContent {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-20);
-}
-
-.premiumModalMessage {
-    margin: 0 0 var(--space-12) 0;
-    font-family: var(--text-body-regular-font-family);
-    font-size: var(--text-body-regular-font-size);
-    color: var(--text-primary);
-    line-height: var(--text-body-regular-line-height);
-    text-align: center;
-}
-
-.upgradeButton {
-    min-width: var(--button-min-width);
-    min-height: var(--button-min-height);
-    padding: var(--button-padding-y) var(--button-padding-x);
-    border: 2px solid var(--button-primary-border);
-    border-radius: var(--button-radius);
-    font-family: var(--button-default-font-family);
-    font-size: var(--button-default-font-size);
-    font-weight: var(--button-primary-font-weight);
-    letter-spacing: var(--button-primary-letter-spacing);
-    background-color: var(--button-primary-bg);
-    color: var(--button-primary-text);
-    cursor: pointer;
-}
-
-.upgradeButton:hover {
-    background-color: var(--highlight-300);
-    color: var(--text-on-light);
-    box-shadow: var(--button-default-hover-shadow);
-    transform: translateY(-2px);
-    transition: var(--button-default-transition);
 }
 
 .deleteAccountButton {
