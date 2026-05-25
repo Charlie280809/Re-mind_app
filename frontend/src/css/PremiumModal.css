@@ -1,0 +1,83 @@
+.premiumCardOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: grid;
+    place-items: center;
+    padding: var(--layout-container-padding);
+    background-color: var(--backdrop-darken);
+    backdrop-filter: var(--premium-card-bg-blur);
+}
+
+.premiumModal {
+    width: var(--premium-card-width);
+    background: var(--premium-card-background);
+    border-radius: var(--premium-card-border-radius);
+    box-shadow: var(--popup-card-box-shadow);
+    padding: var(--premium-card-padding);
+}
+
+.premiumModalCloseButton {
+    margin: 0 0 0 94%;
+    background-color: transparent;
+    padding: 0;
+    height: var(--icon-size-32);
+    border: none;
+    color: var(--text-primary);
+    font-size: var(--close-button-size);
+    cursor: pointer;
+}
+
+.premiumModalContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-20);
+}
+
+.premiumIcon {
+    width: 64px;
+    height: 64px;
+}
+
+.premiumModalTitle {
+    width: 100%;
+    margin: 0;
+    text-align: center;
+    font-family: var(--font-family-heading);
+    font-size: var(--text-heading-3-font-size);
+    font-weight: var(--text-heading-3-font-weight);
+    color: var(--text-primary);
+}
+
+.premiumModalMessage {
+    margin: 0 0 var(--space-12) 0;
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--text-body-regular-font-size);
+    color: var(--text-primary);
+    line-height: var(--text-body-regular-line-height);
+    text-align: center;
+}
+
+.upgradeButton {
+    min-width: var(--button-min-width);
+    min-height: var(--button-min-height);
+    padding: var(--button-padding-y) var(--button-padding-x);
+    border: 2px solid var(--button-primary-border);
+    border-radius: var(--button-radius);
+    font-family: var(--button-default-font-family);
+    font-size: var(--button-default-font-size);
+    font-weight: var(--button-primary-font-weight);
+    letter-spacing: var(--button-primary-letter-spacing);
+    background-color: var(--button-primary-bg);
+    color: var(--button-primary-text);
+    cursor: pointer;
+}
+
+.upgradeButton:hover {
+    background-color: var(--highlight-300);
+    color: var(--text-on-light);
+    box-shadow: var(--button-default-hover-shadow);
+    transform: translateY(-2px);
+    transition: var(--button-default-transition);
+}
