@@ -9,7 +9,7 @@
     justify-content: center;
     z-index: 1000;
     background-color: var(--backdrop-darken);
-    backdrop-filter: var(--backdrop-blur-6);
+    backdrop-filter: var(--backdrop-blur-2);
 }
 
 .checkInModalContent {
