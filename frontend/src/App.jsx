@@ -21,7 +21,7 @@ import spinner from "./assets/images/loadingSpinner.svg";
 import { DATA as PAUSE_OPTIONS } from "./screens/PauseSuggestions";
 import { supabase } from "./lib/supabaseClient";
 import { getApiBaseUrl } from "./api/apiBaseUrl";
-import { createSignupAccount, fetchProfile, saveSignupNotifications, saveSignupWorkHours } from "./api/backendApi";
+import { createSignupAccount, fetchProfile, incrementWorkSessionCounter, saveSignupNotifications, saveSignupWorkHours } from "./api/backendApi";
 import { calculateWorkdayDurationSeconds } from "./lib/workHours";
 
 const NAV_STATE_STORAGE_KEY = "remind-navigation-state";
@@ -443,6 +443,18 @@ export default function App() {
     setFavoriteRemovalTarget(null);
   };
 
+  const incrementWorkSessionCounterOnServer = async (column) => {
+    if (!session?.access_token) {
+      return;
+    }
+
+    try {
+      await incrementWorkSessionCounter(apiBaseUrl, session.access_token, column);
+    } catch (error) {
+      console.error(`Failed to increment ${column}:`, error);
+    }
+  };
+
   // timer control handlers passed down to WorkTimerCard
   const startDay = () => {
     setWorkStarted(true);
@@ -459,7 +471,12 @@ export default function App() {
     setOnBreak(false);
   };
 
-  const takeBreak = () => {
+  const takeBreak = async () => {
+    if (onBreak || !workStarted || finished) {
+      return;
+    }
+
+    await incrementWorkSessionCounterOnServer("breaks_taken");
     setOnBreak(true);
     setCurrentPage("pause");
   };
@@ -467,11 +484,13 @@ export default function App() {
 
   const closePauseReminderModal = () => {
     setShowPauseReminderModal(false);
-    setNextPauseReminderTriggerWorkSecond(workSeconds + pauseReminderIntervalSeconds);
+    // setNextPauseReminderTriggerWorkSecond(workSeconds + pauseReminderIntervalSeconds);
+    // For demo purposes, trigger next reminder after 15 seconds
+    setNextPauseReminderTriggerWorkSecond(workSeconds + 15);
   };
 
   const handlePauseReminderDismiss = () => {
-    // Future hook: persist that the reminder was dismissed before closing the modal.
+    incrementWorkSessionCounterOnServer("breaks_skipped");
     closePauseReminderModal();
   };
 

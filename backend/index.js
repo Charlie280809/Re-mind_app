@@ -124,6 +124,69 @@ app.post("/checkin", async (req, res) => {
   res.json({ needPause });
 });
 
+app.post("/work-sessions/breaks/increment", async (req, res) => {
+  if (!supabase) {
+    return res.status(500).json({
+      error: "Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in backend/.env.",
+    });
+  }
+
+  const token = getBearerToken(req);
+
+  if (!token) {
+    return res.status(401).json({
+      error: "Missing Bearer token.",
+    });
+  }
+
+  const { data: userData, error: userError } = await supabase.auth.getUser(token);
+
+  if (userError || !userData?.user) {
+    return res.status(401).json({
+      error: "Invalid or expired session.",
+    });
+  }
+
+  const column = req.body?.column === "breaks_skipped" ? "breaks_skipped" : "breaks_taken";
+
+  const { data: latestSession, error: sessionError } = await supabase
+    .from("work_sessions")
+    .select(`id, ${column}`)
+    .eq("user_id", userData.user.id)
+    .order("start_tijd", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (sessionError) {
+    return res.status(500).json({
+      error: "Failed to load work session.",
+      details: sessionError.message,
+    });
+  }
+
+  if (!latestSession?.id) {
+    return res.status(404).json({
+      error: "No work session found for the signed-in user.",
+    });
+  }
+
+  const nextValue = Number(latestSession[column] ?? 0) + 1;
+
+  const { error: updateError } = await supabase
+    .from("work_sessions")
+    .update({ [column]: nextValue })
+    .eq("id", latestSession.id);
+
+  if (updateError) {
+    return res.status(500).json({
+      error: "Failed to update breaks_taken.",
+      details: updateError.message,
+    });
+  }
+
+  return res.json({ ok: true, [column]: nextValue });
+});
+
 app.post("/signup/create-account", async (req, res) => {
   if (!supabase) {
     return res.status(500).json({

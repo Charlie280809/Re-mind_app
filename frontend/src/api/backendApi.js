@@ -69,3 +69,22 @@ export async function saveSignupWorkHours(apiBaseUrl, payload) {
 
     return true;
 }
+
+export async function incrementWorkSessionCounter(apiBaseUrl, accessToken, column) {
+    const response = await fetch(`${apiBaseUrl}/work-sessions/breaks/increment`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ column }),
+    });
+
+    const body = await readJsonResponse(response, (snippet) => snippet || "Kon pauze teller niet verhogen.");
+
+    if (!response.ok) {
+        throw new Error(body.error || "Kon pauze teller niet verhogen.");
+    }
+
+    return body;
+}
