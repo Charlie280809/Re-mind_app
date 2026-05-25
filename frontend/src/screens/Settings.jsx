@@ -38,6 +38,7 @@ export default function Settings({ onBack, resetKey, isPremium, initialView, cle
                 profile={profile}
                 onProfileUpdated={onProfileUpdated}
                 onNavigateToUpgrade={onNavigateToUpgrade}
+                onLogout={onLogout}
             />
         );
     }

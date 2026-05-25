@@ -474,6 +474,55 @@ app.put("/profile/me/premium", async (req, res) => {
   });
 });
 
+app.delete("/account/me", async (req, res) => {
+  if (!supabase) {
+    return res.status(500).json({
+      error: "Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in backend/.env.",
+    });
+  }
+
+  const token = getBearerToken(req);
+
+  if (!token) {
+    return res.status(401).json({
+      error: "Missing Bearer token.",
+    });
+  }
+
+  const { data: userData, error: userError } = await supabase.auth.getUser(token);
+
+  if (userError || !userData?.user) {
+    return res.status(401).json({
+      error: "Invalid or expired session.",
+    });
+  }
+
+  const userId = userData.user.id;
+  const tablesToDelete = ["favorite_pauses", "settings", "checkins", "profiles"]; {/* andere data van werksessies toevoegen */}
+
+  for (const tableName of tablesToDelete) {
+    const { error } = await supabase.from(tableName).delete().eq("user_id", userId);
+
+    if (error) {
+      return res.status(500).json({
+        error: `Failed to delete data from ${tableName}.`,
+        details: error.message,
+      });
+    }
+  }
+
+  const { error: deleteAuthError } = await supabase.auth.admin.deleteUser(userId);
+
+  if (deleteAuthError) {
+    return res.status(500).json({
+      error: "Failed to delete auth user.",
+      details: deleteAuthError.message,
+    });
+  }
+
+  return res.json({ ok: true });
+});
+
 app.listen(3000, () => {
   console.log("Backend running on http://localhost:3000");
 });

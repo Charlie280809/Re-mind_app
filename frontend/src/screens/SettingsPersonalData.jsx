@@ -5,7 +5,7 @@ import { supabase } from "../lib/supabaseClient";
 import PremiumModal from "../components/PremiumModal";
 import DeleteConfirmationModal from "../components/deleteConfirmationModal";
 
-export default function SettingsPersonalData({ onBack, profile, onProfileUpdated, onNavigateToUpgrade }) {
+export default function SettingsPersonalData({ onBack, profile, onProfileUpdated, onNavigateToUpgrade, onLogout }) {
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "http://localhost:3000";
     const fileRef = useRef(null);
     const isPremium = Boolean(profile?.is_premium);
@@ -90,9 +90,41 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
         setDeleteConfirmationOpen(false);
     }
 
-    function handleDeleteAccountConfirm() {
+    async function handleDeleteAccountConfirm() {
         setDeleteConfirmationOpen(false);
-        setSavedMessage("Verwijderen bevestigd. Koppeling volgt later.");
+
+        try {
+            const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+            const session = sessionData?.session;
+
+            if (sessionError || !session) {
+                throw new Error(sessionError?.message || "Geen actieve sessie gevonden.");
+            }
+
+            const response = await fetch(`${apiBaseUrl}/account/me`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${session.access_token}`,
+                },
+            });
+
+            const contentType = response.headers.get("content-type") || "";
+            const payload = contentType.includes("application/json") ? await response.json() : null;
+
+            if (!response.ok) {
+                throw new Error(payload?.error || "Kon het account niet verwijderen.");
+            }
+
+            if (onLogout) {
+                await onLogout();
+                return;
+            }
+
+            await supabase.auth.signOut();
+        } catch (error) {
+            console.error(error);
+            setSavedMessage(error?.message || "Fout bij verwijderen van het account.");
+        }
     }
 
     function handleAvatarFileChange(event) {
@@ -357,7 +389,7 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
 
                 <button className="deleteAccountButton" type="button" onClick={openDeleteConfirmation}>
                     Verwijder account
-                </button>
+                </button> {/* moet alle data, inclusief profielgegevens, verwijderen en dus ook uitloggen */}
             </section>
 
             {passwordModalOpen ? (
