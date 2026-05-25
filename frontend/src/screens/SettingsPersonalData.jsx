@@ -4,9 +4,9 @@ import { LuArrowLeft, LuPencil, LuUser, LuX, LuEye, LuEyeOff } from "react-icons
 import { supabase } from "../lib/supabaseClient";
 import PremiumModal from "../components/PremiumModal";
 import DeleteConfirmationModal from "../components/deleteConfirmationModal";
+import { deleteAccount, updateProfile } from "../api/profileApi";
 
 export default function SettingsPersonalData({ onBack, profile, onProfileUpdated, onNavigateToUpgrade, onLogout }) {
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "http://localhost:3000";
     const fileRef = useRef(null);
     const isPremium = Boolean(profile?.is_premium);
     const [passwordModalOpen, setPasswordModalOpen] = useState(false);
@@ -101,19 +101,7 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
                 throw new Error(sessionError?.message || "Geen actieve sessie gevonden.");
             }
 
-            const response = await fetch(`${apiBaseUrl}/account/me`, {
-                method: "DELETE",
-                headers: {
-                    Authorization: `Bearer ${session.access_token}`,
-                },
-            });
-
-            const contentType = response.headers.get("content-type") || "";
-            const payload = contentType.includes("application/json") ? await response.json() : null;
-
-            if (!response.ok) {
-                throw new Error(payload?.error || "Kon het account niet verwijderen.");
-            }
+            await deleteAccount(session.access_token);
 
             if (onLogout) {
                 await onLogout();
@@ -216,25 +204,11 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
                 throw new Error(sessionError?.message || "Geen actieve sessie gevonden.");
             }
 
-            const response = await fetch(`${apiBaseUrl}/profile/me`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${session.access_token}`,
-                },
-                body: JSON.stringify({
-                    email: nextEmail,
-                    username: nextUsername,
-                    bedrijfsnaam: nextCompany,
-                }),
+            const payload = await updateProfile(session.access_token, {
+                email: nextEmail,
+                username: nextUsername,
+                bedrijfsnaam: nextCompany,
             });
-
-            const contentType = response.headers.get("content-type") || "";
-            const payload = contentType.includes("application/json") ? await response.json() : null;
-
-            if (!response.ok) {
-                throw new Error(payload?.error || "Kon de profielgegevens niet opslaan.");
-            }
 
             if (payload?.profile && onProfileUpdated) {
                 onProfileUpdated({

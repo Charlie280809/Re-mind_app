@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { LuChevronLeft, LuChevronRight, LuZap } from "react-icons/lu";
 import { HiOutlineTrendingUp  } from "react-icons/hi";
 import { TbCrown } from "react-icons/tb";
+import { fetchTodayReport } from "../api/reportApi";
 
 const dateOptions = { day: "numeric", month: "long", year: "numeric" };
 
@@ -16,20 +17,12 @@ export default function ReportPage({ isPremium }) {
     const [report, setReport] = useState(null);
 
     useEffect(() => {
-        const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
-
         async function loadReport() {
             setLoading(true);
             setError("");
 
             try {
-                const response = await fetch(`${apiBaseUrl}/report/today`);
-
-                if (!response.ok) {
-                    throw new Error(`Backend gaf status ${response.status}`);
-                }
-
-                const data = await response.json();
+                const data = await fetchTodayReport();
                 setReport(data);
             } catch (err) {
                 setError(err.message || "Kon het dagrapport niet ophalen.");

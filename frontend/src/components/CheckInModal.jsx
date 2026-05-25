@@ -2,6 +2,7 @@ import { useState } from "react";
 import "../css/CheckInModal.css";
 import { HiOutlineTrendingUp  } from "react-icons/hi";
 import { LuZap } from "react-icons/lu";
+import { submitCheckIn } from "../api/checkInApi";
 
 export default function CheckInModal({ onClose, onSubmitCheckIn }) {
     const [stress, setStress] = useState(3);
@@ -14,23 +15,7 @@ export default function CheckInModal({ onClose, onSubmitCheckIn }) {
         setError("");
 
         try {
-            const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
-            const response = await fetch(`${apiBaseUrl}/checkin`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    stress: parseInt(stress, 10),
-                    energy: parseInt(energy, 10),
-                }),
-            });
-
-            if (!response.ok) {
-                throw new Error(`Backend gaf status ${response.status}`);
-            }
-
-            const data = await response.json();
+            const data = await submitCheckIn(stress, energy);
             if (onSubmitCheckIn) {
                 onSubmitCheckIn(data);
             }

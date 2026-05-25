@@ -4,13 +4,12 @@ import { IoMdHeart } from "react-icons/io";
 import { TbCrown } from "react-icons/tb";
 import { useState } from "react";
 import { supabase } from "../lib/supabaseClient";
+import { setPremiumStatus } from "../api/profileApi";
 
 export default function SettingsUpgrade({ isPremium, onProfileUpdated }) {
     const [billingCycle, setBillingCycle] = useState("monthly");
     const [savingPlan, setSavingPlan] = useState(false);
     const [saveMessage, setSaveMessage] = useState("");
-
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "http://localhost:3000";
 
     const premiumPrice = billingCycle === "monthly" ? "€2,99/maand" : "€33/jaar";
     const companyPrice = billingCycle === "monthly" ? "€2,20/maand" : "€20/jaar";
@@ -27,23 +26,7 @@ export default function SettingsUpgrade({ isPremium, onProfileUpdated }) {
                 throw new Error(sessionError?.message || "Geen actieve sessie gevonden.");
             }
 
-            const response = await fetch(`${apiBaseUrl}/profile/me/premium`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${session.access_token}`,
-                },
-                body: JSON.stringify({
-                    is_premium: false,
-                }),
-            });
-
-            const contentType = response.headers.get("content-type") || "";
-            const payload = contentType.includes("application/json") ? await response.json() : null;
-
-            if (!response.ok) {
-                throw new Error(payload?.error || "Kon het plan niet aanpassen.");
-            }
+            const payload = await setPremiumStatus(session.access_token, false);
 
             if (payload?.profile && onProfileUpdated) {
                 onProfileUpdated(payload.profile);

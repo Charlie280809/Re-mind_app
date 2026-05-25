@@ -14,10 +14,13 @@ import LoginPage from "./screens/LoginPage";
 import SignupPage from "./screens/SignupPage";
 import Settings from "./screens/Settings";
 import UpgradePlan from "./screens/UpgradePlan";
-import { DATA as PAUSE_OPTIONS } from "./screens/PauseSuggestions";
 import notitie from "./assets/icons/Afsluitnotitie.svg";
 import spinner from "./assets/images/loadingSpinner.svg";
+
+import { DATA as PAUSE_OPTIONS } from "./screens/PauseSuggestions";
 import { supabase } from "./lib/supabaseClient";
+import { getApiBaseUrl } from "./api/apiBaseUrl";
+import { createSignupAccount, fetchProfile, saveSignupNotifications, saveSignupWorkHours } from "./api/backendApi";
 
 const NAV_STATE_STORAGE_KEY = "remind-navigation-state";
 const PROFILE_AVATAR_STORAGE_KEY_PREFIX = "remind-profile-avatar-";
@@ -115,7 +118,7 @@ const getStoredNavigationState = () => {
 };
 
 export default function App() {
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "http://localhost:3000";
+  const apiBaseUrl = getApiBaseUrl();
 
   const [session, setSession] = useState(null);
   const [profile, setProfile] = useState(null);
@@ -216,29 +219,7 @@ export default function App() {
       setAuthError("");
 
       try {
-        const response = await fetch(`${apiBaseUrl}/profile/me`, {
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-          },
-        });
-
-        const contentType = response.headers.get("content-type") || "";
-
-        let payload = null;
-        if (contentType.includes("application/json")) {
-          payload = await response.json();
-        } else {
-          const bodyText = await response.text();
-          const snippet = bodyText.slice(0, 120).replace(/\s+/g, " ").trim();
-          throw new Error(
-            `Backend antwoordde niet met JSON op ${apiBaseUrl}/profile/me (status ${response.status}). Controleer VITE_API_BASE_URL en of backend draait op poort 3000. Respons: ${snippet}`
-          );
-        }
-
-        if (!response.ok) {
-          throw new Error(payload.error || "Kon je profiel niet laden.");
-        }
-
+        const payload = await fetchProfile(apiBaseUrl, session.access_token);
         if (!isCancelled) {
           setProfile(mergeProfileWithStoredAvatar(payload.profile, session.user.id));
         }
@@ -480,29 +461,12 @@ export default function App() {
     setSignupProvisioning(true);
 
     try {
-      const createResponse = await fetch(`${apiBaseUrl}/signup/create-account`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-          username,
-          bedrijfsnaam,
-        }),
+      const createPayload = await createSignupAccount(apiBaseUrl, {
+        email,
+        password,
+        username,
+        bedrijfsnaam,
       });
-
-      const createContentType = createResponse.headers.get("content-type") || "";
-      const createPayload = createContentType.includes("application/json")
-        ? await createResponse.json()
-        : { error: await createResponse.text() };
-
-      if (!createResponse.ok || !createPayload?.user?.id) {
-        setAuthError(createPayload.error || "Kon account niet aanmaken.");
-        setSignupProvisioning(false);
-        return null;
-      }
 
       return {
         userId: createPayload.user.id,
@@ -530,23 +494,10 @@ export default function App() {
     setSignupSubmitting(true);
 
     try {
-      const response = await fetch(`${apiBaseUrl}/signup/notifications`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId,
-          checkinNotificationsOn,
-        }),
+      await saveSignupNotifications(apiBaseUrl, {
+        userId,
+        checkinNotificationsOn,
       });
-
-      const contentType = response.headers.get("content-type") || "";
-      const payload = contentType.includes("application/json") ? await response.json() : { error: await response.text() };
-
-      if (!response.ok) {
-        throw new Error(payload.error || "Kon onboarding niet opslaan.");
-      }
       return true;
     } catch (error) {
       setAuthError(error.message);
@@ -566,23 +517,10 @@ export default function App() {
     setSignupSubmitting(true);
 
     try {
-      const response = await fetch(`${apiBaseUrl}/signup/work-hours`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId,
-          workHoursSetup,
-        }),
+      await saveSignupWorkHours(apiBaseUrl, {
+        userId,
+        workHoursSetup,
       });
-
-      const contentType = response.headers.get("content-type") || "";
-      const payload = contentType.includes("application/json") ? await response.json() : { error: await response.text() };
-
-      if (!response.ok) {
-        throw new Error(payload.error || "Kon werkuren niet opslaan.");
-      }
 
       const { error } = await supabase.auth.signInWithPassword({
         email,
