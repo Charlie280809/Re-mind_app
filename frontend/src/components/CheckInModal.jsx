@@ -1,31 +1,103 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "../css/CheckInModal.css";
 import { HiOutlineTrendingUp  } from "react-icons/hi";
 import { LuZap } from "react-icons/lu";
 import { submitCheckIn } from "../api/checkInApi";
 
-export default function CheckInModal({ onClose, onSubmitCheckIn }) {
+const CHECK_IN_MIN_INTERVAL_SECONDS = 30 * 60;
+const CHECK_IN_MAX_INTERVAL_SECONDS = 90 * 60;
+
+const getRandomCheckInIntervalSeconds = () => {
+    const range = CHECK_IN_MAX_INTERVAL_SECONDS - CHECK_IN_MIN_INTERVAL_SECONDS;
+    return CHECK_IN_MIN_INTERVAL_SECONDS + Math.floor(Math.random() * (range + 1));
+};
+
+export default function CheckInModal({
+    workStarted,
+    onBreak,
+    finished,
+    workSeconds,
+    checkInNotificationsEnabled,
+}) {
     const [stress, setStress] = useState(3);
     const [energy, setEnergy] = useState(3);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [showCheckInModal, setShowCheckInModal] = useState(false);
+    const [nextCheckInTriggerWorkSecond, setNextCheckInTriggerWorkSecond] = useState(null);
+
+    useEffect(() => {
+        if (!checkInNotificationsEnabled) {
+            setShowCheckInModal(false);
+            setNextCheckInTriggerWorkSecond(null);
+            return;
+        }
+
+        if (!workStarted || finished) {
+            setShowCheckInModal(false);
+            setNextCheckInTriggerWorkSecond(null);
+            return;
+        }
+
+        if (onBreak) {
+            setShowCheckInModal(false);
+            return;
+        }
+
+        if (nextCheckInTriggerWorkSecond == null) {
+            // setNextCheckInTriggerWorkSecond(getRandomCheckInIntervalSeconds());
+            //for demo purposes, trigger first check-in after 10 seconds
+            setNextCheckInTriggerWorkSecond(10);
+            return;
+        }
+
+        if (!showCheckInModal && workSeconds >= nextCheckInTriggerWorkSecond) {
+            setShowCheckInModal(true);
+        }
+    }, [
+        checkInNotificationsEnabled,
+        finished,
+        nextCheckInTriggerWorkSecond,
+        onBreak,
+        showCheckInModal,
+        workSeconds,
+        workStarted,
+    ]);
+
+    useEffect(() => {
+        if (!showCheckInModal) {
+            return undefined;
+        }
+
+        document.body.classList.add("modalOpen");
+
+        return () => {
+            document.body.classList.remove("modalOpen");
+        };
+    }, [showCheckInModal]);
+
+    const closeCheckInModal = () => {
+        setShowCheckInModal(false);
+        setNextCheckInTriggerWorkSecond(workSeconds + getRandomCheckInIntervalSeconds());
+    };
 
     const handleSubmit = async () => {
         setLoading(true);
         setError("");
 
         try {
-            const data = await submitCheckIn(stress, energy);
-            if (onSubmitCheckIn) {
-                onSubmitCheckIn(data);
-            }
+            await submitCheckIn(stress, energy);
         } catch (err) {
             setError(err.message || "Kon check-in niet opslaan.");
         } finally {
             setLoading(false);
-            onClose();
+            closeCheckInModal();
         }
     };
+
+    if (!showCheckInModal) {
+        return null;
+    }
 
     return (
         <div className="checkInModalOverlay">
@@ -41,7 +113,7 @@ export default function CheckInModal({ onClose, onSubmitCheckIn }) {
                     <div className="checkInModalActions">
                         <button
                             className="checkInSkipButton"
-                            onClick={onClose}
+                            onClick={closeCheckInModal}
                             disabled={loading}
                             type="button"
                         >
