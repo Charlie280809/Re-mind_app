@@ -713,6 +713,8 @@ export default function App() {
           setSettingsResetKey((k) => k + 1);
         }}
         isPremium={Boolean(profile?.is_premium)}
+        onBreak={onBreak}
+        breakSeconds={breakSeconds}
       />
 
       {currentPage === "exercise-detail" ? (
@@ -787,7 +789,6 @@ export default function App() {
               onBreak={onBreak}
               finished={finished}
               workSeconds={workSeconds}
-              breakSeconds={breakSeconds}
               startDay={startDay}
               endDay={endDay}
               takeBreak={takeBreak}

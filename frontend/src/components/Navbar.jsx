@@ -4,7 +4,13 @@ import { LuHouse, LuPause, LuUser, LuSettings } from "react-icons/lu";
 import { HiOutlineChartBar, HiOutlineChartSquareBar } from "react-icons/hi";
 import { TbCrown } from "react-icons/tb";
 
-export default function Navbar({ currentPage, setCurrentPage, onSettingsNavigate, isPremium }) {
+function formatTime(totalSeconds) {
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+}
+
+export default function Navbar({ currentPage, setCurrentPage, onSettingsNavigate, isPremium, onBreak, breakSeconds }) {
   const navItems = [
     {
       key: "home",
@@ -75,6 +81,13 @@ export default function Navbar({ currentPage, setCurrentPage, onSettingsNavigate
             </button>
           ))}
         </nav>
+
+        {onBreak ? (
+          <div className="pauseTimePanel" aria-live="polite">
+            <div className="pauseTimeLabel">Pauzetijd</div>
+            <div className="pauseTimeValue">{formatTime(breakSeconds)}</div>
+          </div>
+        ) : null}
       </div>
 
       <div className="sideNavBottom">

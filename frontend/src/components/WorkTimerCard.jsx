@@ -54,7 +54,6 @@ export default function WorkTimerCard({
   onBreak,
   finished,
   workSeconds,
-  breakSeconds,
   startDay,
   endDay,
   takeBreak,
@@ -104,7 +103,6 @@ export default function WorkTimerCard({
               <button className="btn endbtn" onClick={endDay} type="button">
                 Beëindig werkdag
               </button>
-              <div className="muted">Pauzetijd: {formatTime(breakSeconds)}</div>
             </>
           )}
 
