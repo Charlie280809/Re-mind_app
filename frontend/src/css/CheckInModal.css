@@ -47,7 +47,7 @@
 .checkInModalActions {
     display: flex;
     flex-direction: column;
-    gap: var(--space-12);
+    gap: var(--duo-buttons-column-gap);
     min-width: fit-content;
     width: 140px;
 }

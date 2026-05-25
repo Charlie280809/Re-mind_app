@@ -29,6 +29,9 @@
     --button-default-hover-shadow: 0px 4px 6px rgba(0, 0, 0, 0.12);
     --button-default-transition: all 0.2s ease-in-out;
 
+    /* --duo-buttons-row-gap: var(--space-12); */
+    --duo-buttons-column-gap: var(--space-12);
+
     /* Primary Button */
     --button-primary-bg: var(--primary-300);
     --button-primary-border: var(--primary-700);

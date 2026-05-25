@@ -557,16 +557,6 @@
     transform: translateX(26px);
 }
 
-.signupActions {
-    position: absolute;
-    right: var(--space-64);
-    bottom: var(--space-48);
-    display: flex;
-    justify-content: flex-end;
-    gap: var(--space-16);
-    padding-top: var(--space-8);
-}
-
 .signupSubmit {
     min-width: 152px;
     border-radius: var(--button-radius);
@@ -644,10 +634,6 @@
 
     .signupTitle {
         font-size: 36px;
-    }
-
-    .signupActions {
-        flex-direction: column;
     }
 
     .signupSubmit,
