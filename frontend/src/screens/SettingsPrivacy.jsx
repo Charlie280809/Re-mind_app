@@ -287,7 +287,7 @@ export default function SettingsPrivacy({ onBack }) {
 
                     <button className="deletePersonalDataButton" type="button" onClick={handleDelete}>
                         Verwijder data
-                    </button>
+                    </button> {/* zal alle data (op profiles tabel na, moeten verwijderen/resetten naar default states) */}
                     <p className="privacyHint">Verwijder je persoonlijke gegevens uit de database</p>
                 </div>
                 {deleteConfirmationOpen ? (
