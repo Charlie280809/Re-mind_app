@@ -45,7 +45,7 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
 
     const fields = [
         { key: "email", label: "Email:", type: "email", placeholder: "Nog niet beschikbaar" },
-        { key: "username", label: "Gebruikersnaam:", type: "text", placeholder: "Nog niet beschikbaar" },
+        { key: "username", label: "Naam:", type: "text", placeholder: "Nog niet beschikbaar" },
         { key: "bedrijfsnaam", label: "Bedrijf:", type: "text", placeholder: "Nog niet beschikbaar" },
         { key: "plan", label: "Abonnement:", value: planLabel, readOnly: true },
     ];
@@ -330,34 +330,33 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
                                 {field.key === "plan" ? (
                                     <span className="personalFieldValue">{field.value}</span>
                                 ) : (
-                                    <input
-                                        className={`personalFieldInput ${activeField === field.key ? "active" : ""}`}
-                                        type={field.type}
-                                        value={profileForm[field.key]}
-                                        placeholder={field.placeholder}
-                                        readOnly={activeField !== field.key}
-                                        aria-readonly={activeField !== field.key}
-                                        onChange={(event) => updateProfileField(field.key, event.target.value)}
-                                        onFocus={() => startEditingField(field.key)}
-                                    />
-                                )}
+                                    <div className="personalFieldInputWrap">
+                                        <input
+                                            className={`personalFieldInput ${activeField === field.key ? "active" : ""}`}
+                                            type={field.type}
+                                            value={profileForm[field.key]}
+                                            placeholder={field.placeholder}
+                                            readOnly={activeField !== field.key}
+                                            aria-readonly={activeField !== field.key}
+                                            onChange={(event) => updateProfileField(field.key, event.target.value)}
+                                            onFocus={() => startEditingField(field.key)}
+                                        />
 
-                                {field.key !== "plan" ? (
-                                    <button
-                                        className="personalInlineEdit"
-                                        type="button"
-                                        aria-label={`${field.label} bewerken`}
-                                        onClick={() => startEditingField(field.key)}
-                                    >
-                                        <LuPencil />
-                                    </button>
-                                ) : null}
+                                        <span
+                                            className="personalInlineEdit personalInlineEditInside"
+                                            aria-hidden="true"
+                                        >
+                                            <LuPencil />
+                                        </span>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     ))}
 
                     <button className="personalPasswordChangeButton" type="button" onClick={openPasswordModal}>
                         Wachtwoord aanpassen
+                        <LuPencil className="personalPasswordChangeIcon" />
                     </button>
                 </div>
 

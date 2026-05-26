@@ -3,12 +3,19 @@
 @import url("./design_tokens/spacing_tokens.css");
 @import url("./design_tokens/components.css");
 
-.settingsPage {
+.settingsPage,
+.workhoursPage,
+.notificationsPage,
+.personalPage,
+.privacyPage {
     flex: 1;
-    padding: var(--layout-container-padding);
     display: flex;
     flex-direction: column;
+    padding: var(--layout-container-padding);
     background-color: var(--surface-background);
+    max-width: 100%;
+    gap: var(--space-32);
+    color: var(--text-primary);
 }
 
 .settingsHeader {
@@ -34,7 +41,6 @@
     font-family: var(--text-heading-2-font-family);
     font-size: var(--text-heading-2-font-size);
     font-weight: var(--font-weight-semibold);
-    color: var(--text-primary);
 }
 
 .settingsListWrap {
@@ -145,16 +151,6 @@
 /* === Other pages === */
 
 /* --- Work hours Page --- */
-.workhoursPage {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: var(--layout-container-padding);
-    background-color: var(--surface-background);
-    max-width: 100%;
-    gap: var(--space-32);
-}
-
 .workhoursContent {
     /* max-width: 820px; */
     width: 100%;
@@ -163,12 +159,7 @@
     gap: var(--space-20);
     font-family: var(--text-body-regular-font-family);
     font-size: var(--text-body-regular-font-size);
-    color: var(--text-primary);
 }
-
-/* .workhoursContent :nth-child(2) {
-    margin-bottom: 200px;
-} */
 
 .row {
     display: flex;
@@ -197,7 +188,6 @@
     margin: 0;
     font-family: var(--text-body-regular-font-family);
     font-size: var(--text-body-regular-font-size);
-    color: var(--text-primary);
 }
 
 .weekdayCheckbox {
@@ -259,9 +249,7 @@
     padding: var(--space-4);
     border-radius: 10px;
     border: 1px solid var(--border-color-default);
-    /* background-color: var(--surface-card); */
-    background-color: transparent;
-    color: var(--text-primary);
+    background-color: var(--background-100);
     font-family: var(--text-input-value-font-family);
     font-size: var(--text-input-value-font-size);
 }
@@ -325,16 +313,6 @@
 }
 
 /* --- Notifications Page --- */
-.notificationsPage {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: var(--layout-container-padding);
-    background-color: var(--surface-background);
-    max-width: 100%;
-    gap: var(--space-32);
-}
-
 .notificationsContent {
     width: 100%;
     display: flex;
@@ -343,7 +321,6 @@
     gap: var(--space-32);
     font-family: var(--text-body-regular-font-family);
     font-size: var(--text-body-regular-font-size);
-    color: var(--text-primary);
     margin: 0 auto;
 }
 
@@ -357,7 +334,6 @@
     font-family: var(--text-body-regular-font-family);
     font-size: var(--text-body-regular-font-size);
     font-weight: var(--font-weight-semibold);
-    color: var(--text-primary);
 }
 
 .notificationDescription {
@@ -426,16 +402,6 @@
 }
 
 /* --- Personal Data Page --- */
-.personalPage {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: var(--layout-container-padding);
-    background-color: var(--surface-background);
-    max-width: 100%;
-    gap: var(--space-32);
-}
-
 .personalContent {
     width: 100%;
     flex: 1;
@@ -448,22 +414,20 @@
 .personalAvatarRow {
     display: flex;
     align-items: flex-end;
-    gap: var(--space-12);
+    gap: var(--space-8);
 }
 
-.personalAvatarButton,
 .personalInlineEdit {
+    font-size: var(--font-size-md);
+    color: var(--primary-700);
     padding: 0;
     border: 0;
     background: transparent;
     cursor: pointer;
-    color: var(--primary-700);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .personalAvatarButton {
+    padding: 0;
     width: 96px;
     height: 96px;
     border-radius: 50%;
@@ -473,8 +437,9 @@
 }
 
 .personalAvatarIcon {
-    width: 96px;
-    height: 96px;
+    margin: var(--space-4) 0 0 0;
+    width: 100%;
+    height: 100%;
     color: var(--highlight-400);
 }
 
@@ -483,10 +448,6 @@
     height: 100%;
     object-fit: cover;
     display: block;
-}
-
-.personalInlineEdit {
-    font-size: var(--font-size-lg);
 }
 
 .personalFields {
@@ -506,42 +467,57 @@
 }
 
 .personalFieldLabel {
-    /* min-width: 150px; */
     width: fit-content;
     font-family: var(--text-body-regular-font-family);
     font-size: var(--text-body-regular-font-size);
     font-weight: var(--font-weight-bold);
-    color: var(--text-primary);
 }
 
 .personalFieldValueWrap {
     display: inline-flex;
-    align-items: flex-end;
+    align-items: center;
     gap: var(--space-8);
 }
 
+.personalFieldInputWrap {
+    position: relative;
+    width: min(420px, 100%);
+}
+
+.personalFieldInputWrap .personalInlineEditInside {
+    position: absolute;
+    top: 6px;
+    right: var(--space-8);
+    pointer-events: none;
+}
+
 .personalFieldValue {
-    color: var(--text-primary);
     font-family: var(--text-body-regular-font-family);
     font-size: var(--text-body-regular-font-size);
-    /* border-bottom: 1px solid rgba(0, 0, 0, 0.35); */
-    line-height: 1.2;
 }
 
 .personalFieldInput {
-    width: fit-content;
-    /* width: 100px; */
+    /* width: 100%; */
+    width: 360px;
     padding: var(--space-4) var(--space-8);
+    padding-right: calc(var(--space-8) + var(--icon-size-32) + var(--space-8));
     border-radius: var(--button-radius);
     border: 2px solid var(--button-neutral-border);
-    background: transparent;
-    color: var(--text-primary);
+    background-color: var(--background-100);
     font-family: var(--text-body-regular-font-family);
     font-size: var(--text-body-regular-font-size);
+}
+
+.personalFieldInput:focus,
+.personalFieldInput.active {
+    outline: none;
+    border-color: var(--primary-700);
+    box-shadow: var(--input-focus-box-shadow);
 }
 
 .personalFieldInput:hover {
     background-color: var(--button-neutral-hover-bg);
+    border-color: var(--button-neutral-hover-border);
     transition: var(--input-transition);
 }
 
@@ -551,11 +527,14 @@
     padding: var(--button-padding-small-y) var(--button-padding-small-x);
     border: 2px solid var(--button-neutral-border);
     border-radius: var(--button-radius);
-    background-color: var(--button-neutral-bg);
+    background-color: var(--background-100);
     color: var(--button-neutral-text);
     font-family: var(--font-family-body);
     font-size: var(--button-default-font-size);
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-4);
 }
 
 .personalPasswordChangeButton:hover {
@@ -564,6 +543,14 @@
     box-shadow: var(--button-default-hover-shadow);
     transition: var(--button-default-transition);
 }
+
+.personalPasswordChangeIcon {
+    /* margin: var(--space-4) 0 0 var(--space-4); */
+    font-size: var(--font-size-md);
+    color: var(--primary-700);
+}
+
+/* --- Change password modal --- */
 
 .passwordModalOverlay {
     position: fixed;
@@ -598,7 +585,6 @@
     font-family: var(--font-family-heading);
     font-size: var(--text-heading-3-font-size);
     font-weight: var(--text-heading-3-font-weight);
-    color: var(--text-primary);
 }
 
 .passwordModalForm {
@@ -636,7 +622,6 @@
     font-family: var(--font-family-body);
     font-size: var(--font-size-s);
     font-weight: var(--font-weight-semibold);
-    color: var(--text-primary);
 }
 
 .passwordInputWrap {
@@ -654,7 +639,6 @@
     font-family: var(--font-family-body);
     font-size: var(--font-size-xs);
     font-weight: var(--font-weight-regular);
-    color: var(--text-primary);
     outline: var(--input-outline);
 }
 
@@ -784,16 +768,6 @@
 } */
 
 /* --- Privacy Page --- */
-.privacyPage {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: var(--layout-container-padding);
-    background-color: var(--surface-background);
-    max-width: 100%;
-    gap: var(--space-32);
-}
-
 .privacyContent {
     width: 100%;
     display: flex;
@@ -801,7 +775,6 @@
     gap: var(--space-32);
     font-family: var(--text-body-regular-font-family);
     font-size: var(--text-body-regular-font-size);
-    color: var(--text-primary);
 }
 
 .privacyAccordion {
