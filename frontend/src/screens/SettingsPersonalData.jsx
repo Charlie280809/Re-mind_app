@@ -6,6 +6,26 @@ import PremiumModal from "../components/PremiumModal";
 import DeleteConfirmationModal from "../components/deleteConfirmationModal";
 import { deleteAccount, updateProfile } from "../api/profileApi";
 
+const AVATAR_BUCKET = "profile_avatars";
+
+async function uploadAvatarToStorage(userId, file) {
+    const fileExtension = file.name.includes(".") ? file.name.split(".").pop() : "png";
+    const filePath = `${userId}/${crypto.randomUUID()}.${fileExtension}`;
+
+    const { error: uploadError } = await supabase.storage.from(AVATAR_BUCKET).upload(filePath, file, {
+        upsert: true,
+        contentType: file.type,
+    });
+
+    if (uploadError) {
+        throw uploadError;
+    }
+
+    const { data } = supabase.storage.from(AVATAR_BUCKET).getPublicUrl(filePath);
+
+    return data.publicUrl;
+}
+
 export default function SettingsPersonalData({ onBack, profile, onProfileUpdated, onNavigateToUpgrade, onLogout }) {
     const fileRef = useRef(null);
     const isPremium = Boolean(profile?.is_premium);
@@ -20,7 +40,8 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
         confirmPassword: false,
     });
     const [savedMessage, setSavedMessage] = useState("");
-    const [profileForm, setProfileForm] = useState({ email: "", username: "", bedrijfsnaam: "", avatarDataUrl: "" });
+    const [profileForm, setProfileForm] = useState({ email: "", username: "", bedrijfsnaam: "", avatarUrl: "" });
+    const [avatarFile, setAvatarFile] = useState(null);
     const [activeField, setActiveField] = useState(null);
     const [savingProfile, setSavingProfile] = useState(false);
     const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
@@ -36,8 +57,9 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
             email: profile?.email || "",
             username: profile?.username || "",
             bedrijfsnaam: profile?.bedrijfsnaam || "",
-            avatarDataUrl: profile?.avatarDataUrl || "",
+            avatarUrl: profile?.avatar_url || "",
         });
+        setAvatarFile(null);
         setActiveField(null);
     }, [profile]);
 
@@ -134,27 +156,20 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
             return;
         }
 
-        const reader = new FileReader();
+        const previewUrl = URL.createObjectURL(nextFile);
 
-        reader.onload = () => {
-            const avatarDataUrl = typeof reader.result === "string" ? reader.result : "";
-
-            setProfileForm((prev) => ({ ...prev, avatarDataUrl }));
-            setSavedMessage("Profielfoto bijgewerkt.");
-
-            if (onProfileUpdated) {
-                onProfileUpdated({
-                    ...profile,
-                    avatarDataUrl,
-                });
+        setProfileForm((prev) => {
+            if (prev.avatarUrl?.startsWith("blob:")) {
+                URL.revokeObjectURL(prev.avatarUrl);
             }
-        };
 
-        reader.onerror = () => {
-            setSavedMessage("Kon de afbeelding niet laden.");
-        };
-
-        reader.readAsDataURL(nextFile);
+            return {
+                ...prev,
+                avatarUrl: previewUrl,
+            };
+        });
+        setAvatarFile(nextFile);
+        // setSavedMessage("Profielfoto bijgewerkt.");
         event.target.value = "";
     }
 
@@ -204,16 +219,23 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
                 throw new Error(sessionError?.message || "Geen actieve sessie gevonden.");
             }
 
+            let nextAvatarUrl = profile?.avatar_url || null;
+
+            if (avatarFile) {
+                nextAvatarUrl = await uploadAvatarToStorage(session.user.id, avatarFile);
+            }
+
             const payload = await updateProfile(session.access_token, {
                 email: nextEmail,
                 username: nextUsername,
                 bedrijfsnaam: nextCompany,
+                avatar_url: isPremium ? nextAvatarUrl : undefined,
             });
 
             if (payload?.profile && onProfileUpdated) {
                 onProfileUpdated({
                     ...payload.profile,
-                    avatarDataUrl: profileForm.avatarDataUrl || profile?.avatarDataUrl || "",
+                    avatar_url: payload.profile.avatar_url || nextAvatarUrl || profileForm.avatarUrl || profile?.avatar_url || "",
                 });
             }
 
@@ -295,8 +317,8 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
             <section className="personalContent">
                 <div className="personalAvatarRow">
                     <button className="personalAvatarButton" type="button" aria-label="Profielfoto bewerken" onClick={openAvatarPicker}>
-                        {profileForm.avatarDataUrl ? (
-                            <img className="personalAvatarImage" src={profileForm.avatarDataUrl} alt="Geselecteerde profielfoto" />
+                        {profileForm.avatarUrl ? (
+                            <img className="personalAvatarImage" src={profileForm.avatarUrl} alt="Geselecteerde profielfoto" />
                         ) : (
                             <LuUser className="personalAvatarIcon" />
                         )}

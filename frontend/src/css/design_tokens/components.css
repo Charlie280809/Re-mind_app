@@ -32,8 +32,6 @@
     /* --duo-buttons-row-gap: var(--space-12); */
     --duo-buttons-column-gap: var(--space-12);
 
-    /* --button-premium-transform: translateY(-2px); */
-
     /* Primary Button */
     --button-primary-bg: var(--primary-300);
     --button-primary-border: var(--primary-700);
@@ -170,13 +168,16 @@
     --popupcard-padding: var(--space-24);
     --popupcard-box-shadow: 0 28px 64px rgba(0, 0, 0, 0.2);
 
-    /* upgrade cards */
+    /* === PREMIUM / UPGRADE === */
     --premium-card-width: 520px;
     --premium-card-border-radius: 20px;
     --premium-card-background: linear-gradient(140deg, var(--highlight-200) 0%, var(--highlight-100) 30%, var(--background-card-300) 80%);
     --premium-card-shadow: 0px 4px 6px var(--primary-200);
     --premium-card-padding: var(--space-32);
     --premium-card-bg-blur: var(--backdrop-blur-6);
+
+    --button-premium-transform: translateY(-2px);
+
 
     /* === EXTRA'S === */
     --opacity-disabled: 0.6;

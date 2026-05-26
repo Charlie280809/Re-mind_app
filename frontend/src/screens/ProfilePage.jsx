@@ -20,8 +20,8 @@ export default function ProfilePage({ profile, favorites, onToggleFavorite, onNa
         <main className="profile-page">
             <section className="profile-hero">
                 <div className="profile-avatar" aria-hidden="true">
-                    {profile?.avatarDataUrl ? (
-                        <img className="profile-avatarImage" src={profile.avatarDataUrl} alt="Profielfoto" />
+                    {profile?.avatar_url ? (
+                        <img className="profile-avatarImage" src={profile.avatar_url} alt="Profielfoto" />
                     ) : (
                         name
                             .split(" ")

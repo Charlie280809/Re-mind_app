@@ -33,62 +33,7 @@ import {
 import { calculateWorkdayDurationSeconds } from "./lib/workHours";
 
 const NAV_STATE_STORAGE_KEY = "remind-navigation-state";
-const PROFILE_AVATAR_STORAGE_KEY_PREFIX = "remind-profile-avatar-";
 const FREE_FAVORITE_LIMIT = 4;
-
-const getProfileAvatarStorageKey = (userId) =>
-  userId ? `${PROFILE_AVATAR_STORAGE_KEY_PREFIX}${userId}` : null;
-
-const readStoredAvatar = (userId) => {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
-  const storageKey = getProfileAvatarStorageKey(userId);
-  if (!storageKey) {
-    return null;
-  }
-
-  try {
-    return window.localStorage.getItem(storageKey);
-  } catch {
-    return null;
-  }
-};
-
-const writeStoredAvatar = (userId, avatarDataUrl) => {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  const storageKey = getProfileAvatarStorageKey(userId);
-  if (!storageKey) {
-    return;
-  }
-
-  try {
-    if (avatarDataUrl) {
-      window.localStorage.setItem(storageKey, avatarDataUrl);
-    } else {
-      window.localStorage.removeItem(storageKey);
-    }
-  } catch {
-    // Ignore storage failures; the avatar still works in memory.
-  }
-};
-
-const mergeProfileWithStoredAvatar = (profileData, userId) => {
-  if (!profileData) {
-    return profileData;
-  }
-
-  const storedAvatar = readStoredAvatar(userId);
-
-  return {
-    ...profileData,
-    avatarDataUrl: profileData.avatarDataUrl || storedAvatar || null,
-  };
-};
 
 const getStoredNavigationState = () => {
   if (typeof window === "undefined") {
@@ -233,7 +178,7 @@ export default function App() {
       try {
         const payload = await fetchProfile(apiBaseUrl, session.access_token);
         if (!isCancelled) {
-          setProfile(mergeProfileWithStoredAvatar(payload.profile, session.user.id));
+          setProfile(payload.profile);
         }
       } catch (error) {
         if (!isCancelled) {
@@ -325,19 +270,10 @@ export default function App() {
   const companyName = profile?.bedrijfsnaam || "";
 
   const handleProfileUpdated = (nextProfile) => {
-    setProfile((currentProfile) => {
-      const mergedProfile = mergeProfileWithStoredAvatar(
-        {
-          ...currentProfile,
-          ...nextProfile,
-        },
-        sessionUserId
-      );
-
-      writeStoredAvatar(sessionUserId, mergedProfile?.avatarDataUrl || null);
-
-      return mergedProfile;
-    });
+    setProfile((currentProfile) => ({
+      ...currentProfile,
+      ...nextProfile,
+    }));
   };
 
   useEffect(() => {
