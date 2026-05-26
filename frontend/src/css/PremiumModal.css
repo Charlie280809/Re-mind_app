@@ -10,6 +10,7 @@
 }
 
 .premiumModal {
+    position: relative;
     width: var(--premium-card-width);
     background: var(--premium-card-background);
     border-radius: var(--premium-card-border-radius);
@@ -18,7 +19,10 @@
 }
 
 .premiumModalCloseButton {
-    margin: 0 0 0 94%;
+    position: absolute;
+    top: var(--space-20);
+    right: var(--space-20);
+    margin: 0;
     background-color: transparent;
     padding: 0;
     height: var(--icon-size-32);
@@ -37,7 +41,7 @@
 
 .premiumIcon {
     width: 64px;
-    height: 64px;
+    height: auto;
 }
 
 .premiumModalTitle {
