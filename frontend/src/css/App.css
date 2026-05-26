@@ -345,16 +345,16 @@
     min-width: var(--button-min-width);
     min-height: var(--button-min-height);
     width: 140px;
-    padding: var(--space-4) var(--space-16);
+    padding: var(--button-padding-small-y) var(--button-padding-small-x);
     border: 2px solid var(--button-primary-border);
-    background-color: var(--button-primary-bg);
-    color: var(--text-on-dark);
     border-radius: var(--button-radius);
-    font-family: var(--font-family-heading);
+    font-family: var(--button-default-font-family);
     font-size: var(--button-default-font-size);
     font-weight: var(--button-primary-font-weight);
     letter-spacing: var(--button-primary-letter-spacing);
-    text-align: center;
+    background-color: var(--button-primary-bg);
+    color: var(--button-primary-text);
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -369,7 +369,8 @@
 .profile-upgradeBtn:hover {
     background-color: var(--highlight-300);
     color: var(--text-on-light);
-    /* color: var(--text-on-dark); */
+    box-shadow: var(--button-default-hover-shadow);
+    transform: translateY(-2px);
     transition: var(--button-default-transition);
 }
 
