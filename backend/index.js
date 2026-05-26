@@ -95,10 +95,19 @@ app.get("/report/today", async (req, res) => {
 app.post("/checkin", async (req, res) => {
   const stress = Number(req.body.stress);
   const energy = Number(req.body.energy);
+  const token = getBearerToken(req);
 
-  if (!Number.isInteger(stress) || !Number.isInteger(energy) || stress < 1 || stress > 5 || energy < 1 || energy > 5) {
+  if (!token || !Number.isInteger(stress) || !Number.isInteger(energy) || stress < 1 || stress > 5 || energy < 1 || energy > 5) {
     return res.status(400).json({
-      error: "Stress and energy must both be integers between 1 and 5.",
+      error: "Missing bearer token or invalid stress/energy values.",
+    });
+  }
+
+  const { data: userData, error: userError } = await supabase.auth.getUser(token);
+
+  if (userError || !userData?.user) {
+    return res.status(401).json({
+      error: "Invalid or expired session.",
     });
   }
 
@@ -111,6 +120,7 @@ app.post("/checkin", async (req, res) => {
   }
 
   const { error } = await supabase.from("checkins").insert({
+    user_id: userData.user.id,
     stress,
     energy,
     need_pause: needPause,

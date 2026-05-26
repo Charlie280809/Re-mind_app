@@ -1,21 +1,19 @@
-import { getApiBaseUrl } from "./apiBaseUrl";
+import { supabase } from "../lib/supabaseClient";
 
 export async function submitCheckIn(stress, energy) {
-    const apiBaseUrl = getApiBaseUrl();
-    const response = await fetch(`${apiBaseUrl}/checkin`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            stress: parseInt(stress, 10),
-            energy: parseInt(energy, 10),
-        }),
-    });
-
-    if (!response.ok) {
-        throw new Error(`Backend gaf status ${response.status}`);
+    if (!supabase) {
+        throw new Error("Supabase is niet geconfigureerd.");
     }
 
-    return response.json();
+    const { error } = await supabase.from("checkins").insert({
+        stress: parseInt(stress, 10),
+        energy: parseInt(energy, 10),
+        need_pause: parseInt(stress, 10) >= 4 || parseInt(energy, 10) <= 2,
+    });
+
+    if (error) {
+        throw new Error(error.message || "Kon check-in niet opslaan.");
+    }
+
+    return true;
 }
