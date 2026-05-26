@@ -765,6 +765,7 @@ export default function App() {
         isPremium={Boolean(profile?.is_premium)}
         onBreak={onBreak}
         breakSeconds={breakSeconds}
+        onEndBreak={endBreak}
       />
 
       {currentPage === "exercise-detail" ? (

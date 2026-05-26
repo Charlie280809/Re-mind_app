@@ -38,7 +38,7 @@
 
 .pauseTimePanel {
   margin: var(--space-24) 0 0 var(--space-20);
-  padding: var(--space-12) var(--space-20);
+  padding: var(--space-12);
   border-radius: 18px;
   background: var(--primary-200);
   border: 1px solid var(--primary-300);
@@ -59,6 +59,26 @@
   font-family: var(--font-family-heading);
   font-size: var(--font-size-lg);
   font-weight: var(--text-heading-1-font-weight);
+}
+
+.pauseEndButton{
+  margin: 0;
+  min-width: var(--button-min-width);
+  min-height: var(--button-min-height);
+  border: 2px solid var(--button-secondary-border);
+  /* border: 0; */
+  background-color: var(--button-secondary-bg);
+  padding: var(--button-padding-small-y) var(--button-padding-small-x);
+  color: var(--button-secondary-text);
+  border-radius: var(--button-radius);
+  font-family: var(--button-default-font-family);
+  font-size: var(--button-default-font-size);
+}
+
+.pauseEndButton:hover {
+  background-color: var(--button-secondary-hover-bg);
+  border-color: var(--button-secondary-hover-border);
+  transition: var(--button-default-transition);
 }
 
 .sideNavLink {

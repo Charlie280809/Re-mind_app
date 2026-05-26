@@ -10,7 +10,7 @@ function formatTime(totalSeconds) {
   return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 }
 
-export default function Navbar({ currentPage, setCurrentPage, onSettingsNavigate, isPremium, onBreak, breakSeconds }) {
+export default function Navbar({ currentPage, setCurrentPage, onSettingsNavigate, isPremium, onBreak, breakSeconds, onEndBreak }) {
   const navItems = [
     {
       key: "home",
@@ -86,6 +86,13 @@ export default function Navbar({ currentPage, setCurrentPage, onSettingsNavigate
           <div className="pauseTimePanel" aria-live="polite">
             <div className="pauseTimeLabel">Pauzetijd</div>
             <div className="pauseTimeValue">{formatTime(breakSeconds)}</div>
+            <button
+              className="pauseEndButton"
+              type="button"
+              onClick={() => onEndBreak?.()}
+            >
+              Beëindig pauze
+            </button>
           </div>
         ) : null}
       </div>
