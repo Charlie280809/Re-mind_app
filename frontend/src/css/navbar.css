@@ -4,7 +4,7 @@
 @import url("./design_tokens/components.css");
 
 .sideNav {
-  width: fit-content;
+  width: 240px;
   padding-right: var(--space-32);
   height: 100vh;
   min-height: 100vh;
@@ -15,6 +15,13 @@
   justify-content: space-between;
   position: sticky;
   top: 0;
+  transition: width 200ms linear, padding 200ms linear;
+  overflow: hidden;
+}
+
+.sideNav.collapsed {
+  width: 68px;
+  padding-right: 0;
 }
 
 .sideNavTop {
@@ -24,9 +31,39 @@
   gap: var(--space-8);
 }
 
-.brand img {
+.brandLogo {
   padding: var(--space-24) var(--space-0) var(--space-0) var(--space-12);
   width: 200px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.collapseToggle{
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  border: none;
+  padding: var(--space-12) var(--space-4) var(--space-12) var(--space-12);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  color: var(--text-secondary-200);
+  cursor: pointer;
+  svg{
+    width: var(--icon-size324);
+    height: var(--icon-size-32);
+  }
+}
+
+.sideNav.collapsed .brandLogo{
+  width: 48px;
 }
 
 .sideNavLinks {
@@ -37,7 +74,7 @@
 }
 
 .pauseTimePanel {
-  margin: var(--space-24) 0 0 var(--space-20);
+  margin: 100% 0 0 var(--space-12);
   padding: var(--space-12);
   border-radius: 18px;
   background: var(--primary-200);
@@ -82,7 +119,9 @@
 }
 
 .sideNavLink {
-  padding: 0 0 0 var(--space-12);
+  /* padding: 0 0 0 var(--space-12); */
+  padding: 0;
+  margin: 0 0 0 var(--space-12);
   height: 36px;
   border: none;
   background-color: transparent;
@@ -96,6 +135,25 @@
   line-height: var(--text-navigation-default-line-height);
   cursor: pointer;
   transition: all 0.3s ease-in-out;
+}
+
+.sideNav.collapsed .sideNavLink{
+  justify-content: center;
+  padding-left: 0;
+}
+
+.sideNav.collapsed .sideNavIcon{
+  margin: 0;
+}
+
+.sideNavLabel{
+  display: inline-block;
+  transition: opacity 0.2s linear;
+}
+
+.sideNav.collapsed .sideNavLabel{
+  opacity: 0;
+  width: 0;
 }
 
 .sideNavLink:hover {
@@ -128,7 +186,6 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease-in-out;
 }
 
 .sideNavIcon svg {
@@ -143,6 +200,10 @@
   gap: var(--space-20);
   height: fit-content;
   padding: 0 0 var(--space-20);
+}
+
+.sideNav.collapsed .sideNavBottom{
+  align-items: center;
 }
 
 .premiumButton {
@@ -162,13 +223,21 @@
   padding: var(--space-4) var(--space-48) var(--space-4) var(--space-4);
 }
 
+.sideNav.collapsed .premiumButton{
+  padding: var(--space-4);
+  border-radius: 8px;
+  width: 48px;
+  height: 42px;
+  display: inline-block;
+  margin: 0;
+}
+
 .premiumButton svg {
   width: var(--icon-size-32);
   height: var(--icon-size-32);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease-in-out;
 }
 
 .premiumButton:hover {
@@ -195,46 +264,3 @@
   width: 36px;
   height: 36px;
 }
-
-/* @media (max-width: 900px) { //enkel icons zichtbaar?
-  .sideNav {
-    width: 100%;
-    min-height: auto;
-    position: static;
-    border-radius: 0;
-    border-right: 0;
-    border-bottom: 1px solid #d3cbb6;
-    padding: 14px;
-    gap: 14px;
-  }
-
-  .sideNavTop,
-  .sideNavLinks {
-    gap: 10px;
-  }
-
-  .brandText {
-    font-size: 40px;
-  }
-
-  .sideNavLinks {
-    flex-direction: row;
-    flex-wrap: wrap;
-  }
-
-  .sideNavLink {
-    width: auto;
-    font-size: 24px;
-  }
-
-  .sideNavBottom {
-    flex-direction: row;
-    align-items: center;
-  }
-
-  .premiumButton,
-  .settingsLink {
-    font-size: 24px;
-    width: auto;
-  }
-} */

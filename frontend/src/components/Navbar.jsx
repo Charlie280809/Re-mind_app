@@ -1,6 +1,8 @@
 import "../css/Navbar.css";
 import logo from "../assets/images/logo.svg";
-import { LuHouse, LuPause, LuUser, LuSettings } from "react-icons/lu";
+import loadingSpinner from "../assets/images/loadingSpinner.svg";
+import { useState } from "react";
+import { LuHouse, LuPause, LuUser, LuSettings, LuChevronLeft, LuChevronRight } from "react-icons/lu";
 import { HiOutlineChartBar, HiOutlineChartSquareBar } from "react-icons/hi";
 import { TbCrown } from "react-icons/tb";
 
@@ -11,6 +13,7 @@ function formatTime(totalSeconds) {
 }
 
 export default function Navbar({ currentPage, setCurrentPage, onSettingsNavigate, isPremium, onBreak, breakSeconds, onEndBreak }) {
+  const [collapsed, setCollapsed] = useState(false);
   const navItems = [
     {
       key: "home",
@@ -62,10 +65,10 @@ export default function Navbar({ currentPage, setCurrentPage, onSettingsNavigate
   ];
 
   return (
-    <aside className="sideNav">
+    <aside className={`sideNav ${collapsed ? "collapsed" : ""}`}>
       <div className="sideNavTop">
         <div className="brand">
-          <img src={logo} alt="Logo" />
+          <img src={collapsed ? loadingSpinner : logo} alt="Logo" className="brandLogo" />
         </div>
 
         <nav className="sideNavLinks" aria-label="Hoofdnavigatie">
@@ -77,12 +80,12 @@ export default function Navbar({ currentPage, setCurrentPage, onSettingsNavigate
               type="button"
             >
               <span className="sideNavIcon">{item.icon}</span>
-              <span>{item.label}</span>
+              <span className="sideNavLabel">{item.label}</span>
             </button>
           ))}
         </nav>
 
-        {onBreak ? (
+        {onBreak && !collapsed ? (
           <div className="pauseTimePanel" aria-live="polite">
             <div className="pauseTimeLabel">Pauzetijd</div>
             <div className="pauseTimeValue">{formatTime(breakSeconds)}</div>
@@ -97,6 +100,15 @@ export default function Navbar({ currentPage, setCurrentPage, onSettingsNavigate
         ) : null}
       </div>
 
+      <button
+        type="button"
+        className="collapseToggle"
+        aria-label={collapsed ? "Open navigation" : "Collapse navigation"}
+        onClick={() => setCollapsed((s) => !s)}
+      >
+        {collapsed ? <LuChevronRight /> : <LuChevronLeft />}
+      </button>
+
       <div className="sideNavBottom">
         {!isPremium ? (
           <button
@@ -109,7 +121,7 @@ export default function Navbar({ currentPage, setCurrentPage, onSettingsNavigate
             aria-label="Upgrade naar premium"
           >
             <TbCrown />
-            <span>Premium</span>
+            <span className="sideNavLabel">Premium</span>
           </button>
         ) : null}
 
@@ -121,7 +133,7 @@ export default function Navbar({ currentPage, setCurrentPage, onSettingsNavigate
             type="button"
           >
             <span className="sideNavIcon">{item.icon}</span>
-            <span>{item.label}</span>
+            <span className="sideNavLabel">{item.label}</span>
           </button>
         ))}
 
