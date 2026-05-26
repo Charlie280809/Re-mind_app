@@ -219,8 +219,18 @@
     overflow: visible;
     background-color: var(--surface-card);
     height: 120px;
-    /* max-width: 230px; */
     max-width: 100%;
+}
+
+.pause-card--upgrade {
+    cursor: pointer;
+}
+
+.pause-card--upgrade:hover,
+.pause-card--upgrade:focus-visible {
+    box-shadow: var(--premium-card-shadow);
+    transform: var(--button-premium-transform);
+    transition: var(--button-default-transition);
 }
 
 .pause-iconBox {
@@ -240,6 +250,13 @@
     object-fit: contain;
 }
 
+.pause-cardUpgradeIcon {
+    width: 96px;
+    height: 96px;
+    color: var(--highlight-600);
+    stroke-width: 1.2px;
+}
+
 .pause-content {
     flex: 1;
     display: flex;
@@ -249,12 +266,21 @@
     padding: 0 var(--space-8);
 }
 
+.pause-content--upgrade {
+    padding: 0 var(--space-8);
+}
+
 .pause-content p {
     font-family: var(--text-body-regular-font-family);
     font-size: var(--text-body-regular-font-size);
     line-height: var(--text-body-regular-line-height);
     font-weight: var(--font-weight-semibold);
     color: var(--text-primary);
+}
+
+.pause-content--upgrade p {
+    width: 120px;
+    font-weight: var(--font-weight-bold);
 }
 
 .pause-favBtn {
@@ -276,6 +302,27 @@
 
 .pause-favBtn.active {
     background: var(--highlight-300);
+}
+
+.pause-cardUpgradeBadge {
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background-color: var(--primary-300);
+    color: var(--text-on-dark);
+    box-shadow: var(--popupcard-box-shadow);
+    font-size: var(--icon-size-28);
+    z-index: 1;
+}
+
+.pause-cardUpgradeBadge svg {
+    width: var(--icon-size-28);
+    height: var(--icon-size-28);
 }
 
 /* --- Profile Page --- */

@@ -1,9 +1,10 @@
 import { useMemo } from "react";
 import { TbCrown } from "react-icons/tb";
 import PauseCard from "../components/PauseCard";
+import FavoriteLimitCard from "../components/FavoriteLimitCard";
 import { DATA as PAUSE_OPTIONS } from "./PauseSuggestions";
 
-export default function ProfilePage({ profile, favorites, onToggleFavorite, onNavigateToPause, onNavigateToUpgrade }) {
+export default function ProfilePage({ profile, favorites, onToggleFavorite, onNavigateToPause, onNavigateToUpgrade, favoriteLimit }) {
     const name = profile?.username || profile?.email || "Gebruiker";
     const companyName = profile?.bedrijfsnaam || "Geen bedrijfsnaam";
     const isPremium = Boolean(profile?.is_premium);
@@ -12,6 +13,8 @@ export default function ProfilePage({ profile, favorites, onToggleFavorite, onNa
         () => PAUSE_OPTIONS.filter((item) => favorites.has(item.id)),
         [favorites]
     );
+
+    const showFavoriteLimitCard = !isPremium && favoritePauses.length >= favoriteLimit;
 
     return (
         <main className="profile-page">
@@ -62,6 +65,8 @@ export default function ProfilePage({ profile, favorites, onToggleFavorite, onNa
                                 onToggleFavorite={() => onToggleFavorite(item.id)}
                             />
                         ))}
+
+                        {showFavoriteLimitCard ? <FavoriteLimitCard onNavigateToUpgrade={onNavigateToUpgrade} /> : null}
                     </section>
                 ) : (
                     <article className="profile-emptyState">

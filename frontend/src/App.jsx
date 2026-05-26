@@ -11,6 +11,7 @@ import WeekReportPage from "./screens/WeekReportPage";
 import CheckInModal from "./components/CheckInModal";
 import PauseReminderModal from "./components/PauseReminderModal";
 import FavoriteRemovalModal from "./components/FavoriteRemovalModal";
+import PremiumModal from "./components/PremiumModal";
 import LoginPage from "./screens/LoginPage";
 import SignupPage from "./screens/SignupPage";
 import Settings from "./screens/Settings";
@@ -33,6 +34,7 @@ import { calculateWorkdayDurationSeconds } from "./lib/workHours";
 
 const NAV_STATE_STORAGE_KEY = "remind-navigation-state";
 const PROFILE_AVATAR_STORAGE_KEY_PREFIX = "remind-profile-avatar-";
+const FREE_FAVORITE_LIMIT = 4;
 
 const getProfileAvatarStorageKey = (userId) =>
   userId ? `${PROFILE_AVATAR_STORAGE_KEY_PREFIX}${userId}` : null;
@@ -148,6 +150,7 @@ export default function App() {
   const [selectedExercise, setSelectedExercise] = useState(storedNavigationState?.selectedExercise || null);
   const [pauseFavorites, setPauseFavorites] = useState(() => new Set());
   const [favoriteRemovalTarget, setFavoriteRemovalTarget] = useState(null);
+  const [favoriteLimitModalOpen, setFavoriteLimitModalOpen] = useState(false);
   const [pauseSummaryCounts, setPauseSummaryCounts] = useState({ breaks_taken: 0, breaks_skipped: 0 });
   const sessionUserId = session?.user?.id || null;
 
@@ -467,6 +470,11 @@ export default function App() {
       return;
     }
 
+    if (!profile?.is_premium && pauseFavorites.size >= FREE_FAVORITE_LIMIT) {
+      setFavoriteLimitModalOpen(true);
+      return;
+    }
+
     await persistFavoriteToggle(id, false);
   };
 
@@ -480,6 +488,10 @@ export default function App() {
 
   const cancelFavoriteRemoval = () => {
     setFavoriteRemovalTarget(null);
+  };
+
+  const closeFavoriteLimitModal = () => {
+    setFavoriteLimitModalOpen(false);
   };
 
   const incrementWorkSessionCounterOnServer = async (column) => {
@@ -747,6 +759,17 @@ export default function App() {
       {showPauseReminderModal && (
         <PauseReminderModal onDismiss={handlePauseReminderDismiss} onTakeBreak={handlePauseReminderTakeBreak} />
       )}
+      {favoriteLimitModalOpen ? (
+        <PremiumModal
+          title="Meer pauzes toevoegen?"
+          description="Upgrade naar Premium om ongelimiteerd favoriete pauzes op te slaan."
+          onClose={closeFavoriteLimitModal}
+          onUpgrade={() => {
+            closeFavoriteLimitModal();
+            setCurrentPage("upgrade");
+          }}
+        />
+      ) : null}
       {favoriteRemovalTarget ? (
         <FavoriteRemovalModal
           pauseTitle={PAUSE_OPTIONS.find((item) => item.id === favoriteRemovalTarget)?.title || "deze pauze"}
@@ -784,6 +807,7 @@ export default function App() {
           favorites={pauseFavorites}
           onToggleFavorite={togglePauseFavorite}
           onNavigateToPause={() => setCurrentPage("pause")}
+          favoriteLimit={FREE_FAVORITE_LIMIT}
           onNavigateToUpgrade={() => {
             setCurrentPage("upgrade");
           }}
