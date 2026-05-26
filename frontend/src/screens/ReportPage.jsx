@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { LuChevronLeft, LuChevronRight, LuZap } from "react-icons/lu";
 import { HiOutlineTrendingUp  } from "react-icons/hi";
 import { TbCrown } from "react-icons/tb";
+import PremiumModal from "../components/PremiumModal";
 import { fetchTodayReport } from "../api/reportApi";
 
 const dateOptions = { day: "numeric", month: "long", year: "numeric" };
@@ -11,10 +12,11 @@ function formatDate(date = new Date()) {
     return new Intl.DateTimeFormat("nl-BE", dateOptions).format(date);
 }
 
-export default function ReportPage({ isPremium }) {
+export default function ReportPage({ isPremium, onNavigateToUpgrade }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [report, setReport] = useState(null);
+    const [premiumModalOpen, setPremiumModalOpen] = useState(false);
 
     useEffect(() => {
         async function loadReport() {
@@ -43,6 +45,14 @@ export default function ReportPage({ isPremium }) {
     const avgStressLabel = report?.averageStress == null ? "-" : `${report.averageStress}/5`;
     const avgEnergyLabel = report?.averageEnergy == null ? "-" : `${report.averageEnergy}/5`;
 
+    function openPremiumModal() {
+        setPremiumModalOpen(true);
+    }
+
+    function closePremiumModal() {
+        setPremiumModalOpen(false);
+    }
+
     return (
         <main className="reportPage">
             <header className="reportHeader">
@@ -59,7 +69,7 @@ export default function ReportPage({ isPremium }) {
                 </div>
 
                 {!isPremium ? (
-                    <button className="reportWeekButton" type="button">
+                    <button className="reportWeekButton" type="button" onClick={openPremiumModal}>
                         <TbCrown aria-hidden="true" />
                         <span>Bekijk weekrapport</span>
                     </button>
@@ -148,6 +158,15 @@ export default function ReportPage({ isPremium }) {
                     {/* agenda integratie */}
                 </article>
             </section>
+
+            {premiumModalOpen ? (
+                <PremiumModal
+                    title="Ontgrendel weekrapporten"
+                    description="Bekijk je weekrapporten met Premium."
+                    onClose={closePremiumModal}
+                    onUpgrade={onNavigateToUpgrade}
+                />
+            ) : null}
         </main>
     );
 }

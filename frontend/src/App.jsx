@@ -798,7 +798,10 @@ export default function App() {
           onChangeMethod={() => setCurrentPage("breathing")}
         />
       ) : currentPage === "report" ? (
-        <ReportPage isPremium={Boolean(profile?.is_premium)} />
+        <ReportPage
+          isPremium={Boolean(profile?.is_premium)}
+          onNavigateToUpgrade={() => setCurrentPage("upgrade")}
+        />
       ) : currentPage === "weekreport" ? (
         <WeekReportPage />
       ) : currentPage === "profile" ? (
