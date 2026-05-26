@@ -551,7 +551,6 @@
 }
 
 /* --- Change password modal --- */
-
 .passwordModalOverlay {
     position: fixed;
     inset: 0;
