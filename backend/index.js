@@ -3,6 +3,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const { createClient } = require("@supabase/supabase-js");
 
+const PORT = process.env.PORT || 3000;
 dotenv.config();
 
 const app = express();
@@ -637,6 +638,6 @@ app.delete("/account/me", async (req, res) => {
   return res.json({ ok: true });
 });
 
-app.listen(3000, () => {
-  console.log("Backend running on http://localhost:3000");
+app.listen(PORT, () => {
+  console.log(`Backend running on port ${PORT}`);
 });
