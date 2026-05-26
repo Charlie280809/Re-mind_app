@@ -124,6 +124,57 @@ app.post("/checkin", async (req, res) => {
   res.json({ needPause });
 });
 
+app.get("/work-sessions/breaks/latest", async (req, res) => {
+  if (!supabase) {
+    return res.status(500).json({
+      error: "Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in backend/.env.",
+    });
+  }
+
+  const token = getBearerToken(req);
+
+  if (!token) {
+    return res.status(401).json({
+      error: "Missing Bearer token.",
+    });
+  }
+
+  const { data: userData, error: userError } = await supabase.auth.getUser(token);
+
+  if (userError || !userData?.user) {
+    return res.status(401).json({
+      error: "Invalid or expired session.",
+    });
+  }
+
+  const { data: latestSession, error: sessionError } = await supabase
+    .from("work_sessions")
+    .select("id, breaks_taken, breaks_skipped")
+    .eq("user_id", userData.user.id)
+    .order("start_tijd", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (sessionError) {
+    return res.status(500).json({
+      error: "Failed to load work session.",
+      details: sessionError.message,
+    });
+  }
+
+  if (!latestSession?.id) {
+    return res.json({
+      breaks_taken: 0,
+      breaks_skipped: 0,
+    });
+  }
+
+  return res.json({
+    breaks_taken: Number(latestSession.breaks_taken ?? 0),
+    breaks_skipped: Number(latestSession.breaks_skipped ?? 0),
+  });
+});
+
 app.post("/work-sessions/breaks/increment", async (req, res) => {
   if (!supabase) {
     return res.status(500).json({

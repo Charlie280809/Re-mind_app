@@ -21,7 +21,14 @@ import spinner from "./assets/images/loadingSpinner.svg";
 import { DATA as PAUSE_OPTIONS } from "./screens/PauseSuggestions";
 import { supabase } from "./lib/supabaseClient";
 import { getApiBaseUrl } from "./api/apiBaseUrl";
-import { createSignupAccount, fetchProfile, incrementWorkSessionCounter, saveSignupNotifications, saveSignupWorkHours } from "./api/backendApi";
+import {
+  createSignupAccount,
+  fetchLatestWorkSessionBreaks,
+  fetchProfile,
+  incrementWorkSessionCounter,
+  saveSignupNotifications,
+  saveSignupWorkHours,
+} from "./api/backendApi";
 import { calculateWorkdayDurationSeconds } from "./lib/workHours";
 
 const NAV_STATE_STORAGE_KEY = "remind-navigation-state";
@@ -96,11 +103,11 @@ const getStoredNavigationState = () => {
     const allowedPages = new Set([
       "home",
       "report",
-      "weekreport",
+      "weekreport", //verder uitwerken
       "profile",
       "settings",
       "upgrade",
-      "breathing",
+      "breathing", //verder uitwerken
       "pause",
       "exercise-detail",
     ]);
@@ -141,6 +148,7 @@ export default function App() {
   const [selectedExercise, setSelectedExercise] = useState(storedNavigationState?.selectedExercise || null);
   const [pauseFavorites, setPauseFavorites] = useState(() => new Set());
   const [favoriteRemovalTarget, setFavoriteRemovalTarget] = useState(null);
+  const [pauseSummaryCounts, setPauseSummaryCounts] = useState({ breaks_taken: 0, breaks_skipped: 0 });
   const sessionUserId = session?.user?.id || null;
 
   // Persistent work timer state lifted here so the timer keeps running
@@ -278,6 +286,37 @@ export default function App() {
       isCancelled = true;
     };
   }, [session]);
+
+  useEffect(() => {
+    if (!session?.access_token) {
+      setPauseSummaryCounts({ breaks_taken: 0, breaks_skipped: 0 });
+      return undefined;
+    }
+
+    let isCancelled = false;
+
+    const loadLatestBreakCounts = async () => {
+      try {
+        const counts = await fetchLatestWorkSessionBreaks(apiBaseUrl, session.access_token);
+        if (!isCancelled) {
+          setPauseSummaryCounts({
+            breaks_taken: Math.max(0, Number(counts.breaks_taken ?? 0)),
+            breaks_skipped: Math.max(0, Number(counts.breaks_skipped ?? 0)),
+          });
+        }
+      } catch (error) {
+        if (!isCancelled) {
+          console.error("Failed to load pause summary:", error);
+        }
+      }
+    };
+
+    loadLatestBreakCounts();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [apiBaseUrl, sessionUserId]);
 
   const displayName = profile?.username || session?.user?.email?.split("@")[0] || "Gebruiker";
   const companyName = profile?.bedrijfsnaam || "";
@@ -449,7 +488,18 @@ export default function App() {
     }
 
     try {
-      await incrementWorkSessionCounter(apiBaseUrl, session.access_token, column);
+      const response = await incrementWorkSessionCounter(apiBaseUrl, session.access_token, column);
+      if (column === "breaks_taken") {
+        setPauseSummaryCounts((prev) => ({
+          ...prev,
+          breaks_taken: Math.max(0, Number(response?.breaks_taken ?? prev.breaks_taken)),
+        }));
+      } else {
+        setPauseSummaryCounts((prev) => ({
+          ...prev,
+          breaks_skipped: Math.max(0, Number(response?.breaks_skipped ?? prev.breaks_skipped)),
+        }));
+      }
     } catch (error) {
       console.error(`Failed to increment ${column}:`, error);
     }
@@ -803,14 +853,18 @@ export default function App() {
               <div className="pauseSummaryRow">
                 <span className="pauseSummaryLabel">Pauzes genomen:</span>
                 <div className="pauseSummaryDots">
-                  <span className="dot dotGood"></span>
+                  {Array.from({ length: pauseSummaryCounts.breaks_taken }).map((_, index) => (
+                    <span key={`dot-good-${index}`} className="dot dotGood"></span>
+                  ))}
                 </div>
               </div>
 
               <div className="pauseSummaryRow">
                 <span className="pauseSummaryLabel">Pauzes overgeslagen:</span>
                 <div className="pauseSummaryDots">
-                  <span className="dot dotBad"></span>
+                  {Array.from({ length: pauseSummaryCounts.breaks_skipped }).map((_, index) => (
+                    <span key={`dot-bad-${index}`} className="dot dotBad"></span>
+                  ))}
                 </div>
               </div>
             </article>

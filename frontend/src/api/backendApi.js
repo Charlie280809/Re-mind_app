@@ -88,3 +88,22 @@ export async function incrementWorkSessionCounter(apiBaseUrl, accessToken, colum
 
     return body;
 }
+
+export async function fetchLatestWorkSessionBreaks(apiBaseUrl, accessToken) {
+    const response = await fetch(`${apiBaseUrl}/work-sessions/breaks/latest`, {
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+        },
+    });
+
+    const body = await readJsonResponse(response, (snippet) => snippet || "Kon pauze-overzicht niet laden.");
+
+    if (!response.ok) {
+        throw new Error(body.error || "Kon pauze-overzicht niet laden.");
+    }
+
+    return {
+        breaks_taken: Number(body?.breaks_taken ?? 0),
+        breaks_skipped: Number(body?.breaks_skipped ?? 0),
+    };
+}
