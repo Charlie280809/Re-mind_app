@@ -3,16 +3,39 @@
 @import url("./design_tokens/spacing_tokens.css");
 @import url("./design_tokens/components.css");
 
-.loginPage {
+.loginPage,
+.signupPage,
+.signupWorkhoursPage {
     min-height: 100vh;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: var(--layout-container-padding) var(--space-64);
+    gap: var(--space-32);
+    padding: var(--layout-container-padding);
     background-color: var(--surface-background);
     color: var(--text-primary);
 }
 
+.subtitle {
+    max-width: 640px;
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xs);
+    text-align: left;
+}
+
+.subtitle button {
+    border: 0;
+    padding: 0;
+    background-color: transparent;
+    text-decoration: underline;
+    font-weight: var(--font-weight-bold);
+    color: var(--primary-600);
+    cursor: pointer;
+}
+
+/* === Login Page === */
 .loginContent {
     width: 100%;
     display: grid;
@@ -157,35 +180,7 @@
     height: auto;
 }
 
-.subtitle {
-    max-width: 640px;
-    margin: 0;
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-xs);
-    text-align: left;
-}
-
-.subtitle button {
-    border: 0;
-    padding: 0;
-    background-color: transparent;
-    text-decoration: underline;
-    font-weight: var(--font-weight-bold);
-    color: var(--primary-600);
-    cursor: pointer;
-}
-
-.signupPage {
-    min-height: 100vh;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--layout-container-padding);
-    background-color: var(--surface-background);
-    color: var(--text-primary);
-}
-
+/* === Sign up Page === */
 .signupLogoCounterGroup {
     position: fixed;
     top: var(--layout-container-padding);
@@ -214,6 +209,22 @@
     align-items: center;
     justify-content: center;
     gap: var(--space-32);
+}
+
+.signupHeading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-8);
+    text-align: center;
+}
+
+.signupTitle {
+    margin: 0 0 var(--space-8) 0;
+    font-family: var(--font-family-heading);
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
 }
 
 .signupQuestionCard {
@@ -351,12 +362,8 @@
 }
 
 /* === Sign up Workhours Page (step 5) === */
-.signupWorkhoursPage{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-32);
+.signupWorkhoursPage {
+    min-height: 80vh;
 }
 
 .signupWorkhoursContent {
@@ -365,65 +372,17 @@
     border-radius: var(--popupcard-border-radius);
 }
 
-/* @media (max-width: 720px) {
-    .signupTopLogo {
-        width: 130px;
-    }
-
-    .signupCenterStage {
-        padding-top: 120px;
-        padding-bottom: 120px;
-    }
-
-    .signupQuestionCard {
-        width: 100%;
-    }
-
-    .signupPrimaryAction {
-        width: 100%;
-    }
-
-    .signupReturnLink {
-        position: static;
-        margin-top: var(--space-16);
-        text-align: center;
-    }
-} */
-
-/* -----------------------------.signupContent {
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-32);
-} */
-
-.signupHeading {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-8);
-    text-align: center;
-}
-
-.signupTitle {
-    margin: 0 0 var(--space-8) 0;
-    font-family: var(--font-family-heading);
-    font-size: var(--font-size-2xl);
-    font-weight: var(--font-weight-bold);
-}
-
 .signupForm {
     display: flex;
     flex-direction: column;
     gap: var(--space-20);
 }
 
-.signupWeekdays {
+/* .signupWeekdays {
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
     gap: var(--space-8);
-}
+} */
 
 .signupSettingsPanel {
     display: flex;
@@ -447,114 +406,6 @@
 
 .signupWeekdaysRow {
     align-items: flex-start;
-}
-
-.signupWeekdayOption {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-8);
-    align-items: center;
-    padding: var(--space-8) 0;
-    border-radius: 14px;
-    background: rgba(255, 255, 255, 0.6);
-    border: 1px solid rgba(214, 210, 202, 0.8);
-}
-
-.signupWeekdayOption input {
-    width: 18px;
-    height: 18px;
-    accent-color: var(--primary-500);
-}
-
-.signupWeekdayLabel {
-    margin: 0;
-    font-family: var(--text-body-regular-font-family);
-    font-size: var(--text-body-regular-font-size);
-    /* color: var(--text-primary); */
-}
-
-.signupWeekdayCheckbox {
-    margin: 0;
-    appearance: none;
-    width: var(--checkbox-size);
-    height: var(--checkbox-size);
-    border-radius: var(--checkbox-radius);
-    border: 2px solid var(--checkbox-default-border);
-    background-color: transparent;
-    cursor: pointer;
-    display: grid;
-    place-items: center;
-    transition: all 0.2s ease;
-}
-
-.signupWeekdayCheckbox:hover {
-    background-color: var(--checkbox-hover-bg);
-}
-
-.signupWeekdayCheckbox::after {
-    content: "";
-    width: var(--checkbox-icon-size);
-    height: 6px;
-    border: 3px solid transparent;
-    border-top: 0;
-    border-right: 0;
-    margin: 0 0 var(--space-4) 0;
-    transform: rotate(-45deg) scale(0) translateY(8px);
-    transition: transform 0.2s ease;
-}
-
-.signupWeekdayCheckbox:checked {
-    background-color: var(--highlight-400);
-}
-
-.signupWeekdayCheckbox:checked::after {
-    border-color: var(--surface-background);
-    transform: rotate(-45deg) scale(1);
-}
-
-/* ---------------------- .signupGrid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-16);
-} */
-
-/* -------------------.signupDurationRow {
-    display: flex;
-    align-items: center;
-    gap: var(--space-8);
-} */
-
-/* ---------------------.signupDurationRow input {
-    width: 74px;
-} */
-
-.signupToggle {
-    width: 60px;
-    height: 34px;
-    border: 0;
-    border-radius: 999px;
-    padding: 4px;
-    display: inline-flex;
-    align-items: center;
-    background: var(--background-600);
-    cursor: pointer;
-}
-
-.signupToggle[aria-pressed="true"] {
-    background: var(--primary-500);
-}
-
-/* ---------------------------.signupKnob {
-    width: 26px;
-    height: 26px;
-    border-radius: 999px;
-    background: var(--background-50);
-    transform: translateX(0);
-    transition: transform 0.2s ease;
-} */
-
-.signupToggle[aria-pressed="true"] .signupKnob {
-    transform: translateX(26px);
 }
 
 .signupSubmit {
@@ -615,77 +466,3 @@
     text-decoration: underline;
     cursor: pointer;
 }
-
-/* @media (max-width: 980px) {
-    .signupPage {
-        padding: 32px 24px;
-    }
-
-    .signupContent {
-        grid-template-columns: 1fr;
-        gap: 40px;
-    }
-}
-
-@media (max-width: 640px) {
-    .signupPage {
-        padding: 24px 18px;
-    }
-
-    .signupTitle {
-        font-size: 36px;
-    }
-
-    .signupSubmit,
-    .signupSecondary {
-        width: 100%;
-    }
-} */
-
-/* @media (max-width: 980px) {
-    .loginPage {
-        padding: 32px 24px;
-    }
-
-    .loginContent {
-        grid-template-columns: 1fr;
-        gap: 40px;
-    }
-
-    .loginTitle {
-        margin-bottom: 32px;
-        font-size: 44px;
-    }
-
-    .loginBrandLogo {
-        max-width: 420px;
-    }
-}
-
-@media (max-width: 640px) {
-    .loginPage {
-        padding: 24px 18px;
-    }
-
-    .loginContent {
-        gap: 28px;
-    }
-
-    .loginTitle {
-        font-size: 36px;
-        margin-bottom: 24px;
-    }
-
-    .loginBrandLogo {
-        max-width: 300px;
-    }
-
-    .loginBrandText {
-        font-size: 16px;
-    }
-
-    .loginSubmit {
-        width: 100%;
-        max-width: 180px;
-    }
-} */

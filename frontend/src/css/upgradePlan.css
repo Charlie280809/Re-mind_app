@@ -26,7 +26,6 @@
     font-family: var(--text-heading-2-font-family);
     font-size: var(--text-heading-2-font-size);
     font-weight: var(--font-weight-semibold);
-    color: var(--text-primary);
 }
 
 .upgradeBillingToggle {

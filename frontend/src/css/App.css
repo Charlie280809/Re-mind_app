@@ -47,13 +47,19 @@
     }
 }
 
-.homePage {
+.homePage,
+.breathing-page,
+.exercise-detail-page,
+.profile-page {
+    max-width: 100%;
     flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly;
     padding: var(--layout-container-padding);
-    max-width: 100%;
+}
+
+.homePage {
+    justify-content: space-evenly;
 }
 
 .homeHeader {
@@ -113,7 +119,7 @@
 }
 
 .pauseSummaryCard {
-    padding: 24px 28px;
+    padding: var(--space-20) var(--space-24);
     display: flex;
     flex-direction: column;
     gap: var(--space-16);
@@ -122,7 +128,7 @@
 .pauseSummaryRow {
     display: flex;
     align-items: center;
-    gap: 28px;
+    gap: var(--space-24);
 }
 
 .pauseSummaryLabel {
@@ -136,12 +142,12 @@
 .pauseSummaryDots {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-8);
 }
 
 .dot {
-    width: 28px;
-    height: 28px;
+    width: var(--icon-size-24);
+    height: var(--icon-size-24);
     border-radius: 4px;
 }
 
@@ -155,7 +161,7 @@
 
 .adviceCard {
     border: 2px solid var(--border-color-green);
-    border-radius: 20px;
+    border-radius: var(--popupcard-border-radius);
     background-color: var(--highlight-200);
     padding: var(--space-20) var(--space-24);
     font-size: var(--font-size-s);
@@ -163,26 +169,16 @@
     line-height: var(--text-body-regular-line-height);
 }
 
-.breathing-page,
-.exercise-detail-page,
-.profile-page {
-    width: 100%;
-}
-
-
 /* --- Pause page --- */
 .pause-page {
     max-width: 100%;
-    /* margin: 0 auto; */
     flex: 1;
-    /* padding: var(--space-0) var(--space-32) var(--space-32); */
 }
 
 .pause-tabs {
     display: flex;
     gap: var(--space-16);
-    /* margin-bottom: var(--space-12); */
-    padding: var(--space-32) var(--space-0) var(--space-32)var(--space-32);
+    padding: var(--space-32) var(--space-0) var(--space-24)var(--space-32);
     position: sticky;
     top: 0;
     background-color: var(--surface-background);
@@ -284,11 +280,6 @@
 
 /* --- Profile Page --- */
 .profile-page {
-    flex: 1;
-    background-color: var(--surface-background);
-    padding: var(--layout-container-padding);
-    display: flex;
-    flex-direction: column;
     gap: var(--space-64);
 }
 

@@ -166,7 +166,6 @@
     font-family: var(--text-body-regular-font-family);
     font-size: var(--font-size-xs);
     line-height: var(--line-height-xs);
-    color: var(--text-primary);
 }
 
 .reportStatLabel svg {
@@ -207,7 +206,6 @@
     font-family: var(--font-family-body);
     font-size: var(--font-size-xs);
     line-height: var(--line-height-xs);
-    color: var(--text-primary);
 }
 
 .reportBreakCard {
@@ -283,42 +281,3 @@
     min-height: 220px;
     padding: var(--space-20) var(--space-32);
 }
-
-/* @media (max-width: 1024px) {
-    .reportMetricsRow {
-        flex-direction: column;
-    }
-
-    .reportSectionHeader,
-    .reportHeader {
-        align-items: flex-start;
-    }
-}
-
-@media (max-width: 720px) {
-    .reportPage {
-        padding: var(--space-20);
-    }
-
-    .reportTitleGroup,
-    .reportSectionHeader {
-        width: 100%;
-    }
-
-    .reportTitle {
-        font-family: var(--text-heading-2-font-family);
-        font-size: var(--font-size-lg);
-        line-height: var(--line-height-md);
-    }
-
-    .reportStatsSplit {
-        flex-direction: column;
-    }
-
-    .reportBreakCard,
-    .reportAgendaCard,
-    .reportMetricCard {
-        padding-left: var(--space-20);
-        padding-right: var(--space-20);
-    }
-} */
