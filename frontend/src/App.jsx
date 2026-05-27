@@ -15,6 +15,10 @@ import PremiumModal from "./components/PremiumModal";
 import LoginPage from "./screens/LoginPage";
 import SignupPage from "./screens/SignupPage";
 import Settings from "./screens/Settings";
+import SettingsWorkHours from "./screens/SettingsWorkHours";
+import SettingsNotifications from "./screens/SettingsNotifications";
+import SettingsPersonalData from "./screens/SettingsPersonalData";
+import SettingsPrivacy from "./screens/SettingsPrivacy";
 import UpgradePlan from "./screens/UpgradePlan";
 import notitie from "./assets/icons/Afsluitnotitie.svg";
 import spinner from "./assets/images/loadingSpinner.svg";
@@ -53,6 +57,10 @@ const getStoredNavigationState = () => {
       "weekreport", //verder uitwerken
       "profile",
       "settings",
+      "settings-workhours",
+      "settings-notifications",
+      "settings-personal",
+      "settings-privacy",
       "upgrade",
       "breathing", //verder uitwerken
       "pause",
@@ -66,7 +74,6 @@ const getStoredNavigationState = () => {
     return {
       currentPage: parsedState.currentPage,
       selectedExercise: typeof parsedState.selectedExercise === "string" ? parsedState.selectedExercise : null,
-      settingsInitialView: typeof parsedState.settingsInitialView === "string" ? parsedState.settingsInitialView : null,
     };
   } catch {
     return null;
@@ -90,8 +97,6 @@ export default function App() {
 
   const storedNavigationState = getStoredNavigationState();
   const [currentPage, setCurrentPage] = useState(storedNavigationState?.currentPage || "home");
-  const [settingsResetKey, setSettingsResetKey] = useState(0);
-  const [settingsInitialView, setSettingsInitialView] = useState(storedNavigationState?.settingsInitialView || null);
   const [selectedExercise, setSelectedExercise] = useState(storedNavigationState?.selectedExercise || null);
   const [pauseFavorites, setPauseFavorites] = useState(() => new Set());
   const [favoriteRemovalTarget, setFavoriteRemovalTarget] = useState(null);
@@ -286,12 +291,11 @@ export default function App() {
       JSON.stringify({
         currentPage,
         selectedExercise,
-        settingsInitialView,
       })
     );
 
     return undefined;
-  }, [currentPage, selectedExercise, settingsInitialView]);
+  }, [currentPage, selectedExercise]);
 
   useEffect(() => {
     let timer = null;
@@ -714,13 +718,17 @@ export default function App() {
         />
       ) : null}
       <Navbar
-        currentPage={currentPage}
+        currentPage={
+          currentPage === "breathing" || currentPage === "exercise-detail"
+            ? "pause"
+            : currentPage === "settings-workhours" ||
+                currentPage === "settings-notifications" ||
+                currentPage === "settings-personal" ||
+                currentPage === "settings-privacy"
+              ? "settings"
+              : currentPage
+        }
         setCurrentPage={setCurrentPage}
-        onSettingsNavigate={(view) => {
-          setSettingsInitialView(view || null);
-          setCurrentPage("settings");
-          setSettingsResetKey((k) => k + 1);
-        }}
         isPremium={Boolean(profile?.is_premium)}
         onBreak={onBreak}
         breakSeconds={breakSeconds}
@@ -754,15 +762,27 @@ export default function App() {
       ) : currentPage === "settings" ? (
         <Settings
           onBack={() => setCurrentPage("home")}
-          resetKey={settingsResetKey}
-          isPremium={Boolean(profile?.is_premium)}
-          initialView={settingsInitialView}
-          clearInitialView={() => setSettingsInitialView(null)}
+          onNavigateToWorkHours={() => setCurrentPage("settings-workhours")}
+          onNavigateToNotifications={() => setCurrentPage("settings-notifications")}
+          onNavigateToPersonalData={() => setCurrentPage("settings-personal")}
+          onNavigateToPrivacy={() => setCurrentPage("settings-privacy")}
           onNavigateToUpgrade={() => setCurrentPage("upgrade")}
           onLogout={handleLogout}
+        />
+      ) : currentPage === "settings-workhours" ? (
+        <SettingsWorkHours onBack={() => setCurrentPage("settings")} />
+      ) : currentPage === "settings-notifications" ? (
+        <SettingsNotifications onBack={() => setCurrentPage("settings")} />
+      ) : currentPage === "settings-personal" ? (
+        <SettingsPersonalData
+          onBack={() => setCurrentPage("settings")}
           profile={profile}
           onProfileUpdated={handleProfileUpdated}
+          onNavigateToUpgrade={() => setCurrentPage("upgrade")}
+          onLogout={handleLogout}
         />
+      ) : currentPage === "settings-privacy" ? (
+        <SettingsPrivacy onBack={() => setCurrentPage("settings")} />
       ) : currentPage === "upgrade" ? (
         <UpgradePlan
           onBack={() => setCurrentPage("home")}

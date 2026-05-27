@@ -1,19 +1,15 @@
 import "../css/settings.css";
 import { LuChevronRight, LuArrowLeft } from "react-icons/lu";
-import { useState, useEffect } from "react";
-import SettingsWorkHours from "./SettingsWorkHours";
-import SettingsNotifications from "./SettingsNotifications";
-import SettingsPersonalData from "./SettingsPersonalData";
-import SettingsPrivacy from "./SettingsPrivacy";
 
-export default function Settings({ onBack, resetKey, isPremium, initialView, clearInitialView, onNavigateToUpgrade, onLogout, profile, onProfileUpdated }) {
-    const [view, setView] = useState("list");
-
-    useEffect(() => {
-        // when resetKey changes (e.g., user clicked Settings in side-nav), set view to initialView or list
-        setView(initialView ?? "list");
-        if (clearInitialView) clearInitialView();
-    }, [resetKey]);
+export default function Settings({
+    onBack,
+    onNavigateToWorkHours,
+    onNavigateToNotifications,
+    onNavigateToPersonalData,
+    onNavigateToPrivacy,
+    onNavigateToUpgrade,
+    onLogout,
+}) {
 
     const items = [
         { key: "workhours", label: "Werktijden en pauzes" },
@@ -22,30 +18,6 @@ export default function Settings({ onBack, resetKey, isPremium, initialView, cle
         { key: "upgrade", label: "Upgrade plan" },
         { key: "privacy", label: "Privacy" },
     ];
-
-    if (view === "workhours") {
-        return <SettingsWorkHours onBack={() => setView("list")} />;
-    }
-
-    if (view === "notifications") {
-        return <SettingsNotifications onBack={() => setView("list")} />;
-    }
-
-    if (view === "personal") {
-        return (
-            <SettingsPersonalData
-                onBack={() => setView("list")}
-                profile={profile}
-                onProfileUpdated={onProfileUpdated}
-                onNavigateToUpgrade={onNavigateToUpgrade}
-                onLogout={onLogout}
-            />
-        );
-    }
-
-    if (view === "privacy") {
-        return <SettingsPrivacy onBack={() => setView("list")} />;
-    }
 
     return (
         <main className="settingsPage">
@@ -66,8 +38,16 @@ export default function Settings({ onBack, resetKey, isPremium, initialView, cle
                                 onClick={() => {
                                     if (item.key === "upgrade") {
                                         if (onNavigateToUpgrade) onNavigateToUpgrade();
+                                    } else if (item.key === "workhours") {
+                                        if (onNavigateToWorkHours) onNavigateToWorkHours();
+                                    } else if (item.key === "notifications") {
+                                        if (onNavigateToNotifications) onNavigateToNotifications();
+                                    } else if (item.key === "personal") {
+                                        if (onNavigateToPersonalData) onNavigateToPersonalData();
+                                    } else if (item.key === "privacy") {
+                                        if (onNavigateToPrivacy) onNavigateToPrivacy();
                                     } else {
-                                        setView(item.key);
+                                        // no-op
                                     }
                                 }}
                             >
