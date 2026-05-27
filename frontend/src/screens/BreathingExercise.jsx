@@ -1,5 +1,6 @@
 import "../css/BreathingExercise.css";
 import { useState, useEffect, useRef } from "react";
+import { LuArrowLeft } from "react-icons/lu";
 
 const EXERCISE_DATA = {
     box: {
@@ -69,11 +70,10 @@ const EXERCISE_DATA = {
         title: "Physiological sigh",
         variants: {
             "2+1-0-7-0": [
-                { label: "Inademen 2", duration: "2s" },
-                { label: "Inademen 1", duration: "1s" },
+                { label: "Inademen", duration: "2s" },
+                { label: "Nog eens", duration: "1s" },
                 { label: "Vasthouden", duration: "0s" },
                 { label: "Uitademen", duration: "7s" },
-                { label: "Vasthouden", duration: "0s" }
             ]
         }
     }
@@ -83,6 +83,49 @@ const EXERCISE_DATA = {
 const durationToMs = (duration) => {
     const seconds = parseFloat(duration);
     return seconds * 1000;
+};
+
+const getCircleScale = (methodKey, steps, currentStepIndex) => {
+    const currentStep = steps[currentStepIndex];
+    const previousStep = steps[currentStepIndex - 1];
+
+    if (!currentStep) {
+        return 0.84;
+    }
+
+    if (methodKey === "physio") {
+        if (currentStep.label.startsWith("Inademen")) {
+            return currentStepIndex === 0 ? 1 : 1.08;
+        }
+
+        if (currentStep.label.startsWith("Nog eens")) {
+            return 1.08;
+        }
+
+        if (currentStep.label.startsWith("Vasthouden")) {
+            return 1.08;
+        }
+
+        if (currentStep.label.startsWith("Uitademen")) {
+            return 0.84;
+        }
+
+        return 0.84;
+    }
+
+    if (currentStep.label.startsWith("Inademen")) {
+        return 1.08;
+    }
+
+    if (currentStep.label.startsWith("Vasthouden")) {
+        return previousStep?.label.startsWith("Uitademen") ? 0.84 : 1.08;
+    }
+
+    if (currentStep.label.startsWith("Uitademen")) {
+        return 0.84;
+    }
+
+    return 0.84;
 };
 
 export default function BreathingExerciseDetail({ exerciseId, onBack, onChangeMethod }) {
@@ -98,6 +141,9 @@ export default function BreathingExerciseDetail({ exerciseId, onBack, onChangeMe
 
     const selectedExercise = EXERCISE_DATA[selectedMethod];
     const steps = selectedExercise.variants[selectedVariant];
+    const currentStepDurationMs = isActive ? durationToMs(steps[currentStepIndex]?.duration || "0s") : 0;
+    const circleScale = isActive ? getCircleScale(selectedMethod, steps, currentStepIndex) : 0.85;
+    const circleText = isActive && steps[currentStepIndex]?.duration !== "0s" ? steps[currentStepIndex].label : "";
 
     const handleStart = () => {
         setIsActive(true);
@@ -143,15 +189,15 @@ export default function BreathingExerciseDetail({ exerciseId, onBack, onChangeMe
 
     return (
         <main className="exercise-detail-page">
-            <div className="exercise-detail-header">
-                <button className="back-btn" onClick={onBack} aria-label="Terug">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                </button>
+            <button className="back-btn" onClick={onBack} aria-label="Terug">
+                <LuArrowLeft />
+            </button>
 
+            <div className="breathing-exercise-column">
                 <div className="header-center">
-                    <h1 className="exercise-title">{selectedExercise.title} {selectedVariant ? `· ${selectedVariant}` : ''}</h1>
+                    <h1 className="exercise-title">
+                        {selectedExercise.title}
+                    </h1>
 
                     <div className="exercise-controls">
                         <button
@@ -170,12 +216,51 @@ export default function BreathingExerciseDetail({ exerciseId, onBack, onChangeMe
                         </button>
                     </div>
                 </div>
+
+                <div className="exercise-circle-container">
+                    <div
+                        className={`exercise-circle ${isActive ? "active" : ""}`}
+                        style={{
+                            transform: `scale(${circleScale})`,
+                            transitionDuration: `${currentStepDurationMs}ms`,
+                        }}
+                    >
+                        {circleText && (
+                            <span className="circle-text">
+                                {circleText}
+                            </span>
+                        )}
+                    </div>
+                </div>
+
+                <div className="exercise-info">
+                    <h2 className="exercise-steps-title"> {selectedVariant ? `${selectedVariant}` : ''}</h2>
+                    <div className="steps-grid">
+                        {steps.map((s, i) => (
+                            <div className="step-item" key={i}>
+                                <span className="step-label">{s.label}:</span>
+                                <span className="step-value">{s.duration.replace('s', 's')}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
 
             <section className="method-selection" aria-label="Method selection">
+                <h2 className="method-selection-title">Methoden</h2>
                 {Object.entries(EXERCISE_DATA).map(([methodKey, method]) => (
                     <div key={methodKey} className="method-group">
-                        <h3 className="method-title">{method.title}</h3>
+                        <div className="method-header">
+                            <h3 className="method-title">{method.title}</h3>
+                            <button
+                                type="button"
+                                className="method-help-btn"
+                                aria-label={`Meer info over ${method.title}`}
+                                data-method={methodKey}
+                            >
+                                ?
+                            </button>
+                        </div>
                         <div className="method-variants">
                             {Object.keys(method.variants).map((variantKey) => (
                                 <button
@@ -191,39 +276,6 @@ export default function BreathingExerciseDetail({ exerciseId, onBack, onChangeMe
                     </div>
                 ))}
             </section>
-
-            <div className="exercise-circle-container">
-                <div className={`exercise-circle ${isActive ? "active" : ""}`}>
-                    {isActive && (
-                        <span className="circle-text">
-                            {steps[currentStepIndex].label}
-                        </span>
-                    )}
-                </div>
-            </div>
-
-            <div className="exercise-info">
-                <div className="steps-grid">
-                    {steps.map((s, i) => (
-                        <div className="step-item" key={i}>
-                            <span className="step-label">{s.label}</span>
-                            <span className="step-value">{s.duration.replace('s','s')}</span>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            <button className="help-btn" aria-label="Help">?</button>
-
-            <div className="exercise-footer">
-                <button className="change-method-btn" onClick={onChangeMethod}>
-                    Andere methode →
-                </button>
-                <div className="exercise-indicators">
-                    <span className="indicator active"></span>
-                    <span className="indicator"></span>
-                </div>
-            </div>
         </main>
     );
 }

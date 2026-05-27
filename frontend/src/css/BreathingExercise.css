@@ -2,85 +2,99 @@
 @import url("./design_tokens/typography_tokens.css");
 @import url("./design_tokens/spacing_tokens.css");
 
-/* Page layout: main column + right-side methods column */
 .exercise-detail-page {
-    padding: var(--layout-container-padding);
-    display: grid;
-    grid-template-columns: 1fr 320px;
-    gap: var(--space-40);
-    align-items: start;
-    color: var(--text-primary);
-}
-
-/* Header: back button at left, title centered, controls under title */
-.exercise-detail-header {
-    grid-column: 1 / 2;
-    width: 100%;
-    position: relative;
+    max-width: 100%;
+    flex: 1;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    gap: var(--space-12);
+    flex-direction: row;
+    padding: var(--layout-container-padding);
+    justify-content: space-between;
+    font-family: var(--text-body-regular-font-family);
+    color: var(--text-primary);
+    background-color: var(--surface-background);
 }
 
 .back-btn {
-    position: absolute;
-    left: 0;
-    top: 0;
-    background: transparent;
-    border: none;
-    color: var(--text-secondary);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    border-radius: 8px;
+    width: fit-content;
+    height: fit-content;
+    padding: 0;
+    border: 0;
+    background-color: transparent;
+    color: var(--text-primary);
     cursor: pointer;
 }
 
 .back-btn svg {
-    width: 28px;
-    height: 28px;
+    width: var(--icon-size-32);
+    height: var(--icon-size-32);
+}
+
+.breathing-exercise-column{ /* aanpassen op basis van bol die groter/kleiner wordt */
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-32);
+    justify-content: space-between;
+    align-items: center;
 }
 
 .header-center {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--space-12);
+    gap: var(--space-16);
+}
+
+.exercise-title {
+    font-family: var(--text-heading-2-font-family);
+    font-weight: var(--text-heading-2-font-weight);
+    font-size: var(--text-heading-2-font-size);
+    margin: 0;
+    text-align: center;
 }
 
 .exercise-controls {
     display: flex;
-    gap: var(--space-12);
+    gap: var(--duo-buttons-column-gap);
 }
 
 .control-btn {
-    background: transparent;
+    min-width: var(--button-min-width);
+    min-height: var(--button-min-height);
+    padding: var(--button-padding-small-y) var(--button-padding-small-x);
+    background: var(--button-neutral-bg);
     color: var(--text-primary);
-    border: 1px solid var(--border-color-default);
-    padding: var(--space-8) var(--space-20);
-    border-radius: 12px;
-    font-family: var(--text-body-regular-font-family);
-    font-size: var(--text-body-regular-font-size);
+    border: 2px solid var(--button-neutral-border);
+    border-radius: var(--button-radius);
+    font-family: var(--button-default-font-family);
+    font-size: var(--button-default-font-size);
     cursor: pointer;
+    transition: var(--button-default-transition);
+}
+
+.control-btn:hover:not(:disabled) {
+    background: var(--button-neutral-hover-bg);
+    border-color: var(--button-neutral-hover-border);
+    box-shadow: var(--button-default-hover-shadow);
 }
 
 .control-btn.start-btn {
-    background: var(--background-card-100);
-    border-color: var(--border-color-brand);
+    background: var(--button-secondary-bg);
+    border-color: var(--button-secondary-border);
+}
+
+.control-btn.start-btn:hover:not(:disabled) {
+    background: var(--button-secondary-hover-bg);
+    border-color: var(--button-secondary-hover-border);
+    box-shadow: var(--button-default-hover-shadow);
 }
 
 .control-btn:disabled {
-    opacity: 0.5;
-    cursor: default;
+    opacity: var(--opacity-disabled);
+    cursor: not-allowed;
 }
 
 /* Big breathing circle */
 .exercise-circle-container {
-    grid-column: 1 / 2;
     width: 100%;
     display: flex;
     justify-content: center;
@@ -94,65 +108,40 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    transform: scale(0.84);
     transition: transform 600ms ease-in-out, box-shadow 300ms ease;
 }
 
-.exercise-circle.active {
-    transform: scale(1.06);
-    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
-}
-
 .circle-text {
-    font-family: var(--text-heading-3-font-family);
-    font-size: var(--text-heading-3-font-size);
-    line-height: var(--text-heading-3-line-height);
+    font-size: var(--font-size-lg);
     color: var(--text-on-dark);
 }
 
 /* Steps grid under the circle */
 .exercise-info {
-    grid-column: 1 / 2;
-    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--space-16);
+    gap: var(--space-12);
 }
 
-.exercise-title {
-    font-family: var(--text-heading-1-font-family);
-    font-weight: var(--text-heading-1-font-weight);
-    font-size: var(--text-heading-1-font-size);
-    line-height: var(--text-heading-1-line-height);
+.exercise-steps-title {
+    font-family: var(--font-family-heading);
+    font-size: var(--font-size-md);
     margin: 0;
-    color: var(--text-primary);
-    text-align: center;
 }
 
 .steps-grid {
-    width: 100%;
-    max-width: 520px;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--space-12);
     align-items: start;
+    color: var(--text-secondary);
 }
 
 .step-item {
     display: flex;
-    justify-content: space-between;
-    color: var(--text-secondary);
-    font-family: var(--text-body-regular-font-family);
-}
-
-.step-label {
-    color: var(--text-secondary);
-}
-
-.step-value {
-    color: var(--text-primary);
-    font-weight: var(--font-weight-semibold);
+    gap: var(--space-8);
 }
 
 .help-btn {
@@ -166,73 +155,61 @@
     cursor: pointer;
 }
 
-.exercise-footer {
-    grid-column: 1 / 2;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-16);
-}
-
-.change-method-btn {
-    background: transparent;
-    border: none;
-    color: var(--brand-primary);
-    font-family: var(--text-body-regular-font-family);
-    font-size: var(--text-body-regular-font-size);
-    cursor: pointer;
-}
-
-.exercise-indicators {
-    display: flex;
-    gap: var(--space-8);
-}
-
-.indicator {
-    width: 8px;
-    height: 8px;
-    border-radius: 4px;
-    background: var(--background-400);
-    opacity: 0.5;
-}
-
-.indicator.active {
-    background: var(--brand-primary);
-    opacity: 1;
-}
-
 /* Right-side methods column */
 .method-selection {
-    grid-column: 2 / 3;
-    width: 100%;
     display: flex;
     flex-direction: column;
     gap: var(--space-16);
     align-items: flex-start;
+    justify-content: center;
 }
 
-.method-group {
-    display: block;
+.method-selection-title{
+    font-family: var(--text-heading-2-font-family);
+    font-weight: var(--text-heading-2-font-weight);
+    font-size: var(--text-heading-2-font-size);
+    margin: 0;
+}
+
+.method-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-12);
+    margin: 0 0 var(--space-8) 0;
 }
 
 .method-title {
-    font-family: var(--text-heading-3-font-family);
-    font-size: var(--text-heading-3-font-size);
-    margin: 0 0 var(--space-8) 0;
+    font-size: var(--font-size-sm);
+    margin: 0;
+}
+
+.method-help-btn {
+    width: var(--icon-size-28);
+    height: var(--icon-size-28);
+    border-radius: 50%;
+    border: 2px solid var(--text-primary);
+    background: transparent;
     color: var(--text-primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
 }
 
 .method-variants {
+    margin: 0 0 0 var(--space-4);
     display: flex;
     flex-direction: column;
     gap: var(--space-8);
+    border-left: 2px solid var(--text-secondary);
 }
 
 .variant-btn {
     background: transparent;
     border: none;
-    padding: 0;
     color: var(--text-secondary);
     cursor: pointer;
     text-align: left;
@@ -240,10 +217,5 @@
 
 .variant-btn.active {
     color: var(--text-primary);
-    font-weight: var(--font-weight-semibold);
-}
-
-/* small visual tweak to align with screenshot */
-.exercise-detail-page {
-    background: var(--surface-background);
+    font-weight: var(--font-weight-bold);
 }
