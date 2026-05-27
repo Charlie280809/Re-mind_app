@@ -159,10 +159,14 @@ app.get("/work-sessions/breaks/latest", async (req, res) => {
     });
   }
 
+  const { startIso, endIso } = getTodayRange();
+
   const { data: latestSession, error: sessionError } = await supabase
     .from("work_sessions")
     .select("id, breaks_taken, breaks_skipped")
     .eq("user_id", userData.user.id)
+    .gte("start_tijd", startIso)
+    .lt("start_tijd", endIso)
     .order("start_tijd", { ascending: false })
     .limit(1)
     .maybeSingle();
@@ -210,12 +214,16 @@ app.post("/work-sessions/breaks/increment", async (req, res) => {
     });
   }
 
+  const { startIso, endIso } = getTodayRange();
+
   const column = req.body?.column === "breaks_skipped" ? "breaks_skipped" : "breaks_taken";
 
   const { data: latestSession, error: sessionError } = await supabase
     .from("work_sessions")
     .select(`id, ${column}`)
     .eq("user_id", userData.user.id)
+    .gte("start_tijd", startIso)
+    .lt("start_tijd", endIso)
     .order("start_tijd", { ascending: false })
     .limit(1)
     .maybeSingle();
