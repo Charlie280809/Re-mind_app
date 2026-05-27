@@ -46,22 +46,62 @@ app.get("/report/today", async (req, res) => {
     });
   }
 
+  const token = getBearerToken(req);
+
+  if (!token) {
+    return res.status(401).json({
+      error: "Missing Bearer token.",
+    });
+  }
+
+  const { data: userData, error: userError } = await supabase.auth.getUser(token);
+
+  if (userError || !userData?.user) {
+    return res.status(401).json({
+      error: "Invalid or expired session.",
+    });
+  }
+
+  const userId = userData.user.id;
   const { startIso, endIso, localDate } = getTodayRange();
-  const { data, error } = await supabase
+  const { data: checkins, error: checkinError } = await supabase
     .from("checkins")
     .select("stress, energy, need_pause, created_at")
+    .eq("user_id", userId)
     .gte("created_at", startIso)
     .lt("created_at", endIso)
     .order("created_at", { ascending: true });
 
-  if (error) {
+  if (checkinError) {
     return res.status(500).json({
       error: "Failed to load report data from Supabase.",
-      details: error.message,
+      details: checkinError.message,
     });
   }
 
-  const totalCheckins = data.length;
+  const { data: workSessions, error: workSessionError } = await supabase
+    .from("work_sessions")
+    .select("breaks_taken, breaks_skipped")
+    .eq("user_id", userId)
+    .gte("start_tijd", startIso)
+    .lt("start_tijd", endIso);
+
+  if (workSessionError) {
+    return res.status(500).json({
+      error: "Failed to load work session data from Supabase.",
+      details: workSessionError.message,
+    });
+  }
+
+  const totalCheckins = checkins.length;
+  const pauseTotals = (workSessions || []).reduce(
+    (acc, session) => {
+      acc.breaksTaken += Number(session.breaks_taken ?? 0);
+      acc.breaksSkipped += Number(session.breaks_skipped ?? 0);
+      return acc;
+    },
+    { breaksTaken: 0, breaksSkipped: 0 }
+  );
 
   if (totalCheckins === 0) {
     return res.json({
@@ -70,10 +110,12 @@ app.get("/report/today", async (req, res) => {
       averageStress: null,
       averageEnergy: null,
       pauseRecommendations: 0,
+      breaks_taken: pauseTotals.breaksTaken,
+      breaks_skipped: pauseTotals.breaksSkipped,
     });
   }
 
-  const totals = data.reduce(
+  const totals = checkins.reduce(
     (acc, row) => {
       acc.stress += row.stress;
       acc.energy += row.energy;
@@ -89,6 +131,8 @@ app.get("/report/today", async (req, res) => {
     averageStress: Number((totals.stress / totalCheckins).toFixed(1)),
     averageEnergy: Number((totals.energy / totalCheckins).toFixed(1)),
     pauseRecommendations: totals.pauseRecommendations,
+    breaks_taken: pauseTotals.breaksTaken,
+    breaks_skipped: pauseTotals.breaksSkipped,
   });
 });
 
