@@ -61,7 +61,8 @@
 .control-btn {
     min-width: var(--button-min-width);
     min-height: var(--button-min-height);
-    padding: var(--button-padding-small-y) var(--button-padding-small-x);
+    width: 140px;
+    padding: var(--button-padding-y) var(--button-padding-x);
     background: var(--button-neutral-bg);
     color: var(--text-primary);
     border: 2px solid var(--button-neutral-border);
@@ -72,7 +73,7 @@
     transition: var(--button-default-transition);
 }
 
-.control-btn:hover:not(:disabled) {
+.control-btn:hover {
     background: var(--button-neutral-hover-bg);
     border-color: var(--button-neutral-hover-border);
     box-shadow: var(--button-default-hover-shadow);
@@ -83,15 +84,10 @@
     border-color: var(--button-secondary-border);
 }
 
-.control-btn.start-btn:hover:not(:disabled) {
+.control-btn.start-btn:hover {
     background: var(--button-secondary-hover-bg);
     border-color: var(--button-secondary-hover-border);
     box-shadow: var(--button-default-hover-shadow);
-}
-
-.control-btn:disabled {
-    opacity: var(--opacity-disabled);
-    cursor: not-allowed;
 }
 
 /* Big breathing circle */

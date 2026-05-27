@@ -234,18 +234,10 @@ export default function BreathingExerciseDetail({ exerciseId, onBack, onChangeMe
 
                     <div className="exercise-controls">
                         <button
-                            className="control-btn start-btn"
-                            onClick={handleStart}
-                            disabled={isActive}
+                            className={`control-btn ${isActive ? "" : "start-btn"}`}
+                            onClick={isActive ? handleStop : handleStart}
                         >
-                            Start
-                        </button>
-                        <button
-                            className="control-btn"
-                            onClick={handleStop}
-                            disabled={!isActive}
-                        >
-                            Stop
+                            {isActive ? "Stop" : "Start"}
                         </button>
                     </div>
                 </div>
