@@ -1,11 +1,9 @@
 import "../css/ReportPage.css";
 import { useEffect, useMemo, useState } from "react";
-import { LuChevronLeft, LuChevronRight, LuZap } from "react-icons/lu";
+import { LuChevronLeft, LuChevronRight, LuBatteryCharging  } from "react-icons/lu";
 import { HiOutlineTrendingUp  } from "react-icons/hi";
 import { TbCrown } from "react-icons/tb";
 import PremiumModal from "../components/PremiumModal";
-import { getApiBaseUrl } from "../api/apiBaseUrl";
-import { fetchLatestWorkSessionBreaks } from "../api/backendApi";
 import { fetchTodayReport } from "../api/reportApi";
 
 const dateOptions = { day: "numeric", month: "long", year: "numeric" };
@@ -14,16 +12,31 @@ function formatDate(date = new Date()) {
     return new Intl.DateTimeFormat("nl-BE", dateOptions).format(date);
 }
 
+function formatDateKey(date = new Date()) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+}
+
+function shiftDateKey(dateKey, offsetDays) {
+    const [year, month, day] = dateKey.split("-").map((part) => Number(part));
+    const nextDate = new Date(year, month - 1, day);
+    nextDate.setDate(nextDate.getDate() + offsetDays);
+    return formatDateKey(nextDate);
+}
+
 export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken }) {
-    const apiBaseUrl = getApiBaseUrl();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [report, setReport] = useState(null);
-    const [premiumModalOpen, setPremiumModalOpen] = useState(false);
-    const [pauseCounts, setPauseCounts] = useState({ breaks_taken: 0, breaks_skipped: 0 });
+    const [selectedReportDate, setSelectedReportDate] = useState(() => formatDateKey(new Date()));
+    const [premiumModalContent, setPremiumModalContent] = useState(null);
 
-    const breaksTaken = Number(pauseCounts.breaks_taken ?? 0);
-    const breaksSkipped = Number(pauseCounts.breaks_skipped ?? 0);
+    const breaksTaken = Number(report?.breaks_taken ?? 0);
+    const breaksSkipped = Number(report?.breaks_skipped ?? 0);
+    const todayDateKey = useMemo(() => formatDateKey(new Date()), []);
+    const isCurrentDayReport = selectedReportDate >= todayDateKey;
 
     useEffect(() => {
         async function loadReport() {
@@ -31,13 +44,8 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
             setError("");
 
             try {
-                const [reportData, breakData] = await Promise.all([
-                    fetchTodayReport(accessToken),
-                    fetchLatestWorkSessionBreaks(apiBaseUrl, accessToken),
-                ]);
-
+                const reportData = await fetchTodayReport(accessToken, selectedReportDate);
                 setReport(reportData);
-                setPauseCounts(breakData);
             } catch (err) {
                 setError(err.message || "Kon het dagrapport niet ophalen.");
             } finally {
@@ -46,42 +54,63 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
         }
 
         loadReport();
-    }, [accessToken]);
+    }, [accessToken, selectedReportDate]);
 
     const reportTitle = useMemo(() => {
-        const reportDate = report?.date ? new Date(`${report.date}T00:00:00`) : new Date();
+        const reportDate = new Date(`${selectedReportDate}T00:00:00`);
         const safeDate = Number.isNaN(reportDate.getTime()) ? new Date() : reportDate;
         return `Rapport van ${formatDate(safeDate)}`;
-    }, [report?.date]);
+    }, [selectedReportDate]);
 
     const avgStressLabel = report?.averageStress == null ? "-" : `${report.averageStress}/5`;
     const avgEnergyLabel = report?.averageEnergy == null ? "-" : `${report.averageEnergy}/5`;
 
-    function openPremiumModal() {
-        setPremiumModalOpen(true);
+    function openPremiumModal(title, description) {
+        setPremiumModalContent({ title, description });
     }
 
     function closePremiumModal() {
-        setPremiumModalOpen(false);
+        setPremiumModalContent(null);
+    }
+
+    function handlePreviousDay() {
+        if (!isPremium) {
+            openPremiumModal("Ontgrendel vorige dagrapporten", "Bekijk je voorgaande dagrapporten met Premium.");
+            return;
+        }
+
+        setSelectedReportDate((currentDate) => shiftDateKey(currentDate, -1));
+    }
+
+    function handleNextDay() {
+        if (isCurrentDayReport) {
+            return;
+        }
+
+        setSelectedReportDate((currentDate) => shiftDateKey(currentDate, 1));
     }
 
     return (
         <main className="reportPage">
             <header className="reportHeader">
                 <div className="reportTitleGroup">
-                    <button className="reportNavButton" type="button" aria-label="Vorige dagrapport">
+                    <button className="reportNavButton" type="button" aria-label="Vorige dagrapport" onClick={handlePreviousDay}>
                         <LuChevronLeft />
                     </button>
 
                     <h2 className="reportTitle">{reportTitle}</h2>
 
-                    <button className="reportNavButton" type="button" aria-label="Volgende dagrapport">
+                    <button className="reportNavButton" type="button" aria-label="Volgende dagrapport" onClick={handleNextDay} disabled={isCurrentDayReport}>
                         <LuChevronRight />
                     </button>
                 </div>
 
                 {!isPremium ? (
-                    <button className="reportWeekButton" type="button" onClick={openPremiumModal}>
+                    <button
+                        className="reportWeekButton"
+                        type="button"
+                        onClick={() => openPremiumModal("Ontgrendel weekrapporten", "Bekijk je weekrapporten met Premium.")}
+                    >
                         <TbCrown aria-hidden="true" />
                         <span>Bekijk weekrapport</span>
                     </button>
@@ -108,7 +137,7 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
 
                         <div className="reportStatItem">
                             <div className="reportStatLabel">
-                                <LuZap />
+                                <LuBatteryCharging />
                                 <span>Gemiddelde energie</span>
                             </div>
                             <p className="reportStatValue reportStatValueEnergy">{avgEnergyLabel}</p>
@@ -119,9 +148,9 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
 
             {loading ? <p className="reportSectionMeta">Rapport wordt geladen...</p> : null}
             {!loading && error ? <p className="reportSectionMeta">Fout: {error}</p> : null}
-            {!loading && !error && report?.totalCheckins === 0 ? (
+            {/* {!loading && !error && report?.totalCheckins === 0 ? (
                 <p className="reportSectionMeta">Nog geen check-ins vandaag. Vul stress en energie in om data op te bouwen.</p>
-            ) : null}
+            ) : null} */}
 
             <section className="reportSection">
                 <div className="reportSectionHeader">
@@ -174,10 +203,10 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
                 </article>
             </section>
 
-            {premiumModalOpen ? (
+            {premiumModalContent ? (
                 <PremiumModal
-                    title="Ontgrendel weekrapporten"
-                    description="Bekijk je weekrapporten met Premium."
+                    title={premiumModalContent.title}
+                    description={premiumModalContent.description}
                     onClose={closePremiumModal}
                     onUpgrade={onNavigateToUpgrade}
                 />

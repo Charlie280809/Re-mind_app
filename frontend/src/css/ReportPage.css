@@ -54,14 +54,30 @@
 }
 
 .reportNavButton {
-    width: 38px;
-    height: 38px;
-    border-radius: var(--button-radius);
+    width: var(--icon-size-36);
+    height: var(--icon-size-36);
+    border-radius: 10px;
+    border: 2px solid var(--highlight-300);
+    background-color: var(--highlight-50);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     padding: 0;
-    flex: 0 0 auto;
+
+    path{
+        transform: scale(1.1);
+        transform-origin: center;
+    }
+}
+
+.reportNavButton:hover:not(:disabled) {
+    background-color: var(--highlight-200);
+    transition: var(--button-default-transition);
+}
+
+.reportNavButton:disabled {
+    opacity: var(--opacity-disabled);
+    cursor: not-allowed;
 }
 
 .reportNavButton svg,

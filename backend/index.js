@@ -25,8 +25,9 @@ function getBearerToken(req) {
   return header.slice(7).trim() || null;
 }
 
-function getTodayRange() {
-  const start = new Date();
+function getReportRange(dateInput) {
+  const startDate = typeof dateInput === "string" && /^\d{4}-\d{2}-\d{2}$/.test(dateInput) ? new Date(`${dateInput}T00:00:00`) : new Date();
+  const start = new Date(startDate);
   start.setHours(0, 0, 0, 0);
 
   const end = new Date(start);
@@ -37,6 +38,10 @@ function getTodayRange() {
     endIso: end.toISOString(),
     localDate: `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, "0")}-${String(start.getDate()).padStart(2, "0")}`,
   };
+}
+
+function getTodayRange() {
+  return getReportRange();
 }
 
 app.get("/report/today", async (req, res) => {
@@ -63,7 +68,8 @@ app.get("/report/today", async (req, res) => {
   }
 
   const userId = userData.user.id;
-  const { startIso, endIso, localDate } = getTodayRange();
+  const requestedDate = typeof req.query?.date === "string" ? req.query.date : undefined;
+  const { startIso, endIso, localDate } = getReportRange(requestedDate);
   const { data: checkins, error: checkinError } = await supabase
     .from("checkins")
     .select("stress, energy, need_pause, created_at")
