@@ -15,6 +15,8 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const supabase = supabaseUrl && supabaseServiceRoleKey ? createClient(supabaseUrl, supabaseServiceRoleKey) : null;
 
+// --- shared request helpers ---
+
 function getBearerToken(req) {
   const header = req.headers.authorization || "";
 
@@ -44,6 +46,55 @@ function getTodayRange() {
   return getReportRange();
 }
 
+// Convert a duration in minutes to a human-readable string for the report UI.
+function formatMinutesAsDuration(totalMinutes) {
+  const safeMinutes = Math.max(0, Math.round(Number(totalMinutes) || 0));
+  const hours = Math.floor(safeMinutes / 60);
+  const minutes = safeMinutes % 60;
+
+  if (hours === 0) {
+    return `${minutes} minuten`;
+  }
+
+  return `${hours} uur en ${minutes} minuten`;
+}
+
+function summarizeDailyWorkSessions(workSessions) {
+  return (workSessions || []).reduce(
+    (acc, session) => {
+      const startTime = new Date(session.start_tijd);
+      const endTime = new Date(session.eind_tijd);
+      const sessionDurationMinutes = Number.isFinite(startTime.getTime()) && Number.isFinite(endTime.getTime())
+        ? Math.max(0, Math.round((endTime.getTime() - startTime.getTime()) / 60000))
+        : 0;
+      const sessionPauseMinutes = Math.max(0, Number(session.total_pausetime ?? 0));
+
+      acc.breaksTaken += Number(session.breaks_taken ?? 0);
+      acc.breaksSkipped += Number(session.breaks_skipped ?? 0);
+      acc.totalBreakMinutes += sessionPauseMinutes;
+      acc.totalWorkMinutes += Math.max(0, sessionDurationMinutes - sessionPauseMinutes);
+      return acc;
+    },
+    { breaksTaken: 0, breaksSkipped: 0, totalBreakMinutes: 0, totalWorkMinutes: 0 }
+  );
+}
+
+function buildDailyReportPayload({ localDate, totals, pauseTotals, totalCheckins }) {
+  return {
+    date: localDate,
+    totalCheckins,
+    averageStress: totalCheckins === 0 ? null : Number((totals.stress / totalCheckins).toFixed(1)),
+    averageEnergy: totalCheckins === 0 ? null : Number((totals.energy / totalCheckins).toFixed(1)),
+    pauseRecommendations: totals.pauseRecommendations,
+    breaks_taken: pauseTotals.breaksTaken,
+    breaks_skipped: pauseTotals.breaksSkipped,
+    totalBreakTime: formatMinutesAsDuration(pauseTotals.totalBreakMinutes),
+    totalWorkTime: formatMinutesAsDuration(pauseTotals.totalWorkMinutes),
+  };
+}
+
+// --- report data ---
+
 app.get("/report/today", async (req, res) => {
   if (!supabase) {
     return res.status(500).json({
@@ -67,6 +118,7 @@ app.get("/report/today", async (req, res) => {
     });
   }
 
+  // Report rows are scoped to the selected calendar day and signed-in user.
   const userId = userData.user.id;
   const requestedDate = typeof req.query?.date === "string" ? req.query.date : undefined;
   const { startIso, endIso, localDate } = getReportRange(requestedDate);
@@ -85,9 +137,10 @@ app.get("/report/today", async (req, res) => {
     });
   }
 
+  // Sum all sessions of the day to get the total work and pause time.
   const { data: workSessions, error: workSessionError } = await supabase
     .from("work_sessions")
-    .select("breaks_taken, breaks_skipped")
+    .select("breaks_taken, breaks_skipped, total_pausetime, start_tijd, eind_tijd")
     .eq("user_id", userId)
     .gte("start_tijd", startIso)
     .lt("start_tijd", endIso);
@@ -100,25 +153,17 @@ app.get("/report/today", async (req, res) => {
   }
 
   const totalCheckins = checkins.length;
-  const pauseTotals = (workSessions || []).reduce(
-    (acc, session) => {
-      acc.breaksTaken += Number(session.breaks_taken ?? 0);
-      acc.breaksSkipped += Number(session.breaks_skipped ?? 0);
-      return acc;
-    },
-    { breaksTaken: 0, breaksSkipped: 0 }
-  );
+  const pauseTotals = summarizeDailyWorkSessions(workSessions);
 
   if (totalCheckins === 0) {
-    return res.json({
-      date: localDate,
-      totalCheckins: 0,
-      averageStress: null,
-      averageEnergy: null,
-      pauseRecommendations: 0,
-      breaks_taken: pauseTotals.breaksTaken,
-      breaks_skipped: pauseTotals.breaksSkipped,
-    });
+    return res.json(
+      buildDailyReportPayload({
+        localDate,
+        totals: { stress: 0, energy: 0, pauseRecommendations: 0 },
+        pauseTotals,
+        totalCheckins,
+      })
+    );
   }
 
   const totals = checkins.reduce(
@@ -131,16 +176,17 @@ app.get("/report/today", async (req, res) => {
     { stress: 0, energy: 0, pauseRecommendations: 0 }
   );
 
-  return res.json({
-    date: localDate,
-    totalCheckins,
-    averageStress: Number((totals.stress / totalCheckins).toFixed(1)),
-    averageEnergy: Number((totals.energy / totalCheckins).toFixed(1)),
-    pauseRecommendations: totals.pauseRecommendations,
-    breaks_taken: pauseTotals.breaksTaken,
-    breaks_skipped: pauseTotals.breaksSkipped,
-  });
+  return res.json(
+    buildDailyReportPayload({
+      localDate,
+      totals,
+      pauseTotals,
+      totalCheckins,
+    })
+  );
 });
+
+// --- check-ins ---
 
 app.post("/checkin", async (req, res) => {
   const stress = Number(req.body.stress);
@@ -185,6 +231,8 @@ app.post("/checkin", async (req, res) => {
 
   res.json({ needPause });
 });
+
+// --- current-day work session counters ---
 
 app.get("/work-sessions/breaks/latest", async (req, res) => {
   if (!supabase) {
@@ -307,6 +355,8 @@ app.post("/work-sessions/breaks/increment", async (req, res) => {
 
   return res.json({ ok: true, [column]: nextValue });
 });
+
+// --- signup flow ---
 
 app.post("/signup/create-account", async (req, res) => {
   if (!supabase) {
@@ -448,6 +498,8 @@ app.post("/signup/work-hours", async (req, res) => {
   return res.json({ ok: true });
 });
 
+// --- profile management ---
+
 app.get("/profile/me", async (req, res) => {
   if (!supabase) {
     return res.status(500).json({
@@ -464,6 +516,8 @@ app.get("/profile/me", async (req, res) => {
   }
 
   const { data: userData, error: userError } = await supabase.auth.getUser(token);
+    // --- account deletion ---
+
 
   if (userError || !userData?.user) {
     return res.status(401).json({
@@ -689,7 +743,7 @@ app.delete("/account/me", async (req, res) => {
   }
 
   const userId = userData.user.id;
-  const tablesToDelete = ["favorite_pauses", "settings", "checkins", "profiles"]; {/* andere data van werksessies toevoegen */}
+  const tablesToDelete = ["favorite_pauses", "settings", "checkins", "profiles"];
 
   for (const tableName of tablesToDelete) {
     const { error } = await supabase.from(tableName).delete().eq("user_id", userId);
