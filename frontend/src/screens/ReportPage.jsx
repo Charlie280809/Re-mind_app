@@ -4,6 +4,8 @@ import { LuChevronLeft, LuChevronRight, LuZap } from "react-icons/lu";
 import { HiOutlineTrendingUp  } from "react-icons/hi";
 import { TbCrown } from "react-icons/tb";
 import PremiumModal from "../components/PremiumModal";
+import { getApiBaseUrl } from "../api/apiBaseUrl";
+import { fetchLatestWorkSessionBreaks } from "../api/backendApi";
 import { fetchTodayReport } from "../api/reportApi";
 
 const dateOptions = { day: "numeric", month: "long", year: "numeric" };
@@ -12,11 +14,16 @@ function formatDate(date = new Date()) {
     return new Intl.DateTimeFormat("nl-BE", dateOptions).format(date);
 }
 
-export default function ReportPage({ isPremium, onNavigateToUpgrade }) {
+export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken }) {
+    const apiBaseUrl = getApiBaseUrl();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [report, setReport] = useState(null);
     const [premiumModalOpen, setPremiumModalOpen] = useState(false);
+    const [pauseCounts, setPauseCounts] = useState({ breaks_taken: 0, breaks_skipped: 0 });
+
+    const breaksTaken = Number(pauseCounts.breaks_taken ?? 0);
+    const breaksSkipped = Number(pauseCounts.breaks_skipped ?? 0);
 
     useEffect(() => {
         async function loadReport() {
@@ -24,8 +31,13 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade }) {
             setError("");
 
             try {
-                const data = await fetchTodayReport();
-                setReport(data);
+                const [reportData, breakData] = await Promise.all([
+                    fetchTodayReport(accessToken),
+                    fetchLatestWorkSessionBreaks(apiBaseUrl, accessToken),
+                ]);
+
+                setReport(reportData);
+                setPauseCounts(breakData);
             } catch (err) {
                 setError(err.message || "Kon het dagrapport niet ophalen.");
             } finally {
@@ -34,7 +46,7 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade }) {
         }
 
         loadReport();
-    }, []);
+    }, [accessToken]);
 
     const reportTitle = useMemo(() => {
         const reportDate = report?.date ? new Date(`${report.date}T00:00:00`) : new Date();
@@ -121,18 +133,21 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade }) {
                     <div className="reportBreakRow">
                         <span className="reportBreakLabel">Pauzes genomen:</span>
                         <div className="reportDots" aria-hidden="true">
-                            <span className="reportDot reportDotGood" />
-                            <span className="reportDot reportDotGood" />
-                            <span className="reportDot reportDotGood" />
+                            {Array.from({ length: breaksTaken }).map((_, index) => (
+                                <span key={`taken-${index}`} className="reportDot reportDotGood" />
+                            ))}
                         </div>
+                        <strong className="reportBreakCount reportBreakCountGood">{breaksTaken}</strong>
                     </div>
 
                     <div className="reportBreakRow">
                         <span className="reportBreakLabel">Pauzes overgeslagen:</span>
                         <div className="reportDots" aria-hidden="true">
-                            <span className="reportDot reportDotBad" />
-                            <span className="reportDot reportDotBad" />
+                            {Array.from({ length: breaksSkipped }).map((_, index) => (
+                                <span key={`skipped-${index}`} className="reportDot reportDotBad" />
+                            ))}
                         </div>
+                        <strong className="reportBreakCount reportBreakCountBad">{breaksSkipped}</strong>
                     </div>
                 </article>
             </section>

@@ -211,22 +211,24 @@
 .reportBreakCard {
     padding: var(--space-24) var(--space-32);
     display: flex;
-    border-radius: 20px;
+    border-radius: var(--popupcard-border-radius);
     flex-direction: column;
-    gap: var(--space-24);
+    gap: var(--space-20);
     background: var(--surface-card);
 }
 
 .reportBreakRow {
-    gap: var(--space-24);
-    flex-wrap: wrap;
+    width: 100%;
+    gap: var(--space-12);
+    justify-content: space-between;
+    flex-wrap: nowrap;
 }
 
 .reportBreakLabel {
     min-width: 180px;
     font-family: var(--text-body-regular-font-family);
     font-size: var(--text-body-regular-font-size);
-    line-height: var(--line-height-xs);
+    font-weight: var(--font-weight-semibold);
 }
 
 .reportDots {
@@ -236,8 +238,8 @@
 }
 
 .reportDot {
-    width: 24px;
-    height: 24px;
+    width: var(--space-24);
+    height: var(--space-24);
     border-radius: 4px;
 }
 
@@ -247,6 +249,20 @@
 
 .reportDotBad {
     background-color: var(--error-300);
+}
+
+.reportBreakCount {
+    margin-left: auto;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-md);
+}
+
+.reportBreakCountGood {
+    color: var(--highlight-400);
+}
+
+.reportBreakCountBad {
+    color: var(--error-400);
 }
 
 .reportAdviceCard {
