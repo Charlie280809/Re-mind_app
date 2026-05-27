@@ -13,7 +13,7 @@
 }
 
 .checkInModalContent {
-    background-color: var(--surface-background);
+    background: var(--surface-background);
     border-radius: var(--popupcard-border-radius);
     padding: var(--space-24);
     min-width: 500px;

@@ -558,13 +558,13 @@
     display: grid;
     place-items: center;
     padding: var(--layout-container-padding);
-    background-color: var(--backdrop-darken);
+    background: var(--backdrop-darken);
 }
 
 .passwordModal {
     min-width: fit-content;
     border-radius: var(--popupcard-border-radius);
-    background-color: var(--surface-card);
+    background: var(--surface-card);
     box-shadow: var(--popupcard-box-shadow, 0 28px 64px rgba(0, 0, 0, 0.2));
     padding: var(--popupcard-padding);
     display: flex;
