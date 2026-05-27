@@ -29,7 +29,8 @@
     height: var(--icon-size-32);
 }
 
-.breathing-exercise-column{ /* aanpassen op basis van bol die groter/kleiner wordt */
+.breathing-exercise-column {
+    /* aanpassen op basis van bol die groter/kleiner wordt */
     display: flex;
     flex-direction: column;
     gap: var(--space-32);
@@ -164,7 +165,7 @@
     justify-content: center;
 }
 
-.method-selection-title{
+.method-selection-title {
     font-family: var(--text-heading-2-font-family);
     font-weight: var(--text-heading-2-font-weight);
     font-size: var(--text-heading-2-font-size);
@@ -218,4 +219,48 @@
 .variant-btn.active {
     color: var(--text-primary);
     font-weight: var(--font-weight-bold);
+}
+
+/* --- Help popup --- */
+.helpPopupOverlay {
+    position: fixed;
+    inset: 0;
+    background: var(--backdrop-darken);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+}
+
+.helpPopup {
+    position: relative;
+    max-width: 520px;
+    background: var(--background-300);
+    border-radius: var(--popupcard-border-radius);
+    padding: var(--popupcard-padding);
+    color: var(--text-primary);
+}
+
+.helpPopupClose {
+    position: absolute;
+    right: var(--space-20);
+    top: var(--space-20);
+    border: 0;
+    background: transparent;
+    color: var(--text-primary);
+    font-size: var(--close-button-size);
+    cursor: pointer;
+}
+
+.helpPopupTitle {
+    margin: 0 0 var(--space-12) 0;
+    text-align: center;
+    font-size: var(--font-size-md);
+}
+
+.helpPopupBody {
+    margin: 0;
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--text-body-regular-font-size);
+    line-height: var(--text-body-regular-line-height);
 }

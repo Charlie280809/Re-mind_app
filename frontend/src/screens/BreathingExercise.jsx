@@ -1,10 +1,18 @@
 import "../css/BreathingExercise.css";
 import { useState, useEffect, useRef } from "react";
-import { LuArrowLeft } from "react-icons/lu";
+import { LuArrowLeft, LuX } from "react-icons/lu";
 
 const EXERCISE_DATA = {
     box: {
         title: "Box breathing",
+        helpTitle: "Wat doet Box breathing?",
+        helpBody: (
+            <>
+                <strong>Box breathing</strong> stabiliseert het autonome zenuwstelsel, verhoogt focus en controle bij acute stress.
+                <br />
+                Deze oefening activeert het parasympathisch zenuwstelsel, wat zorgt voor een directe stressdaling.
+            </>
+        ),
         variants: {
             "4-4-4-4": [
                 { label: "Inademen", duration: "4s" },
@@ -28,6 +36,14 @@ const EXERCISE_DATA = {
     },
     ratio: {
         title: "1:2 ratio breathing",
+        helpTitle: "Wat doet 1:2 ratio breathing?",
+        helpBody: (
+            <>
+                <strong>1:2 ratio breathing</strong> verlaagt de hartslag en bloeddruk.
+                <br />
+                Deze oefening is effectief bij angst en onrust. Een langere uitademing activeert het kalmerend zenuwstelsel.
+            </>
+        ),
         variants: {
             "2-0-4-0": [
                 { label: "Inademen", duration: "2s" },
@@ -51,6 +67,14 @@ const EXERCISE_DATA = {
     },
     coherent: {
         title: "Coherent breathing",
+        helpTitle: "Wat doet Coherent breathing?",
+        helpBody: (
+            <>
+                <strong>Coherent breathing</strong> bevordert kalmte en adem-efficientie.
+                <br />
+                Deze oefening maximaliseert de hartslagvariabiliteit en brengt het zenuwstelsel in balans.
+            </>
+        ),
         variants: {
             "5-0-5-0": [
                 { label: "Inademen", duration: "5s" },
@@ -68,6 +92,14 @@ const EXERCISE_DATA = {
     },
     physio: {
         title: "Physiological sigh",
+        helpTitle: "Wat doet de Psychological sigh?",
+        helpBody: (
+            <>
+                De <strong>Psychological Sigh</strong> verlaagt snel stress en benauwdheid. Het herstelt je natuurlijke ademdiepte.
+                <br />
+                Deze methode is wetenschappelijk bewezen als een van de meest effectieve technieken bij acute spanning.
+            </>
+        ),
         variants: {
             "2+1-0-7-0": [
                 { label: "Inademen", duration: "2s" },
@@ -131,6 +163,7 @@ const getCircleScale = (methodKey, steps, currentStepIndex) => {
 export default function BreathingExerciseDetail({ exerciseId, onBack, onChangeMethod }) {
     const [isActive, setIsActive] = useState(false);
     const [currentStepIndex, setCurrentStepIndex] = useState(0);
+    const [helpMethod, setHelpMethod] = useState(null);
     const [selectedMethod, setSelectedMethod] = useState("box");
     const [selectedVariant, setSelectedVariant] = useState(() => {
         const firstVariant = Object.keys(EXERCISE_DATA.box.variants)[0];
@@ -256,7 +289,7 @@ export default function BreathingExerciseDetail({ exerciseId, onBack, onChangeMe
                                 type="button"
                                 className="method-help-btn"
                                 aria-label={`Meer info over ${method.title}`}
-                                data-method={methodKey}
+                                onClick={() => setHelpMethod(methodKey)}
                             >
                                 ?
                             </button>
@@ -276,6 +309,27 @@ export default function BreathingExerciseDetail({ exerciseId, onBack, onChangeMe
                     </div>
                 ))}
             </section>
+
+            {helpMethod ? (
+                <div className="helpPopupOverlay" onClick={() => setHelpMethod(null)}>
+                    <div className="helpPopup" onClick={(event) => event.stopPropagation()}>
+                        <button
+                            type="button"
+                            aria-label="Sluiten"
+                            onClick={() => setHelpMethod(null)}
+                            className="helpPopupClose"
+                        >
+                            <LuX />
+                        </button>
+                        <h2 className="helpPopupTitle">
+                            {EXERCISE_DATA[helpMethod].helpTitle}
+                        </h2>
+                        <p className="helpPopupBody">
+                            {EXERCISE_DATA[helpMethod].helpBody}
+                        </p>
+                    </div>
+                </div>
+            ) : null}
         </main>
     );
 }
