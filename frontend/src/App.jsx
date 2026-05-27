@@ -62,7 +62,7 @@ const getStoredNavigationState = () => {
       "settings-personal",
       "settings-privacy",
       "upgrade",
-      "breathing", //verder uitwerken
+      "breathing",
       "pause",
       "exercise-detail",
     ]);
@@ -744,6 +744,7 @@ export default function App() {
       ) : currentPage === "report" ? (
         <ReportPage
           isPremium={Boolean(profile?.is_premium)}
+          accessToken={session?.access_token}
           onNavigateToUpgrade={() => setCurrentPage("upgrade")}
         />
       ) : currentPage === "weekreport" ? (
@@ -841,6 +842,7 @@ export default function App() {
                     <span key={`dot-good-${index}`} className="dot dotGood"></span>
                   ))}
                 </div>
+                <strong className="pauseSummaryCount pauseSummaryCountGood">{pauseSummaryCounts.breaks_taken}</strong>
               </div>
 
               <div className="pauseSummaryRow">
@@ -850,6 +852,7 @@ export default function App() {
                     <span key={`dot-bad-${index}`} className="dot dotBad"></span>
                   ))}
                 </div>
+                <strong className="pauseSummaryCount pauseSummaryCountBad">{pauseSummaryCounts.breaks_skipped}</strong>
               </div>
             </article>
           </section>
