@@ -1,0 +1,249 @@
+@import url("./design_tokens/color_tokens.css");
+@import url("./design_tokens/typography_tokens.css");
+@import url("./design_tokens/spacing_tokens.css");
+
+/* Page layout: main column + right-side methods column */
+.exercise-detail-page {
+    padding: var(--layout-container-padding);
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: var(--space-40);
+    align-items: start;
+    color: var(--text-primary);
+}
+
+/* Header: back button at left, title centered, controls under title */
+.exercise-detail-header {
+    grid-column: 1 / 2;
+    width: 100%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: var(--space-12);
+}
+
+.back-btn {
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.back-btn svg {
+    width: 28px;
+    height: 28px;
+}
+
+.header-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-12);
+}
+
+.exercise-controls {
+    display: flex;
+    gap: var(--space-12);
+}
+
+.control-btn {
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color-default);
+    padding: var(--space-8) var(--space-20);
+    border-radius: 12px;
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--text-body-regular-font-size);
+    cursor: pointer;
+}
+
+.control-btn.start-btn {
+    background: var(--background-card-100);
+    border-color: var(--border-color-brand);
+}
+
+.control-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+/* Big breathing circle */
+.exercise-circle-container {
+    grid-column: 1 / 2;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.exercise-circle {
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    background: var(--brand-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    transition: transform 600ms ease-in-out, box-shadow 300ms ease;
+}
+
+.exercise-circle.active {
+    transform: scale(1.06);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
+}
+
+.circle-text {
+    font-family: var(--text-heading-3-font-family);
+    font-size: var(--text-heading-3-font-size);
+    line-height: var(--text-heading-3-line-height);
+    color: var(--text-on-dark);
+}
+
+/* Steps grid under the circle */
+.exercise-info {
+    grid-column: 1 / 2;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-16);
+}
+
+.exercise-title {
+    font-family: var(--text-heading-1-font-family);
+    font-weight: var(--text-heading-1-font-weight);
+    font-size: var(--text-heading-1-font-size);
+    line-height: var(--text-heading-1-line-height);
+    margin: 0;
+    color: var(--text-primary);
+    text-align: center;
+}
+
+.steps-grid {
+    width: 100%;
+    max-width: 520px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-12);
+    align-items: start;
+}
+
+.step-item {
+    display: flex;
+    justify-content: space-between;
+    color: var(--text-secondary);
+    font-family: var(--text-body-regular-font-family);
+}
+
+.step-label {
+    color: var(--text-secondary);
+}
+
+.step-value {
+    color: var(--text-primary);
+    font-weight: var(--font-weight-semibold);
+}
+
+.help-btn {
+    position: absolute;
+    right: var(--space-32);
+    top: var(--space-24);
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.exercise-footer {
+    grid-column: 1 / 2;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-16);
+}
+
+.change-method-btn {
+    background: transparent;
+    border: none;
+    color: var(--brand-primary);
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--text-body-regular-font-size);
+    cursor: pointer;
+}
+
+.exercise-indicators {
+    display: flex;
+    gap: var(--space-8);
+}
+
+.indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 4px;
+    background: var(--background-400);
+    opacity: 0.5;
+}
+
+.indicator.active {
+    background: var(--brand-primary);
+    opacity: 1;
+}
+
+/* Right-side methods column */
+.method-selection {
+    grid-column: 2 / 3;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-16);
+    align-items: flex-start;
+}
+
+.method-group {
+    display: block;
+}
+
+.method-title {
+    font-family: var(--text-heading-3-font-family);
+    font-size: var(--text-heading-3-font-size);
+    margin: 0 0 var(--space-8) 0;
+    color: var(--text-primary);
+}
+
+.method-variants {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+}
+
+.variant-btn {
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: var(--text-secondary);
+    cursor: pointer;
+    text-align: left;
+}
+
+.variant-btn.active {
+    color: var(--text-primary);
+    font-weight: var(--font-weight-semibold);
+}
+
+/* small visual tweak to align with screenshot */
+.exercise-detail-page {
+    background: var(--surface-background);
+}

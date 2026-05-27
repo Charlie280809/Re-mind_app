@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
 import WorkTimerCard from "./components/WorkTimerCard";
 import PauseSuggestions from "./screens/PauseSuggestions";
-import BreathingExerciseDetail from "./screens/BreathingExerciseDetail";
+import BreathingExercise from "./screens/BreathingExercise";
 import ProfilePage from "./screens/ProfilePage";
 import ReportPage from "./screens/ReportPage";
 import WeekReportPage from "./screens/WeekReportPage";
@@ -770,7 +770,7 @@ export default function App() {
           onProfileUpdated={handleProfileUpdated}
         />
       ) : currentPage === "breathing" ? (
-        <BreathingExercises
+        <BreathingExercise
           onBack={() => setCurrentPage("pause")}
           onSelectExercise={(id) => {
             setSelectedExercise(id);
