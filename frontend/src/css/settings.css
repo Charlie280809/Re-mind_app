@@ -286,7 +286,7 @@
 }
 
 .toggle[aria-pressed="true"] {
-    background: var(--toggle-on-bg);
+    background-color: var(--toggle-on-bg);
     border: 2px solid var(--toggle-border-color);
 }
 
@@ -432,7 +432,7 @@
     height: 96px;
     border-radius: 50%;
     overflow: hidden;
-    background: var(--primary-200);
+    background-color: var(--primary-200);
     border: 4px solid var(--primary-600);
 }
 
@@ -564,7 +564,7 @@
 .passwordModal {
     min-width: fit-content;
     border-radius: var(--popupcard-border-radius);
-    background: var(--surface-card);
+    background-color: var(--surface-card);
     box-shadow: var(--popupcard-box-shadow, 0 28px 64px rgba(0, 0, 0, 0.2));
     padding: var(--popupcard-padding);
     display: flex;

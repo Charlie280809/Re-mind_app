@@ -101,7 +101,7 @@
 }
 
 .upgradeCardTop {
-    background: var(--premium-card-background);
+    background-color: var(--premium-card-background);
 }
 
 .upgradeCardBottom {

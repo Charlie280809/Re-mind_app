@@ -63,7 +63,7 @@
     min-height: var(--button-min-height);
     width: 140px;
     padding: var(--button-padding-y) var(--button-padding-x);
-    background: var(--button-neutral-bg);
+    background-color: var(--button-neutral-bg);
     color: var(--text-primary);
     border: 2px solid var(--button-neutral-border);
     border-radius: var(--button-radius);
@@ -74,18 +74,18 @@
 }
 
 .control-btn:hover {
-    background: var(--button-neutral-hover-bg);
+    background-color: var(--button-neutral-hover-bg);
     border-color: var(--button-neutral-hover-border);
     box-shadow: var(--button-default-hover-shadow);
 }
 
 .control-btn.start-btn {
-    background: var(--button-secondary-bg);
+    background-color: var(--button-secondary-bg);
     border-color: var(--button-secondary-border);
 }
 
 .control-btn.start-btn:hover {
-    background: var(--button-secondary-hover-bg);
+    background-color: var(--button-secondary-hover-bg);
     border-color: var(--button-secondary-hover-border);
     box-shadow: var(--button-default-hover-shadow);
 }
@@ -101,7 +101,7 @@
     width: 320px;
     height: 320px;
     border-radius: 50%;
-    background: var(--brand-primary);
+    background-color: var(--brand-primary);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -231,7 +231,7 @@
 .helpPopup {
     position: relative;
     max-width: 520px;
-    background: var(--background-300);
+    background-color: var(--surface-background);
     border-radius: var(--popupcard-border-radius);
     padding: var(--popupcard-padding);
     color: var(--text-primary);
