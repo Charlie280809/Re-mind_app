@@ -1,5 +1,5 @@
 import "../css/ReportPage.css";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { LuChevronLeft, LuChevronRight, LuBatteryCharging  } from "react-icons/lu";
 import { HiOutlineTrendingUp  } from "react-icons/hi";
 import { TbCrown } from "react-icons/tb";
@@ -26,6 +26,20 @@ function shiftDateKey(dateKey, offsetDays) {
     return formatDateKey(nextDate);
 }
 
+function renderBreakRow(label, count, dotClass, countClass, keyPrefix) {
+    return (
+        <div className="reportBreakRow">
+            <span className="reportBreakLabel">{label}</span>
+            <div className="reportDots" aria-hidden="true">
+                {Array.from({ length: count }).map((_, index) => (
+                    <span key={`${keyPrefix}-${index}`} className={`reportDot ${dotClass}`} />
+                ))}
+            </div>
+            <strong className={`reportBreakCount ${countClass}`}>{count}</strong>
+        </div>
+    );
+}
+
 export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -35,7 +49,7 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
 
     const breaksTaken = Number(report?.breaks_taken ?? 0);
     const breaksSkipped = Number(report?.breaks_skipped ?? 0);
-    const todayDateKey = useMemo(() => formatDateKey(new Date()), []);
+    const todayDateKey = formatDateKey(new Date());
     const isCurrentDayReport = selectedReportDate >= todayDateKey;
 
     useEffect(() => {
@@ -56,11 +70,11 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
         loadReport();
     }, [accessToken, selectedReportDate]);
 
-    const reportTitle = useMemo(() => {
+    const reportTitle = (() => {
         const reportDate = new Date(`${selectedReportDate}T00:00:00`);
         const safeDate = Number.isNaN(reportDate.getTime()) ? new Date() : reportDate;
         return `Rapport van ${formatDate(safeDate)}`;
-    }, [selectedReportDate]);
+    })();
 
     const avgStressLabel = report?.averageStress == null ? "-" : `${report.averageStress}/5`;
     const avgEnergyLabel = report?.averageEnergy == null ? "-" : `${report.averageEnergy}/5`;
@@ -148,9 +162,6 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
 
             {loading ? <p className="reportSectionMeta">Rapport wordt geladen...</p> : null}
             {!loading && error ? <p className="reportSectionMeta">Fout: {error}</p> : null}
-            {/* {!loading && !error && report?.totalCheckins === 0 ? (
-                <p className="reportSectionMeta">Nog geen check-ins vandaag. Vul stress en energie in om data op te bouwen.</p>
-            ) : null} */}
 
             <section className="reportSection">
                 <div className="reportSectionHeader">
@@ -159,25 +170,8 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
                 </div>
 
                 <article className="reportCard reportBreakCard">
-                    <div className="reportBreakRow">
-                        <span className="reportBreakLabel">Pauzes genomen:</span>
-                        <div className="reportDots" aria-hidden="true">
-                            {Array.from({ length: breaksTaken }).map((_, index) => (
-                                <span key={`taken-${index}`} className="reportDot reportDotGood" />
-                            ))}
-                        </div>
-                        <strong className="reportBreakCount reportBreakCountGood">{breaksTaken}</strong>
-                    </div>
-
-                    <div className="reportBreakRow">
-                        <span className="reportBreakLabel">Pauzes overgeslagen:</span>
-                        <div className="reportDots" aria-hidden="true">
-                            {Array.from({ length: breaksSkipped }).map((_, index) => (
-                                <span key={`skipped-${index}`} className="reportDot reportDotBad" />
-                            ))}
-                        </div>
-                        <strong className="reportBreakCount reportBreakCountBad">{breaksSkipped}</strong>
-                    </div>
+                    {renderBreakRow("Pauzes genomen:", breaksTaken, "reportDotGood", "reportBreakCountGood", "taken")}
+                    {renderBreakRow("Pauzes overgeslagen:", breaksSkipped, "reportDotBad", "reportBreakCountBad", "skipped")}
                 </article>
             </section>
 

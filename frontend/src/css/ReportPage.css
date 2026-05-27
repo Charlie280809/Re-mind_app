@@ -118,7 +118,8 @@
 }
 
 .reportMetricCardWorktime {
-    flex: 0 0 auto;
+    flex: 0 0 1;
+    min-width: 240px;
 }
 
 .reportMetricCardStats {
