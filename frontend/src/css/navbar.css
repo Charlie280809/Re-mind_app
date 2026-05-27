@@ -4,19 +4,19 @@
 @import url("./design_tokens/components.css");
 
 .sideNav {
-  width: 240px;
-  padding-right: var(--space-32);
+  width: 224px;
+  padding-right: var(--space-24);
   height: 100vh;
   min-height: 100vh;
   background: var(--surface-card);
-  border-radius: 0 20px 20px 0;
+  border-radius: 0 20px 0px 0;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   position: sticky;
   top: 0;
   transition: width 200ms linear, padding 200ms linear;
-  overflow: hidden;
+  /* overflow: hidden; */
 }
 
 .sideNav.collapsed {
@@ -28,239 +28,235 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: var(--space-8);
+  gap: var(--space-20);
 }
 
 .brandLogo {
-  padding: var(--space-24) var(--space-0) var(--space-0) var(--space-12);
   width: 200px;
+  padding: var(--space-24) var(--space-0) var(--space-0) var(--space-12);
 }
 
-.brand {
+/* .brand {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
-}
+  width: fit-content;
+} */
 
-.collapseToggle{
+.collapseToggle {
   position: absolute;
-  top: 50%;
-  right: 0;
-  transform: translateY(-50%);
+  bottom: 0px;
+  right: -24px;
   border: none;
-  padding: var(--space-12) var(--space-4) var(--space-12) var(--space-12);
+  border-radius: 0 20px 20px 0;
+  padding: var(--space-20) 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: transparent;
+  background-color: var(--background-card-300);
   color: var(--text-secondary-200);
   cursor: pointer;
-  svg{
-    width: var(--icon-size324);
+  z-index: 2;
+
+  svg {
+    width: var(--icon-size-24);
+    height: var(--icon-size-24);
+    transform: scale(1.35) translateX(-2px);
+  }
+}
+
+  .sideNav.collapsed .brandLogo {
+    width: 48px;
+  }
+
+  .sideNavLinks {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-16);
+  }
+
+  .pauseTimePanel {
+    margin: 100% 0 0 var(--space-12);
+    padding: var(--space-12);
+    border-radius: 18px;
+    background: var(--primary-200);
+    border: 1px solid var(--primary-300);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    width: calc(100% - var(--space-12));
+    color: var(--text-primary);
+  }
+
+  .pauseTimeLabel {
+    font-family: var(--text-heading-3-font-family);
+    font-size: var(--text-heading-3-font-size);
+  }
+
+  .pauseTimeValue {
+    font-family: var(--font-family-heading);
+    font-size: var(--font-size-lg);
+    font-weight: var(--text-heading-1-font-weight);
+  }
+
+  .pauseEndButton {
+    margin: 0;
+    min-width: var(--button-min-width);
+    min-height: var(--button-min-height);
+    border: 2px solid var(--button-secondary-border);
+    /* border: 0; */
+    background-color: var(--button-secondary-bg);
+    padding: var(--button-padding-small-y) var(--button-padding-small-x);
+    color: var(--button-secondary-text);
+    border-radius: var(--button-radius);
+    font-family: var(--button-default-font-family);
+    font-size: var(--button-default-font-size);
+  }
+
+  .pauseEndButton:hover {
+    background-color: var(--button-secondary-hover-bg);
+    border-color: var(--button-secondary-hover-border);
+    transition: var(--button-default-transition);
+  }
+
+  .sideNavLink {
+    padding: 0;
+    margin: 0 0 0 var(--space-12);
+    height: 36px;
+    border: none;
+    background-color: transparent;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: var(--space-12);
+    font-family: var(--text-navigation-default-font-family);
+    font-size: var(--text-navigation-default-font-size);
+    font-weight: var(--text-navigation-default-font-weight);
+    line-height: var(--text-navigation-default-line-height);
+    cursor: pointer;
+    transition: var(--button-default-transition);
+  }
+
+  .sideNav.collapsed .sideNavLink {
+    padding-left: 0;
+  }
+
+  .sideNav.collapsed .sideNavIcon {
+    margin: 0;
+  }
+
+  .sideNavLabel {
+    display: inline-block;
+  }
+
+  .sideNav.collapsed .sideNavLabel {
+    width: 0;
+    display: none;
+  }
+
+  .sideNavLink:hover {
+    font-family: var(--text-navigation-hover-font-family);
+    font-weight: var(--text-navigation-hover-font-weight);
+    font-size: var(--text-navigation-hover-font-size);
+    line-height: var(--text-navigation-hover-line-height);
+
+    .sideNavIcon {
+      color: var(--text-navigation-hover-color);
+    }
+  }
+
+  .sideNavLink.active {
+    font-weight: var(--text-navigation-active-font-weight);
+    font-size: var(--text-navigation-active-font-size);
+    line-height: var(--text-navigation-active-line-height);
+    gap: var(--space-8);
+
+    .sideNavIcon {
+      color: var(--text-navigation-active-color);
+      width: var(--icon-size-36);
+      height: var(--icon-size-36);
+      transition: var(--button-default-transition);
+    }
+  }
+
+  .sideNavIcon {
+    width: var(--icon-size-32);
     height: var(--icon-size-32);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
-}
 
-.sideNav.collapsed .brandLogo{
-  width: 48px;
-}
-
-.sideNavLinks {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-16);
-  padding-top: var(--space-12);
-}
-
-.pauseTimePanel {
-  margin: 100% 0 0 var(--space-12);
-  padding: var(--space-12);
-  border-radius: 18px;
-  background: var(--primary-200);
-  border: 1px solid var(--primary-300);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-4);
-  width: calc(100% - var(--space-12));
-  color: var(--text-primary);
-}
-
-.pauseTimeLabel {
-  font-family: var(--text-heading-3-font-family);
-  font-size: var(--text-heading-3-font-size);
-}
-
-.pauseTimeValue {
-  font-family: var(--font-family-heading);
-  font-size: var(--font-size-lg);
-  font-weight: var(--text-heading-1-font-weight);
-}
-
-.pauseEndButton{
-  margin: 0;
-  min-width: var(--button-min-width);
-  min-height: var(--button-min-height);
-  border: 2px solid var(--button-secondary-border);
-  /* border: 0; */
-  background-color: var(--button-secondary-bg);
-  padding: var(--button-padding-small-y) var(--button-padding-small-x);
-  color: var(--button-secondary-text);
-  border-radius: var(--button-radius);
-  font-family: var(--button-default-font-family);
-  font-size: var(--button-default-font-size);
-}
-
-.pauseEndButton:hover {
-  background-color: var(--button-secondary-hover-bg);
-  border-color: var(--button-secondary-hover-border);
-  transition: var(--button-default-transition);
-}
-
-.sideNavLink {
-  /* padding: 0 0 0 var(--space-12); */
-  padding: 0;
-  margin: 0 0 0 var(--space-12);
-  height: 36px;
-  border: none;
-  background-color: transparent;
-  color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  gap: var(--space-12);
-  font-family: var(--text-navigation-default-font-family);
-  font-size: var(--text-navigation-default-font-size);
-  font-weight: var(--text-navigation-default-font-weight);
-  line-height: var(--text-navigation-default-line-height);
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
-}
-
-.sideNav.collapsed .sideNavLink{
-  justify-content: center;
-  padding-left: 0;
-}
-
-.sideNav.collapsed .sideNavIcon{
-  margin: 0;
-}
-
-.sideNavLabel{
-  display: inline-block;
-  transition: opacity 0.2s linear;
-}
-
-.sideNav.collapsed .sideNavLabel{
-  opacity: 0;
-  width: 0;
-}
-
-.sideNavLink:hover {
-  font-family: var(--text-navigation-hover-font-family);
-  font-weight: var(--text-navigation-hover-font-weight);
-  font-size: var(--text-navigation-hover-font-size);
-  line-height: var(--text-navigation-hover-line-height);
-
-  .sideNavIcon {
-    color: var(--text-navigation-hover-color);
+  .sideNavIcon svg {
+    width: 100%;
+    height: 100%;
   }
-}
 
-.sideNavLink.active {
-  font-weight: var(--text-navigation-active-font-weight);
-  font-size: var(--text-navigation-active-font-size);
-  line-height: var(--text-navigation-active-line-height);
-  gap: var(--space-8);
+  .sideNavBottom {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-20);
+    height: fit-content;
+    padding: 0 0 var(--space-20);
+  }
 
-  .sideNavIcon {
-    color: var(--text-navigation-active-color);
+  .premiumButton {
+    margin: 0 0 0 var(--space-12);
+    border: 2px solid var(--primary-700);
+    background-color: var(--brand-primary);
+    color: var(--text-on-dark);
+    border-radius: var(--button-radius);
+    font-family: var(--button-default-font-family);
+    font-size: var(--text-navigation-default-font-size);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--text-navigation-default-line-height);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-8);
+    padding: var(--space-4) var(--space-48) var(--space-4) var(--space-4);
+  }
+
+  .sideNav.collapsed .premiumButton {
+    padding: var(--space-4);
+    border-radius: 8px;
+    width: 48px;
+    height: 42px;
+    display: inline-block;
+    margin: 0;
+  }
+
+  .premiumButton svg {
+    width: var(--icon-size-32);
+    height: var(--icon-size-32);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .premiumButton:hover {
+    font-weight: var(--font-weight-bold);
+    font-size: var(--text-navigation-active-font-size);
+    line-height: var(--text-navigation-active-line-height);
+    gap: var(--space-8);
+  }
+
+  .premiumButton:hover svg {
     width: var(--icon-size-36);
     height: var(--icon-size-36);
   }
-}
 
-.sideNavIcon {
-  width: var(--icon-size-32);
-  height: var(--icon-size-32);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
+  .premiumButton:active {
+    font-weight: var(--text-navigation-active-font-weight);
+    font-size: var(--text-navigation-active-font-size);
+    line-height: var(--text-navigation-active-line-height);
+    gap: var(--space-8);
+  }
 
-.sideNavIcon svg {
-  width: 100%;
-  height: 100%;
-}
-
-.sideNavBottom {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-20);
-  height: fit-content;
-  padding: 0 0 var(--space-20);
-}
-
-.sideNav.collapsed .sideNavBottom{
-  align-items: center;
-}
-
-.premiumButton {
-  margin: 0 0 0 var(--space-12);
-  border: 2px solid var(--primary-700);
-  background-color: var(--brand-primary);
-  color: var(--text-on-dark);
-  border-radius: var(--button-radius);
-  font-family: var(--button-default-font-family);
-  font-size: var(--text-navigation-default-font-size);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--text-navigation-default-line-height);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-8);
-  padding: var(--space-4) var(--space-48) var(--space-4) var(--space-4);
-}
-
-.sideNav.collapsed .premiumButton{
-  padding: var(--space-4);
-  border-radius: 8px;
-  width: 48px;
-  height: 42px;
-  display: inline-block;
-  margin: 0;
-}
-
-.premiumButton svg {
-  width: var(--icon-size-32);
-  height: var(--icon-size-32);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.premiumButton:hover {
-  font-weight: var(--font-weight-bold);
-  font-size: var(--text-navigation-active-font-size);
-  line-height: var(--text-navigation-active-line-height);
-  gap: var(--space-8);
-}
-
-.premiumButton:hover svg {
-  width: var(--icon-size-36);
-  height: var(--icon-size-36);
-}
-
-.premiumButton:active{
-  font-weight: var(--text-navigation-active-font-weight);
-  font-size: var(--text-navigation-active-font-size);
-  line-height: var(--text-navigation-active-line-height);
-  gap: var(--space-8);
-}
-
-.settingsLink:active svg {
-  color: var(--text-navigation-active-color);
-  width: 36px;
-  height: 36px;
-}
+  .settingsLink:active svg {
+    color: var(--text-navigation-active-color);
+    width: 36px;
+    height: 36px;
+  }
