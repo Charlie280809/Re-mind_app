@@ -1,11 +1,11 @@
-import { getApiBaseUrl, readJsonResponse } from "./apiBaseUrl";
+import { fetchWithApiError, readJsonResponse } from "./apiBaseUrl";
 
 export async function fetchProfile(apiBaseUrl, accessToken) {
-    const response = await fetch(`${apiBaseUrl}/profile/me`, {
+    const response = await fetchWithApiError(`${apiBaseUrl}/profile/me`, {
         headers: {
             Authorization: `Bearer ${accessToken}`,
         },
-    });
+    }, (detail) => `Kan backend niet bereiken op ${apiBaseUrl}/profile/me. Controleer of de backend draait en of VITE_API_BASE_URL klopt. ${detail ? `(${detail})` : ""}`);
 
     const payload = await readJsonResponse(response, (snippet) => `Backend antwoordde niet met JSON op ${apiBaseUrl}/profile/me (status ${response.status}). Controleer VITE_API_BASE_URL en of backend draait op poort 3000. Respons: ${snippet}`);
 
@@ -90,11 +90,11 @@ export async function incrementWorkSessionCounter(apiBaseUrl, accessToken, colum
 }
 
 export async function fetchLatestWorkSessionBreaks(apiBaseUrl, accessToken) {
-    const response = await fetch(`${apiBaseUrl}/work-sessions/breaks/latest`, {
+    const response = await fetchWithApiError(`${apiBaseUrl}/work-sessions/breaks/latest`, {
         headers: {
             Authorization: `Bearer ${accessToken}`,
         },
-    });
+    }, (detail) => `Kan backend niet bereiken op ${apiBaseUrl}/work-sessions/breaks/latest. Controleer of de backend draait en of VITE_API_BASE_URL klopt. ${detail ? `(${detail})` : ""}`);
 
     const body = await readJsonResponse(response, (snippet) => snippet || "Kon pauze-overzicht niet laden.");
 
