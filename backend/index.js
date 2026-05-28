@@ -111,7 +111,7 @@ function buildDailyReportPayload({ localDate, totals, pauseTotals, totalCheckins
 }
 
 const WORK_SESSION_SELECT = "id, start_tijd, eind_tijd, source, source_details, server_scheduled_day, total_pausetime, breaks_taken, breaks_skipped";
-const WORKDAY_TASK_SELECT = "id, user_id, task_date, task_text, is_done, done_at, sort_order, created_at, updated_at";
+const WORKDAY_TASK_SELECT = "id, user_id, task_date, task_text, is_done";
 
 // --- report data ---
 
@@ -709,8 +709,7 @@ app.get("/workday-tasks/overview", async (req, res) => {
     .from("workday_tasks")
     .select(WORKDAY_TASK_SELECT)
     .eq("user_id", userData.user.id)
-    .in("task_date", [todayDate, tomorrowDate])
-    .order("created_at", { ascending: true });
+    .in("task_date", [todayDate, tomorrowDate]);
 
   if (taskError) {
     return res.status(500).json({
@@ -839,7 +838,6 @@ app.patch("/workday-tasks/:id", async (req, res) => {
 
   if (typeof req.body?.is_done === "boolean") {
     updates.is_done = req.body.is_done;
-    updates.done_at = req.body.is_done ? new Date().toISOString() : null;
   }
 
   if (Object.keys(updates).length === 0) {
