@@ -110,7 +110,7 @@ export default function WorkTimerCard({
           {finished && (
             <>
               <div className="finishedText">Je bent klaar voor vandaag!</div>
-              <button className="btn" onClick={onOpenWorkdayTasks} type="button">
+              <button className="btn" onClick={() => onOpenWorkdayTasks("tomorrow")} type="button">
                 Notitie invullen
               </button>
             </>
