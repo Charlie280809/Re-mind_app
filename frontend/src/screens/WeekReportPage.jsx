@@ -2,6 +2,7 @@ import "../css/WeekReportPage.css";
 import { LuChevronLeft, LuChevronRight, LuSparkles, LuClock3 } from "react-icons/lu";
 import { HiOutlineTrendingUp } from "react-icons/hi";
 import { TbActivityHeartbeat, TbZzz } from "react-icons/tb";
+import smallLoader from "../components/SmallLoader";
 
 const stressEnergyData = [
     { day: "Ma", stress: 4.8, energy: 4.0 },
