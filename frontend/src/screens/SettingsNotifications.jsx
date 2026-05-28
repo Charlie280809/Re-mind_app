@@ -9,7 +9,6 @@ function createDefaultNotificationState() {
         notificationsEnabled: true,
         checkInEnabled: true,
         suggestFavoritesEnabled: false,
-        endOfDayNoteEnabled: true,
     };
 }
 
@@ -43,7 +42,7 @@ export default function SettingsNotifications({ onBack }) {
 
             const { data: settingsRow, error: settingsError } = await supabase
                 .from("settings")
-                .select("checkin_notifications_on, favorite_pauses_suggest_on, afsluitnotitie_popup_on")
+                .select("checkin_notifications_on, favorite_pauses_suggest_on")
                 .eq("user_id", data.user.id)
                 .maybeSingle();
 
@@ -178,7 +177,7 @@ export default function SettingsNotifications({ onBack }) {
                 <div className="row notificationRow">
                     <div className="label">
                         <div className="notificationTitle">Check-in meldingen inschakelen</div>
-                        <div className="notificationDescription">Ontvange meldingen die doorheen de dag naar je stress en energie vragen. Deze meldingen zijn nodig om data te verzamelen voor het dag-/weekrapport.</div>
+                        <div className="notificationDescription">Ontvang meldingen die doorheen de dag naar je stress en energie vragen. Deze meldingen zijn nodig om data te verzamelen voor het dag-/weekrapport.</div>
                     </div>
                     <div className="value">
                         <button
@@ -211,28 +210,6 @@ export default function SettingsNotifications({ onBack }) {
                                 setNotificationSettings((prev) => ({
                                     ...prev,
                                     suggestFavoritesEnabled: !prev.suggestFavoritesEnabled,
-                                }))
-                            }
-                        >
-                            <span className="knob" />
-                        </button>
-                    </div>
-                </div>
-
-                <div className="row notificationRow">
-                    <div className="label">
-                        <div className="notificationTitle">Afsluitnotitie invullen</div>
-                        <div className="notificationDescription">Op het einde van je werkdag kan je een ‘afsluitnotitie’ voor jezelf invullen.</div>
-                    </div>
-                    <div className="value">
-                        <button
-                            className="toggle"
-                            type="button"
-                            aria-pressed={notificationSettings.endOfDayNoteEnabled}
-                            onClick={() =>
-                                setNotificationSettings((prev) => ({
-                                    ...prev,
-                                    endOfDayNoteEnabled: !prev.endOfDayNoteEnabled,
                                 }))
                             }
                         >
