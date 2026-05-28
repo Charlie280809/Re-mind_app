@@ -6,12 +6,7 @@ import { TbCrown } from "react-icons/tb";
 import PremiumModal from "../components/PremiumModal";
 import SmallLoader from "../components/SmallLoader";
 import { fetchTodayReport } from "../api/reportApi";
-
-const dateOptions = { day: "numeric", month: "long", year: "numeric" };
-
-function formatDate(date = new Date()) {
-    return new Intl.DateTimeFormat("nl-BE", dateOptions).format(date);
-}
+import { formatReportDate } from "../lib/dateFormat";
 
 function formatDateKey(date = new Date()) {
     const year = date.getFullYear();
@@ -74,7 +69,7 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
     const reportTitle = (() => {
         const reportDate = new Date(`${selectedReportDate}T00:00:00`);
         const safeDate = Number.isNaN(reportDate.getTime()) ? new Date() : reportDate;
-        return `Rapport van ${formatDate(safeDate)}`;
+        return `Rapport van ${formatReportDate(safeDate)}`;
     })();
 
     const avgStressLabel = report?.averageStress == null ? "-" : `${report.averageStress}/5`;
