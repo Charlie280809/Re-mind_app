@@ -42,6 +42,22 @@ function getReportRange(dateInput) {
   };
 }
 
+function getWeekRange(dateInput) {
+  const baseDate = typeof dateInput === "string" && /^\d{4}-\d{2}-\d{2}$/.test(dateInput) ? new Date(`${dateInput}T00:00:00`) : new Date();
+  const start = new Date(baseDate);
+  start.setHours(0, 0, 0, 0);
+  start.setDate(start.getDate() - ((start.getDay() + 6) % 7));
+
+  const end = new Date(start);
+  end.setDate(end.getDate() + 7);
+
+  return {
+    startIso: start.toISOString(),
+    endIso: end.toISOString(),
+    localStartDate: `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, "0")}-${String(start.getDate()).padStart(2, "0")}`,
+  };
+}
+
 function getTodayRange() {
   return getReportRange();
 }
@@ -64,6 +80,14 @@ function formatSecondsAsDuration(totalSeconds) {
   const seconds = safeSeconds % 60;
 
   return `${minutes} minuten ${seconds} seconden`;
+}
+
+function formatSecondsAsHoursAndMinutes(totalSeconds) {
+  const safeSeconds = Math.max(0, Math.floor(Number(totalSeconds) || 0));
+  const hours = Math.floor(safeSeconds / 3600);
+  const minutes = Math.floor((safeSeconds % 3600) / 60);
+
+  return `${hours} uur en ${minutes} minuten`;
 }
 
 function summarizeDailyWorkSessions(workSessions) {
@@ -204,6 +228,55 @@ app.get("/report/today", async (req, res) => {
       totalCheckins,
     })
   );
+});
+
+app.get("/report/week", async (req, res) => {
+  if (!supabase) {
+    return res.status(500).json({
+      error: "Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in backend/.env.",
+    });
+  }
+
+  const token = getBearerToken(req);
+
+  if (!token) {
+    return res.status(401).json({
+      error: "Missing Bearer token.",
+    });
+  }
+
+  const { data: userData, error: userError } = await supabase.auth.getUser(token);
+
+  if (userError || !userData?.user) {
+    return res.status(401).json({
+      error: "Invalid or expired session.",
+    });
+  }
+
+  const userId = userData.user.id;
+  const requestedDate = typeof req.query?.date === "string" ? req.query.date : undefined;
+  const { startIso, endIso, localStartDate } = getWeekRange(requestedDate);
+
+  const { data: workSessions, error: workSessionError } = await supabase
+    .from("work_sessions")
+    .select("breaks_taken, breaks_skipped, total_pausetime, start_tijd, eind_tijd")
+    .eq("user_id", userId)
+    .gte("start_tijd", startIso)
+    .lt("start_tijd", endIso);
+
+  if (workSessionError) {
+    return res.status(500).json({
+      error: "Failed to load weekly work session data from Supabase.",
+      details: workSessionError.message,
+    });
+  }
+
+  const pauseTotals = summarizeDailyWorkSessions(workSessions);
+
+  return res.json({
+    date: localStartDate,
+    totalWorkTime: formatSecondsAsHoursAndMinutes(pauseTotals.totalWorkSeconds),
+  });
 });
 
 // --- check-ins ---

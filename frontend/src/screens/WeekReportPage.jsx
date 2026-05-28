@@ -1,8 +1,11 @@
 import "../css/WeekReportPage.css";
-import { LuChevronLeft, LuChevronRight, LuSparkles, LuClock3 } from "react-icons/lu";
+import { useEffect, useState } from "react";
+import { LuChevronLeft, LuChevronRight, LuSparkles, LuClock3, LuBatteryCharging  } from "react-icons/lu";
 import { HiOutlineTrendingUp } from "react-icons/hi";
 import { TbActivityHeartbeat, TbZzz } from "react-icons/tb";
-import smallLoader from "../components/SmallLoader";
+import { formatWeekRange, getEndOfWeek, getStartOfWeek } from "../lib/dateFormat";
+import SmallLoader from "../components/SmallLoader";
+import { fetchWeekReport } from "../api/reportApi";
 
 const stressEnergyData = [
     { day: "Ma", stress: 4.8, energy: 4.0 },
@@ -66,21 +69,95 @@ function buildLinePath(values) {
         .join(" ");
 }
 
-export default function WeekReportPage() {
+function formatDateKey(date = new Date()) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+}
+
+export default function WeekReportPage({ accessToken }) {
+    const [selectedWeekStart, setSelectedWeekStart] = useState(() => getStartOfWeek(new Date()));
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+    const [report, setReport] = useState(null);
     const stressPath = buildLinePath(stressEnergyData.map((item) => item.stress));
     const energyPath = buildLinePath(stressEnergyData.map((item) => item.energy));
+    const currentWeekStart = getStartOfWeek(new Date());
+    const isCurrentWeek = selectedWeekStart.getTime() >= currentWeekStart.getTime();
+    const weekTitle = `Weekrapport van ${formatWeekRange(selectedWeekStart, getEndOfWeek(selectedWeekStart))}`;
+
+    useEffect(() => {
+        async function loadWeekReport() {
+            setLoading(true);
+            setError("");
+
+            try {
+                const reportData = await fetchWeekReport(accessToken, formatDateKey(selectedWeekStart));
+                setReport(reportData);
+            } catch (err) {
+                setError(err.message || "Kon het weekrapport niet ophalen.");
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        loadWeekReport();
+    }, [accessToken, selectedWeekStart]);
+
+    function handlePreviousWeek() {
+        setSelectedWeekStart((currentDate) => {
+            const nextDate = new Date(currentDate);
+            nextDate.setDate(nextDate.getDate() - 7);
+            return getStartOfWeek(nextDate);
+        });
+    }
+
+    function handleNextWeek() {
+        if (isCurrentWeek) {
+            return;
+        }
+
+        setSelectedWeekStart((currentDate) => {
+            const nextDate = new Date(currentDate);
+            nextDate.setDate(nextDate.getDate() + 7);
+            return getStartOfWeek(nextDate);
+        });
+    }
+
+    if (loading) {
+        return (
+            <main className="weekReportPage">
+                <header className="weekReportHeader">
+                    <div className="weekReportTitleGroup">
+                        <button className="weekReportNavButton" type="button" aria-label="Vorige week" onClick={handlePreviousWeek}>
+                            <LuChevronLeft />
+                        </button>
+
+                        <h2 className="weekReportTitle">{weekTitle}</h2>
+
+                        <button className="weekReportNavButton" type="button" aria-label="Volgende week" onClick={handleNextWeek} disabled={isCurrentWeek}>
+                            <LuChevronRight />
+                        </button>
+                    </div>
+                </header>
+
+                <SmallLoader message="Weekrapport wordt geladen..." />
+            </main>
+        );
+    }
 
     return (
         <main className="weekReportPage">
             <header className="weekReportHeader">
                 <div className="weekReportTitleGroup">
-                    <button className="weekReportNavButton" type="button" aria-label="Vorige week">
+                    <button className="weekReportNavButton" type="button" aria-label="Vorige week" onClick={handlePreviousWeek}>
                         <LuChevronLeft />
                     </button>
 
-                    <h2 className="weekReportTitle">Weekrapport van 08-12 tot 14-12</h2>
+                    <h2 className="weekReportTitle">{weekTitle}</h2>
 
-                    <button className="weekReportNavButton" type="button" aria-label="Volgende week">
+                    <button className="weekReportNavButton" type="button" aria-label="Volgende week" onClick={handleNextWeek} disabled={isCurrentWeek}>
                         <LuChevronRight />
                     </button>
                 </div>
@@ -89,7 +166,7 @@ export default function WeekReportPage() {
             <section className="weekReportTopGrid" aria-label="Weekoverzicht">
                 <article className="weekReportStatBlock">
                     <h3 className="weekReportSectionTitle">Totale werktijd</h3>
-                    <p className="weekReportValueCard">38 uur en 12 minuten</p>
+                    <p className="weekReportValueCard">{report?.totalWorkTime || "0 uur en 0 minuten"}</p>
                 </article>
 
                 <article className="weekReportChartBlock">
@@ -146,7 +223,7 @@ export default function WeekReportPage() {
                             <div className="weekReportDivider" aria-hidden="true" />
 
                             <div className="weekReportStatItem">
-                                <TbActivityHeartbeat className="weekReportStatIcon" />
+                                <LuBatteryCharging className="weekReportStatIcon" />
                                 <span className="weekReportStatLabel">Gemiddelde energie</span>
                                 <strong className="weekReportStatValue weekReportStatValueEnergy">3.2/5</strong>
                             </div>
@@ -183,6 +260,8 @@ export default function WeekReportPage() {
 
             <section className="weekReportSection weekReportInsightsSection">
                 <h3 className="weekReportSectionTitle">Inzichten van afgelopen week</h3>
+
+                {error ? <p className="weekReportSectionMeta">Fout: {error}</p> : null}
 
                 <article className="weekReportInsightsCard">
                     <div className="weekReportTimeline" aria-hidden="true" />

@@ -894,7 +894,7 @@ export default function App() {
           onNavigateToUpgrade={() => setCurrentPage("upgrade")}
         />
       ) : currentPage === "weekreport" ? (
-        <WeekReportPage />
+        <WeekReportPage accessToken={session?.access_token} />
       ) : currentPage === "profile" ? (
         <ProfilePage
           profile={profile}
