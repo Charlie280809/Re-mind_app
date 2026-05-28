@@ -119,40 +119,9 @@
     transition: var(--button-default-transition);
 }
 
-.settingsLoading {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-16);
-    font-family: var(--text-body-regular-font-family);
-    font-size: var(--text-body-regular-font-size);
-    font-weight: var(--font-weight-semibold);
-    color: var(--text-primary);
-}
-
-.settingsLoading img {
-    width: var(--space-48);
-    height: auto;
-    object-fit: contain;
-    animation: loadingSpin 1.2s linear infinite;
-    transform-origin: center;
-}
-
-@keyframes loadingSpin {
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
-}
-
 /* === Other pages === */
-
 /* --- Work hours Page --- */
 .workhoursContent {
-    /* max-width: 820px; */
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -244,7 +213,6 @@
 }
 
 .value input {
-    /* margin: 0; */
     width: fit-content;
     padding: var(--space-4);
     border-radius: 10px;
@@ -317,7 +285,6 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    /* justify-content: center; */
     gap: var(--space-32);
     font-family: var(--text-body-regular-font-family);
     font-size: var(--text-body-regular-font-size);
@@ -452,10 +419,8 @@
 
 .personalFields {
     width: fit-content;
-    /* width: min(520px, 100%); */
     display: flex;
     flex-direction: column;
-    /* align-items: flex-start; */
     gap: var(--space-24);
 }
 
@@ -497,7 +462,6 @@
 }
 
 .personalFieldInput {
-    /* width: 100%; */
     width: 360px;
     padding: var(--space-4) var(--space-8);
     padding-right: calc(var(--space-8) + var(--icon-size-32) + var(--space-8));
@@ -545,7 +509,7 @@
 }
 
 .personalPasswordChangeIcon {
-    /* margin: var(--space-4) 0 0 var(--space-4); */
+    margin: 0 0 var(--space-4) var(--space-4);
     font-size: var(--font-size-md);
     color: var(--primary-700);
 }
@@ -749,23 +713,6 @@
     bottom: var(--layout-container-padding);
 }
 
-/* @media (max-width: 720px) {
-    .personalFieldRow {
-        justify-content: flex-start;
-        flex-wrap: wrap;
-    }
-
-    .personalFieldLabel {
-        min-width: 120px;
-        text-align: left;
-    }
-
-    .personalSaveButton {
-        position: static;
-        margin-left: auto;
-    }
-} */
-
 /* --- Privacy Page --- */
 .privacyContent {
     width: 100%;
@@ -879,39 +826,3 @@
     box-shadow: var(--button-default-hover-shadow);
     transition: var(--button-default-transition);
 }
-
-/* @media (max-width: 720px) {
-    .personalFieldRow {
-        justify-content: flex-start;
-        flex-wrap: wrap;
-    }
-
-    .personalFieldLabel {
-        min-width: 120px;
-        text-align: left;
-    }
-
-    .personalPasswordChangeButton {
-        align-self: flex-start;
-    }
-
-    .passwordModal {
-        border-radius: 24px;
-        padding: var(--space-20);
-        gap: var(--space-24);
-    }
-
-    .passwordModalTitle {
-        font-size: 1.8rem;
-    }
-
-    .passwordModalField input {
-        min-height: 60px;
-        border-radius: 14px;
-    }
-
-    .passwordModalSubmitButton {
-        min-width: 220px;
-        font-size: 1.4rem;
-    }
-} */
