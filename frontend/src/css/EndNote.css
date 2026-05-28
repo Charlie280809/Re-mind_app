@@ -1,0 +1,149 @@
+.endNoteOverlay {
+	position: fixed;
+	inset: 0;
+	z-index: 1200;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: var(--space-16);
+	background-color: var(--backdrop-darken);
+	backdrop-filter: var(--backdrop-blur-4);
+}
+
+.endNoteModal {
+	position: relative;
+	width: min(640px, calc(100vw - 32px));
+	border-radius: var(--popupcard-border-radius);
+	padding: var(--space-32);
+	background: var(--surface-card);
+	box-shadow: var(--popupcard-box-shadow);
+	color: var(--text-primary);
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-24);
+}
+
+.endNoteCloseButton {
+	position: absolute;
+	top: var(--space-20);
+	right: var(--space-20);
+	padding: 0;
+	border: none;
+	background: transparent;
+	color: var(--text-primary);
+	font-size: var(--close-button-size);
+	cursor: pointer;
+}
+
+.endNoteHeader {
+	padding-right: var(--space-32);
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-8);
+}
+
+.endNoteTitle {
+	margin: 0;
+	font-family: var(--text-heading-2-font-family);
+	font-size: var(--text-heading-2-font-size);
+	line-height: var(--text-heading-2-line-height);
+	font-weight: var(--text-heading-2-font-weight);
+}
+
+.endNoteSubtitle {
+	margin: 0;
+	font-family: var(--text-body-regular-font-family);
+	font-size: var(--text-body-regular-font-size);
+	line-height: var(--text-body-regular-line-height);
+	color: var(--text-secondary);
+}
+
+.endNoteIcon{
+    width: var(--icon-size-24);
+    height: var(--icon-size-24);
+}
+
+.endNoteForm {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-16);
+}
+
+.endNoteTextarea {
+	width: 100%;
+	resize: vertical;
+	min-height: 200px;
+	border: var(--input-border-width) var(--input-border-style) var(--input-border-color);
+	border-radius: var(--input-border-radius);
+	padding: var(--layout-input-padding-y) var(--layout-input-padding-x);
+	background: var(--background-100);
+	color: var(--text-primary);
+	font-family: var(--text-input-value-font-family);
+	font-size: var(--text-input-value-font-size);
+	line-height: var(--text-input-value-line-height);
+	outline: none;
+	transition: var(--input-transition);
+}
+
+.endNoteTextarea::placeholder {
+	color: var(--text-placeholder);
+}
+
+.endNoteTextarea:focus {
+	border-color: var(--border-color-brand);
+	box-shadow: var(--input-focus-box-shadow);
+}
+
+.endNoteTextarea:disabled {
+	opacity: var(--opacity-disabled);
+	cursor: not-allowed;
+}
+
+.endNoteError {
+	margin: 0;
+	color: var(--text-error);
+	font-family: var(--text-body-regular-font-family);
+	font-size: var(--font-size-xs);
+	line-height: var(--text-body-regular-line-height);
+}
+
+.endNoteActions {
+	display: flex;
+	justify-content: flex-end;
+}
+
+.endNotePrimaryButton {
+	min-width: 140px;
+	padding: var(--button-padding-y) var(--button-padding-x);
+	border-radius: var(--button-radius);
+	border: 2px solid var(--button-primary-border);
+	background-color: var(--button-primary-bg);
+	color: var(--button-primary-text);
+	font-family: var(--button-default-font-family);
+	font-size: var(--button-default-font-size);
+	font-weight: var(--button-primary-font-weight);
+	cursor: pointer;
+	transition: var(--button-default-transition);
+}
+
+.endNotePrimaryButton:hover:not(:disabled) {
+	background-color: var(--button-primary-hover-bg);
+	border-color: var(--button-primary-hover-border);
+	box-shadow: var(--button-default-hover-shadow);
+}
+
+.endNotePrimaryButton:disabled {
+	opacity: var(--opacity-disabled);
+	cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+	.endNoteModal {
+		width: 100%;
+		padding: var(--space-24);
+	}
+
+	.endNoteHeader {
+		padding-right: var(--space-24);
+	}
+}

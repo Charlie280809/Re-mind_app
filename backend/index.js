@@ -99,6 +99,8 @@ function buildDailyReportPayload({ localDate, totals, pauseTotals, totalCheckins
   };
 }
 
+const WORK_SESSION_SELECT = "id, start_tijd, eind_tijd, end_note, source, source_details, server_scheduled_day, total_pausetime, breaks_taken, breaks_skipped";
+
 // --- report data ---
 
 app.get("/report/today", async (req, res) => {
@@ -267,7 +269,7 @@ app.get("/work-sessions/today/latest", async (req, res) => {
 
   const { data: latestSession, error: sessionError } = await supabase
     .from("work_sessions")
-    .select("id, start_tijd, eind_tijd, source, source_details, server_scheduled_day, total_pausetime, breaks_taken, breaks_skipped")
+    .select(WORK_SESSION_SELECT)
     .eq("user_id", userData.user.id)
     .gte("start_tijd", startIso)
     .lt("start_tijd", endIso)
@@ -328,7 +330,7 @@ app.post("/work-sessions/start", async (req, res) => {
 
   const { data: latestSession, error: sessionError } = await supabase
     .from("work_sessions")
-    .select("id, start_tijd, eind_tijd, source, source_details, server_scheduled_day, total_pausetime, breaks_taken, breaks_skipped")
+    .select(WORK_SESSION_SELECT)
     .eq("user_id", userData.user.id)
     .gte("start_tijd", startIso)
     .lt("start_tijd", endIso)
@@ -362,7 +364,7 @@ app.post("/work-sessions/start", async (req, res) => {
       },
       server_scheduled_day: source === "server_scheduled" ? serverScheduledDay : null,
     })
-    .select("id, start_tijd, eind_tijd, source, source_details, server_scheduled_day, total_pausetime, breaks_taken, breaks_skipped")
+    .select(WORK_SESSION_SELECT)
     .single();
 
   if (insertError) {
@@ -400,9 +402,10 @@ app.post("/work-sessions/end", async (req, res) => {
     });
   }
 
-  const requestedEndTime = typeof req.body?.eind_tijd === "string" ? new Date(req.body.eind_tijd) : new Date();
+  const requestedEndTime = typeof req.body?.eind_tijd === "string" ? new Date(req.body.eind_tijd) : null;
+  const requestedEndNote = typeof req.body?.end_note === "string" ? req.body.end_note.trim() : null;
 
-  if (Number.isNaN(requestedEndTime.getTime())) {
+  if (requestedEndTime && Number.isNaN(requestedEndTime.getTime())) {
     return res.status(400).json({
       error: "Invalid end time.",
     });
@@ -410,16 +413,18 @@ app.post("/work-sessions/end", async (req, res) => {
 
   const { startIso, endIso } = getTodayRange();
 
-  const { data: latestSession, error: sessionError } = await supabase
+  const sessionQuery = supabase
     .from("work_sessions")
-    .select("id, start_tijd, eind_tijd, source, source_details, server_scheduled_day, total_pausetime, breaks_taken, breaks_skipped")
+    .select(WORK_SESSION_SELECT)
     .eq("user_id", userData.user.id)
     .gte("start_tijd", startIso)
     .lt("start_tijd", endIso)
-    .is("eind_tijd", null)
     .order("start_tijd", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+    .limit(1);
+
+  const { data: latestSession, error: sessionError } = requestedEndTime
+    ? await sessionQuery.is("eind_tijd", null).maybeSingle()
+    : await sessionQuery.not("eind_tijd", "is", null).maybeSingle();
 
   if (sessionError) {
     return res.status(500).json({
@@ -429,18 +434,14 @@ app.post("/work-sessions/end", async (req, res) => {
   }
 
   if (!latestSession?.id) {
-    return res.status(404).json({
-      error: "No open work session found for the signed-in user.",
-    });
+    return res.status(404).json({ error: requestedEndTime ? "No open work session found for the signed-in user." : "No closed work session found for the signed-in user." });
   }
 
   const { data: updatedSession, error: updateError } = await supabase
     .from("work_sessions")
-    .update({
-      eind_tijd: requestedEndTime.toISOString(),
-    })
+    .update(requestedEndTime ? { eind_tijd: requestedEndTime.toISOString(), ...(requestedEndNote !== null ? { end_note: requestedEndNote || null } : {}) } : { end_note: requestedEndNote || null })
     .eq("id", latestSession.id)
-    .select("id, start_tijd, eind_tijd, source, source_details, server_scheduled_day, total_pausetime, breaks_taken, breaks_skipped")
+    .select(WORK_SESSION_SELECT)
     .single();
 
   if (updateError) {

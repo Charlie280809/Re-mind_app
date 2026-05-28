@@ -58,6 +58,7 @@ export default function WorkTimerCard({
   endDay,
   takeBreak,
   endBreak,
+  onOpenEndNote,
   dayTargetSeconds = 8 * 60,
 }) {
   const mainTime = useMemo(() => formatTime(workSeconds), [workSeconds]);
@@ -109,7 +110,7 @@ export default function WorkTimerCard({
           {finished && (
             <>
               <div className="finishedText">Je bent klaar voor vandaag!</div>
-              <button className="btn" onClick={() => alert("Reflectie (demo)")} type="button"> {/* afsluitnotitie */}
+              <button className="btn" onClick={onOpenEndNote} type="button">
                 Afsluitnotitie invullen
               </button>
             </>

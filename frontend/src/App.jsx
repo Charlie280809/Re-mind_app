@@ -12,6 +12,7 @@ import CheckInModal from "./components/CheckInModal";
 import PauseReminderModal from "./components/PauseReminderModal";
 import FavoriteRemovalModal from "./components/FavoriteRemovalModal";
 import PremiumModal from "./components/PremiumModal";
+import EndNote from "./components/EndNote";
 import LoginPage from "./screens/LoginPage";
 import SignupPage from "./screens/SignupPage";
 import Settings from "./screens/Settings";
@@ -122,6 +123,10 @@ export default function App() {
   const [favoriteRemovalTarget, setFavoriteRemovalTarget] = useState(null);
   const [favoriteLimitModalOpen, setFavoriteLimitModalOpen] = useState(false);
   const [pauseSummaryCounts, setPauseSummaryCounts] = useState({ breaks_taken: 0, breaks_skipped: 0 });
+  const [endNoteOpen, setEndNoteOpen] = useState(false);
+  const [endNoteValue, setEndNoteValue] = useState("");
+  const [endNoteSaving, setEndNoteSaving] = useState(false);
+  const [endNoteError, setEndNoteError] = useState("");
   const sessionUserId = session?.user?.id || null;
 
   // Persistent work timer state lifted here so the timer keeps running
@@ -345,6 +350,10 @@ export default function App() {
     setBreakSeconds(0);
     setShowPauseReminderModal(false);
     setNextPauseReminderTriggerWorkSecond(null);
+    setEndNoteOpen(false);
+    setEndNoteValue("");
+    setEndNoteSaving(false);
+    setEndNoteError("");
   };
 
   const applyWorkSessionState = (workSession) => {
@@ -357,6 +366,7 @@ export default function App() {
     setBreakSeconds(0);
     setShowPauseReminderModal(false);
     setNextPauseReminderTriggerWorkSecond(workSession.eind_tijd ? null : elapsedSeconds + pauseReminderIntervalSeconds);
+    setEndNoteValue(typeof workSession.end_note === "string" ? workSession.end_note : "");
   };
 
   useEffect(() => {
@@ -610,6 +620,43 @@ export default function App() {
     setNextPauseReminderTriggerWorkSecond(workSeconds + pauseReminderIntervalSeconds);
   };
 
+  const openEndNoteModal = () => {
+    setEndNoteError("");
+    setEndNoteOpen(true);
+  };
+
+  const closeEndNoteModal = () => {
+    if (endNoteSaving) {
+      return;
+    }
+
+    setEndNoteError("");
+    setEndNoteOpen(false);
+  };
+
+  const handleSaveEndNote = async () => {
+    if (!session?.access_token) {
+      return;
+    }
+
+    setEndNoteSaving(true);
+    setEndNoteError("");
+
+    try {
+      const savedSession = await endWorkSession(apiBaseUrl, session.access_token, { end_note: endNoteValue });
+
+      if (savedSession) {
+        setEndNoteValue(typeof savedSession.end_note === "string" ? savedSession.end_note : "");
+      }
+
+      setEndNoteOpen(false);
+    } catch (error) {
+      setEndNoteError(error.message || "Kon afsluitnotitie niet opslaan.");
+    } finally {
+      setEndNoteSaving(false);
+    }
+  };
+
   const handlePauseReminderDismiss = () => {
     incrementWorkSessionCounterOnServer("breaks_skipped");
     closePauseReminderModal();
@@ -817,6 +864,15 @@ export default function App() {
         workSeconds={workSeconds}
         checkInNotificationsEnabled={Boolean(workSettings?.checkin_notifications_on)}
       />
+      <EndNote
+        isOpen={endNoteOpen}
+        value={endNoteValue}
+        onChange={setEndNoteValue}
+        onClose={closeEndNoteModal}
+        onSubmit={handleSaveEndNote}
+        isSaving={endNoteSaving}
+        error={endNoteError}
+      />
       {showPauseReminderModal && (
         <PauseReminderModal onDismiss={handlePauseReminderDismiss} onTakeBreak={handlePauseReminderTakeBreak} />
       )}
@@ -949,6 +1005,7 @@ export default function App() {
               endDay={endDay}
               takeBreak={takeBreak}
               endBreak={endBreak}
+                onOpenEndNote={openEndNoteModal}
               dayTargetSeconds={dayTargetSeconds}
             />
           </section>
