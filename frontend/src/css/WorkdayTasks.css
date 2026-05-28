@@ -139,19 +139,6 @@
     cursor: not-allowed;
 }
 
-.workdayTasksDeleteButton {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex: 0 0 auto;
-    border: 2px solid var(--button-primary-border);
-    border-radius: var(--button-radius);
-    background: var(--button-primary-bg);
-    color: var(--button-primary-text);
-    cursor: pointer;
-    transition: var(--button-default-transition);
-}
-
 .workdayTasksAddButton {
     min-width: var(--button-min-width);
     min-height: var(--button-min-height);
@@ -249,15 +236,20 @@
     width: var(--icon-size-36);
     height: var(--icon-size-36);
     border: 2px solid var(--button-red-border);
+    border-radius: var(--button-radius);
     background-color: var(--error-50);
     color: var(--text-secondary);
     font-size: var(--font-size-sm);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
 }
 
 .workdayTasksDeleteButton:hover:not(:disabled) {
     background-color: var(--button-red-bg);
     border-color: var(--border-color-error);
-    color: var(--text-error);
+    color: var(--error-400);
     transition: var(--button-default-transition);
 }
 
