@@ -89,6 +89,65 @@ export async function incrementWorkSessionCounter(apiBaseUrl, accessToken, colum
     return body;
 }
 
+export async function fetchLatestWorkSession(apiBaseUrl, accessToken) {
+    const response = await fetchWithApiError(
+        `${apiBaseUrl}/work-sessions/today/latest`,
+        {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            },
+        },
+        (detail) =>
+            `Kan backend niet bereiken op ${apiBaseUrl}/work-sessions/today/latest. Controleer of de backend draait en of VITE_API_BASE_URL klopt. ${detail ? `(${detail})` : ""}`
+    );
+
+    const body = await readJsonResponse(response, (snippet) => snippet || "Kon werkdag niet laden.");
+
+    if (!response.ok) {
+        throw new Error(body.error || "Kon werkdag niet laden.");
+    }
+
+    return body?.work_session ?? null;
+}
+
+export async function startWorkSession(apiBaseUrl, accessToken, payload) {
+    const response = await fetch(`${apiBaseUrl}/work-sessions/start`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(payload),
+    });
+
+    const body = await readJsonResponse(response, (snippet) => snippet || "Kon werkdag niet starten.");
+
+    if (!response.ok) {
+        throw new Error(body.error || "Kon werkdag niet starten.");
+    }
+
+    return body?.work_session ?? null;
+}
+
+export async function endWorkSession(apiBaseUrl, accessToken, payload) {
+    const response = await fetch(`${apiBaseUrl}/work-sessions/end`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(payload || {}),
+    });
+
+    const body = await readJsonResponse(response, (snippet) => snippet || "Kon werkdag niet beëindigen.");
+
+    if (!response.ok) {
+        throw new Error(body.error || "Kon werkdag niet beëindigen.");
+    }
+
+    return body?.work_session ?? null;
+}
+
 export async function fetchLatestWorkSessionBreaks(apiBaseUrl, accessToken) {
     const response = await fetchWithApiError(`${apiBaseUrl}/work-sessions/breaks/latest`, {
         headers: {

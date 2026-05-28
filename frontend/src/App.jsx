@@ -28,9 +28,12 @@ import { supabase } from "./lib/supabaseClient";
 import { getApiBaseUrl } from "./api/apiBaseUrl";
 import {
   createSignupAccount,
+  endWorkSession,
   fetchLatestWorkSessionBreaks,
+  fetchLatestWorkSession,
   fetchProfile,
   incrementWorkSessionCounter,
+  startWorkSession,
   saveSignupNotifications,
   saveSignupWorkHours,
 } from "./api/backendApi";
@@ -38,6 +41,44 @@ import { calculateWorkdayDurationSeconds } from "./lib/workHours";
 
 const NAV_STATE_STORAGE_KEY = "remind-navigation-state";
 const FREE_FAVORITE_LIMIT = 4;
+
+const LOCAL_TIME_PATTERN = /^\d{2}:\d{2}$/;
+
+const formatLocalDate = (date) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
+const buildLocalDateTime = (timeString, baseDate = new Date()) => {
+  if (typeof timeString !== "string" || !LOCAL_TIME_PATTERN.test(timeString)) {
+    return null;
+  }
+
+  const [hoursPart, minutesPart] = timeString.split(":");
+  const hours = Number.parseInt(hoursPart, 10);
+  const minutes = Number.parseInt(minutesPart, 10);
+
+  if (!Number.isFinite(hours) || !Number.isFinite(minutes)) {
+    return null;
+  }
+
+  const localDateTime = new Date(baseDate);
+  localDateTime.setHours(hours, minutes, 0, 0);
+  return localDateTime;
+};
+
+const getSessionElapsedSeconds = (sessionRow) => {
+  if (!sessionRow?.start_tijd) {
+    return 0;
+  }
+
+  const startTime = new Date(sessionRow.start_tijd);
+  const endTime = sessionRow.eind_tijd ? new Date(sessionRow.eind_tijd) : new Date();
+
+  if (!Number.isFinite(startTime.getTime()) || !Number.isFinite(endTime.getTime())) {
+    return 0;
+  }
+
+  return Math.max(0, Math.floor((endTime.getTime() - startTime.getTime()) / 1000));
+};
 
 const getStoredNavigationState = () => {
   if (typeof window === "undefined") {
@@ -220,7 +261,7 @@ export default function App() {
     const loadWorkSettings = async () => {
       const { data, error } = await supabase
         .from("settings")
-        .select("werk_startuur, werk_einduur, pause_reminder, checkin_notifications_on")
+        .select("werk_startuur, werk_einduur, pause_reminder, checkin_notifications_on, werktimer_autostart")
         .eq("user_id", session.user.id)
         .maybeSingle();
 
@@ -239,6 +280,79 @@ export default function App() {
       isCancelled = true;
     };
   }, [session]);
+
+  useEffect(() => {
+    if (!session?.access_token || !sessionUserId || signupProvisioning || (authView === "signup" && !signupCompleted)) {
+      resetTimerState();
+      return undefined;
+    }
+
+    let isCancelled = false;
+    let autoStartTimeout = null;
+
+    const startSessionOnServer = async (startTime, source) => {
+      const startedSession = await startWorkSession(apiBaseUrl, session.access_token, {
+        start_tijd: startTime.toISOString(),
+        source,
+        server_scheduled_day: source === "server_scheduled" ? formatLocalDate(startTime) : null,
+      });
+
+      if (!isCancelled && startedSession) {
+        applyWorkSessionState(startedSession);
+      }
+    };
+
+    const loadWorkSession = async () => {
+      try {
+        const latestSession = await fetchLatestWorkSession(apiBaseUrl, session.access_token);
+
+        if (isCancelled) {
+          return;
+        }
+
+        if (latestSession?.id) {
+          applyWorkSessionState(latestSession);
+          return;
+        }
+
+        resetTimerState();
+
+        const scheduledStart = buildLocalDateTime(workSettings?.werk_startuur);
+
+        if (!workSettings?.werktimer_autostart || !scheduledStart) {
+          return;
+        }
+
+        const delayUntilStart = scheduledStart.getTime() - Date.now();
+
+        if (delayUntilStart <= 0) {
+          await startSessionOnServer(scheduledStart, "server_scheduled");
+          return;
+        }
+
+        autoStartTimeout = window.setTimeout(() => {
+          startSessionOnServer(scheduledStart, "server_scheduled").catch((error) => {
+            if (!isCancelled) {
+              console.error("Failed to auto-start work session:", error);
+            }
+          });
+        }, delayUntilStart);
+      } catch (error) {
+        if (!isCancelled) {
+          console.error("Failed to synchronize work session:", error);
+        }
+      }
+    };
+
+    loadWorkSession();
+
+    return () => {
+      isCancelled = true;
+      if (autoStartTimeout) {
+        clearTimeout(autoStartTimeout);
+      }
+    };
+  }, [apiBaseUrl, authView, pauseReminderIntervalSeconds, session?.access_token, sessionUserId, signupCompleted, signupProvisioning, workSettings?.werk_startuur, workSettings?.werktimer_autostart]);
 
   useEffect(() => {
     if (!session?.access_token) {
@@ -279,6 +393,28 @@ export default function App() {
       ...currentProfile,
       ...nextProfile,
     }));
+  };
+
+  const resetTimerState = () => {
+    setWorkStarted(false);
+    setOnBreak(false);
+    setFinished(false);
+    setWorkSeconds(0);
+    setBreakSeconds(0);
+    setShowPauseReminderModal(false);
+    setNextPauseReminderTriggerWorkSecond(null);
+  };
+
+  const applyWorkSessionState = (workSession) => {
+    const elapsedSeconds = getSessionElapsedSeconds(workSession);
+
+    setWorkStarted(true);
+    setOnBreak(false);
+    setFinished(Boolean(workSession.eind_tijd));
+    setWorkSeconds(elapsedSeconds);
+    setBreakSeconds(0);
+    setShowPauseReminderModal(false);
+    setNextPauseReminderTriggerWorkSecond(workSession.eind_tijd ? null : elapsedSeconds + pauseReminderIntervalSeconds);
   };
 
   useEffect(() => {
@@ -349,7 +485,7 @@ export default function App() {
   // Pause reminder trigger: first after the configured interval, then after each dismissal.
   useEffect(() => {
     if (workStarted && !finished && nextPauseReminderTriggerWorkSecond == null) {
-      setNextPauseReminderTriggerWorkSecond(pauseReminderIntervalSeconds);
+      setNextPauseReminderTriggerWorkSecond(workSeconds + pauseReminderIntervalSeconds);
       return;
     }
 
@@ -458,19 +594,35 @@ export default function App() {
   };
 
   // timer control handlers passed down to WorkTimerCard
-  const startDay = () => {
-    setWorkStarted(true);
-    setFinished(false);
-    setOnBreak(false);
-    setWorkSeconds(0);
-    setBreakSeconds(0);
-    setShowPauseReminderModal(false);
-    setNextPauseReminderTriggerWorkSecond(pauseReminderIntervalSeconds);
+  const startDay = async () => {
+    const startTime = new Date();
+
+    try {
+      const startedSession = await startWorkSession(apiBaseUrl, session.access_token, {
+        start_tijd: startTime.toISOString(),
+        source: "manual",
+      });
+
+      if (startedSession) {
+        applyWorkSessionState(startedSession);
+      }
+    } catch (error) {
+      console.error("Failed to start work session:", error);
+    }
   };
 
-  const endDay = () => {
-    setFinished(true);
-    setOnBreak(false);
+  const endDay = async () => {
+    try {
+      const endedSession = await endWorkSession(apiBaseUrl, session.access_token, {
+        eind_tijd: new Date().toISOString(),
+      });
+
+      if (endedSession) {
+        applyWorkSessionState(endedSession);
+      }
+    } catch (error) {
+      console.error("Failed to end work session:", error);
+    }
   };
 
   const takeBreak = async () => {
@@ -486,9 +638,8 @@ export default function App() {
 
   const closePauseReminderModal = () => {
     setShowPauseReminderModal(false);
-    // setNextPauseReminderTriggerWorkSecond(workSeconds + pauseReminderIntervalSeconds);
-    // For demo purposes, trigger next reminder after 15 seconds
-    setNextPauseReminderTriggerWorkSecond(workSeconds + 15);
+    // setNextPauseReminderTriggerWorkSecond(workSeconds + 15); // For demo purposes, trigger next reminder after 15 seconds
+    setNextPauseReminderTriggerWorkSecond(workSeconds + pauseReminderIntervalSeconds);
   };
 
   const handlePauseReminderDismiss = () => {
@@ -622,6 +773,7 @@ export default function App() {
     setProfile(null);
     setAuthView("login");
     setSignupCompleted(false);
+    resetTimerState();
 
     if (supabase) {
       await supabase.auth.signOut();
@@ -635,6 +787,7 @@ export default function App() {
     setProfileLoading(false);
     setProfile(null);
     setSession(null);
+    resetTimerState();
 
     if (supabase) {
       await supabase.auth.signOut();
@@ -648,8 +801,8 @@ export default function App() {
   if (authLoading || (session && profileLoading)) {
     return (
       <div className="authLoadingState" aria-live="polite">
-          <p>Bezig met inloggen...</p>
-          <img className="authLoadingSpinner" src={spinner} alt="Laden" />
+        <p>Bezig met inloggen...</p>
+        <img className="authLoadingSpinner" src={spinner} alt="Laden" />
       </div>
     );
   }
@@ -681,8 +834,8 @@ export default function App() {
   if (!profile) {
     return (
       <div className="authLoadingState" aria-live="polite">
-          <p>{authError || "Profiel laden..."}</p>
-          <img className="authLoadingSpinner" src={spinner} alt="Laden" />
+        <p>{authError || "Profiel laden..."}</p>
+        <img className="authLoadingSpinner" src={spinner} alt="Laden" />
       </div>
     );
   }
@@ -722,9 +875,9 @@ export default function App() {
           currentPage === "breathing" || currentPage === "exercise-detail"
             ? "pause"
             : currentPage === "settings-workhours" ||
-                currentPage === "settings-notifications" ||
-                currentPage === "settings-personal" ||
-                currentPage === "settings-privacy"
+              currentPage === "settings-notifications" ||
+              currentPage === "settings-personal" ||
+              currentPage === "settings-privacy"
               ? "settings"
               : currentPage
         }
@@ -814,7 +967,7 @@ export default function App() {
             </div>
 
             <button className="noteButton" type="button" aria-label="Meldingen"> {/* aanpassen --> afsluitroutine van voorgaande dag */}
-              <img src={notitie} alt="Afsluitnotitie van vorige dag"/>
+              <img src={notitie} alt="Afsluitnotitie van vorige dag" />
             </button>
           </header>
 

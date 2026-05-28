@@ -234,6 +234,221 @@ app.post("/checkin", async (req, res) => {
 
 // --- current-day work session counters ---
 
+app.get("/work-sessions/today/latest", async (req, res) => {
+  if (!supabase) {
+    return res.status(500).json({
+      error: "Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in backend/.env.",
+    });
+  }
+
+  const token = getBearerToken(req);
+
+  if (!token) {
+    return res.status(401).json({
+      error: "Missing Bearer token.",
+    });
+  }
+
+  const { data: userData, error: userError } = await supabase.auth.getUser(token);
+
+  if (userError || !userData?.user) {
+    return res.status(401).json({
+      error: "Invalid or expired session.",
+    });
+  }
+
+  const { startIso, endIso } = getTodayRange();
+
+  const { data: latestSession, error: sessionError } = await supabase
+    .from("work_sessions")
+    .select("id, start_tijd, eind_tijd, source, source_details, server_scheduled_day, total_pausetime, breaks_taken, breaks_skipped")
+    .eq("user_id", userData.user.id)
+    .gte("start_tijd", startIso)
+    .lt("start_tijd", endIso)
+    .order("start_tijd", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (sessionError) {
+    return res.status(500).json({
+      error: "Failed to load work session.",
+      details: sessionError.message,
+    });
+  }
+
+  return res.json({
+    work_session: latestSession || null,
+  });
+});
+
+app.post("/work-sessions/start", async (req, res) => {
+  if (!supabase) {
+    return res.status(500).json({
+      error: "Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in backend/.env.",
+    });
+  }
+
+  const token = getBearerToken(req);
+
+  if (!token) {
+    return res.status(401).json({
+      error: "Missing Bearer token.",
+    });
+  }
+
+  const { data: userData, error: userError } = await supabase.auth.getUser(token);
+
+  if (userError || !userData?.user) {
+    return res.status(401).json({
+      error: "Invalid or expired session.",
+    });
+  }
+
+  const requestedStartTime = typeof req.body?.start_tijd === "string" ? new Date(req.body.start_tijd) : new Date();
+
+  if (Number.isNaN(requestedStartTime.getTime())) {
+    return res.status(400).json({
+      error: "Invalid start time.",
+    });
+  }
+
+  const source = req.body?.source === "server_scheduled" ? "server_scheduled" : "manual";
+  const serverScheduledDay =
+    typeof req.body?.server_scheduled_day === "string" && /^\d{4}-\d{2}-\d{2}$/.test(req.body.server_scheduled_day)
+      ? req.body.server_scheduled_day
+      : null;
+
+  const { startIso, endIso } = getTodayRange();
+
+  const { data: latestSession, error: sessionError } = await supabase
+    .from("work_sessions")
+    .select("id, start_tijd, eind_tijd, source, source_details, server_scheduled_day, total_pausetime, breaks_taken, breaks_skipped")
+    .eq("user_id", userData.user.id)
+    .gte("start_tijd", startIso)
+    .lt("start_tijd", endIso)
+    .order("start_tijd", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (sessionError) {
+    return res.status(500).json({
+      error: "Failed to load work session.",
+      details: sessionError.message,
+    });
+  }
+
+  if (latestSession?.id) {
+    return res.json({
+      work_session: latestSession,
+    });
+  }
+
+  const { data: createdSession, error: insertError } = await supabase
+    .from("work_sessions")
+    .insert({
+      user_id: userData.user.id,
+      start_tijd: requestedStartTime.toISOString(),
+      eind_tijd: null,
+      source,
+      source_details: {
+        started_at: new Date().toISOString(),
+        source,
+      },
+      server_scheduled_day: source === "server_scheduled" ? serverScheduledDay : null,
+    })
+    .select("id, start_tijd, eind_tijd, source, source_details, server_scheduled_day, total_pausetime, breaks_taken, breaks_skipped")
+    .single();
+
+  if (insertError) {
+    return res.status(500).json({
+      error: "Failed to create work session.",
+      details: insertError.message,
+    });
+  }
+
+  return res.status(201).json({
+    work_session: createdSession,
+  });
+});
+
+app.post("/work-sessions/end", async (req, res) => {
+  if (!supabase) {
+    return res.status(500).json({
+      error: "Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in backend/.env.",
+    });
+  }
+
+  const token = getBearerToken(req);
+
+  if (!token) {
+    return res.status(401).json({
+      error: "Missing Bearer token.",
+    });
+  }
+
+  const { data: userData, error: userError } = await supabase.auth.getUser(token);
+
+  if (userError || !userData?.user) {
+    return res.status(401).json({
+      error: "Invalid or expired session.",
+    });
+  }
+
+  const requestedEndTime = typeof req.body?.eind_tijd === "string" ? new Date(req.body.eind_tijd) : new Date();
+
+  if (Number.isNaN(requestedEndTime.getTime())) {
+    return res.status(400).json({
+      error: "Invalid end time.",
+    });
+  }
+
+  const { startIso, endIso } = getTodayRange();
+
+  const { data: latestSession, error: sessionError } = await supabase
+    .from("work_sessions")
+    .select("id, start_tijd, eind_tijd, source, source_details, server_scheduled_day, total_pausetime, breaks_taken, breaks_skipped")
+    .eq("user_id", userData.user.id)
+    .gte("start_tijd", startIso)
+    .lt("start_tijd", endIso)
+    .is("eind_tijd", null)
+    .order("start_tijd", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (sessionError) {
+    return res.status(500).json({
+      error: "Failed to load work session.",
+      details: sessionError.message,
+    });
+  }
+
+  if (!latestSession?.id) {
+    return res.status(404).json({
+      error: "No open work session found for the signed-in user.",
+    });
+  }
+
+  const { data: updatedSession, error: updateError } = await supabase
+    .from("work_sessions")
+    .update({
+      eind_tijd: requestedEndTime.toISOString(),
+    })
+    .eq("id", latestSession.id)
+    .select("id, start_tijd, eind_tijd, source, source_details, server_scheduled_day, total_pausetime, breaks_taken, breaks_skipped")
+    .single();
+
+  if (updateError) {
+    return res.status(500).json({
+      error: "Failed to close work session.",
+      details: updateError.message,
+    });
+  }
+
+  return res.json({
+    work_session: updatedSession,
+  });
+});
+
 app.get("/work-sessions/breaks/latest", async (req, res) => {
   if (!supabase) {
     return res.status(500).json({
@@ -743,7 +958,7 @@ app.delete("/account/me", async (req, res) => {
   }
 
   const userId = userData.user.id;
-  const tablesToDelete = ["favorite_pauses", "settings", "checkins", "profiles"];
+  const tablesToDelete = ["favorite_pauses", "settings", "checkins", "work_sessions", "profiles"];
 
   for (const tableName of tablesToDelete) {
     const { error } = await supabase.from(tableName).delete().eq("user_id", userId);
