@@ -1,8 +1,8 @@
 import "../css/settings.css";
 import { LuArrowLeft, LuPencil } from "react-icons/lu";
-import spinner from "../assets/images/loadingSpinner.svg";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
+import SmallLoader from "../components/SmallLoader";
 import { createDefaultWorkdaySelection, normalizeDuration, parseIntegerValue } from "../lib/workHours";
 
 function settingsStateFromRow(row) {
@@ -178,10 +178,7 @@ export default function SettingsWorkHours({ onBack, userId }) {
                     </button>
                     <h1 className="settingsTitle">Werktijden en pauzes</h1>
                 </header>
-                <div className="settingsLoading">
-                    Bezig met laden...
-                    <img src={spinner} alt="Bezig met laden" />
-                </div>
+                <SmallLoader message="Bezig met laden..." />
             </main>
         );
     }

@@ -1,8 +1,8 @@
 import "../css/settings.css";
 import { LuArrowLeft } from "react-icons/lu";
-import spinner from "../assets/images/loadingSpinner.svg";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
+import SmallLoader from "../components/SmallLoader";
 
 function createDefaultNotificationState() {
     return {
@@ -87,10 +87,7 @@ export default function SettingsNotifications({ onBack }) {
                     </button>
                     <h1 className="settingsTitle">Notificatie-voorkeuren</h1>
                 </header>
-                <div className="settingsLoading">
-                    Bezig met laden...
-                    <img src={spinner} alt="Bezig met laden" />
-                </div>
+                <SmallLoader message="Bezig met laden..." />
             </main>
         );
     }

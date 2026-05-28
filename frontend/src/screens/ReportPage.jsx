@@ -1,9 +1,10 @@
 import "../css/ReportPage.css";
 import { useEffect, useState } from "react";
-import { LuChevronLeft, LuChevronRight, LuBatteryCharging  } from "react-icons/lu";
-import { HiOutlineTrendingUp  } from "react-icons/hi";
+import { LuChevronLeft, LuChevronRight, LuBatteryCharging } from "react-icons/lu";
+import { HiOutlineTrendingUp } from "react-icons/hi";
 import { TbCrown } from "react-icons/tb";
 import PremiumModal from "../components/PremiumModal";
+import SmallLoader from "../components/SmallLoader";
 import { fetchTodayReport } from "../api/reportApi";
 
 const dateOptions = { day: "numeric", month: "long", year: "numeric" };
@@ -104,6 +105,28 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
         setSelectedReportDate((currentDate) => shiftDateKey(currentDate, 1));
     }
 
+    if (loading) {
+        return (
+            <main className="reportPage">
+                <header className="reportHeader">
+                    <div className="reportTitleGroup">
+                        <button className="reportNavButton" type="button" aria-label="Vorige dagrapport" onClick={handlePreviousDay}>
+                            <LuChevronLeft />
+                        </button>
+
+                        <h2 className="reportTitle">{reportTitle}</h2>
+
+                        <button className="reportNavButton" type="button" aria-label="Volgende dagrapport" onClick={handleNextDay} disabled={isCurrentDayReport}>
+                            <LuChevronRight />
+                        </button>
+                    </div>
+                </header>
+
+                <SmallLoader message="Dagrapport wordt geladen..." />
+            </main>
+        );
+    }
+
     return (
         <main className="reportPage">
             <header className="reportHeader">
@@ -160,8 +183,7 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
                 </article>
             </section>
 
-            {loading ? <p className="reportSectionMeta">Rapport wordt geladen...</p> : null}
-            {!loading && error ? <p className="reportSectionMeta">Fout: {error}</p> : null}
+            {error ? <p className="reportSectionMeta">Fout: {error}</p> : null}
 
             <section className="reportSection">
                 <div className="reportSectionHeader">
