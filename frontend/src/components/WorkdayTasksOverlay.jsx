@@ -219,7 +219,7 @@ export default function WorkdayTasksOverlay({ isOpen, onClose, apiBaseUrl, acces
 
                 <p className="workdayTasksQuestion">
                     {activeTab === "today" ? "Waar wil je vandaag aan werken?" : "Waar wil je morgen zeker aan werken?"}
-                    {isSaving ? "Opslaan..." : error ? <span className="workdayTasksError">{error}</span> : null}
+                    {isSaving ? <span className="workdayTasksSaving">Opslaan...</span> : error ? <span className="workdayTasksError">{error}</span> : null}
                 </p>
 
                 <form onSubmit={handleAddItem}>
