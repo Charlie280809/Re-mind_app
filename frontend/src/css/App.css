@@ -99,19 +99,24 @@
     background-color: transparent;
     padding: 0;
     cursor: pointer;
-}
-
-.noteButton:hover {
-    img {
-        background-color: var(--highlight-200);
-        transition: var(--button-default-transition);
+    svg{
+            stroke-width: 1.2px;
     }
 }
 
-.noteButton img {
+.noteButton:hover {
+    svg {
+        color: var(--primary-300);
+        transition: var(--button-default-transition);
+        fill: var(--highlight-200);
+    }
+}
+
+.noteButton svg {
     border-radius: 10px;
     width: var(--icon-size-48);
-    height: var(--icon-size-48);
+    /* height: var(--icon-size-48); */
+    height: auto;
 }
 
 .homeSection {
