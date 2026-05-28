@@ -124,6 +124,7 @@ export default function App() {
   const [favoriteLimitModalOpen, setFavoriteLimitModalOpen] = useState(false);
   const [pauseSummaryCounts, setPauseSummaryCounts] = useState({ breaks_taken: 0, breaks_skipped: 0 });
   const [workdayTasksOpen, setWorkdayTasksOpen] = useState(false);
+  const [workdayTasksInitialTab, setWorkdayTasksInitialTab] = useState("today");
   const sessionUserId = session?.user?.id || null;
 
   // Persistent work timer state lifted here so the timer keeps running
@@ -615,6 +616,12 @@ export default function App() {
 
   const openWorkdayTasksModal = () => {
     setWorkdayTasksOpen(true);
+    setWorkdayTasksInitialTab("today");
+  };
+
+  const openWorkdayTasksModalOnTomorrow = () => {
+    setWorkdayTasksOpen(true);
+    setWorkdayTasksInitialTab("tomorrow");
   };
 
   const closeWorkdayTasksModal = () => {
@@ -833,6 +840,7 @@ export default function App() {
         onClose={closeWorkdayTasksModal}
         apiBaseUrl={apiBaseUrl}
         accessToken={session.access_token}
+        initialTab={workdayTasksInitialTab}
       />
       {showPauseReminderModal && (
         <PauseReminderModal onDismiss={handlePauseReminderDismiss} onTakeBreak={handlePauseReminderTakeBreak} />
@@ -971,7 +979,7 @@ export default function App() {
               endDay={endDay}
               takeBreak={takeBreak}
               endBreak={endBreak}
-              onOpenWorkdayTasks={openWorkdayTasksModal}
+              onOpenWorkdayTasks={openWorkdayTasksModalOnTomorrow}
               dayTargetSeconds={dayTargetSeconds}
             />
           </section>
