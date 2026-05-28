@@ -29,6 +29,7 @@ import { supabase } from "./lib/supabaseClient";
 import { getApiBaseUrl } from "./api/apiBaseUrl";
 import {
   createSignupAccount,
+  completeWorkSessionBreak,
   endWorkSession,
   fetchLatestWorkSessionBreaks,
   fetchLatestWorkSession,
@@ -534,6 +535,18 @@ export default function App() {
     }
   };
 
+  const persistCurrentBreakDuration = async () => {
+    if (!session?.access_token || !onBreak) {
+      return null;
+    }
+
+    if (breakSeconds <= 0) {
+      return null;
+    }
+
+    return completeWorkSessionBreak(apiBaseUrl, session.access_token, breakSeconds);
+  };
+
   // timer control handlers passed down to WorkTimerCard
   const startDay = async () => {
     const startTime = new Date();
@@ -554,6 +567,12 @@ export default function App() {
 
   const endDay = async () => {
     try {
+      if (onBreak) {
+        await persistCurrentBreakDuration();
+        setOnBreak(false);
+        setBreakSeconds(0);
+      }
+
       const endedSession = await endWorkSession(apiBaseUrl, session.access_token, {
         eind_tijd: new Date().toISOString(),
       });
@@ -575,7 +594,15 @@ export default function App() {
     setOnBreak(true);
     setCurrentPage("pause");
   };
-  const endBreak = () => setOnBreak(false);
+  const endBreak = async () => {
+    try {
+      await persistCurrentBreakDuration();
+      setOnBreak(false);
+      setBreakSeconds(0);
+    } catch (error) {
+      console.error("Failed to save break duration:", error);
+    }
+  };
 
   const closePauseReminderModal = () => {
     setShowPauseReminderModal(false);

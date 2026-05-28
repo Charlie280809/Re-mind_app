@@ -79,6 +79,16 @@ function summarizeDailyWorkSessions(workSessions) {
   );
 }
 
+function convertBreakSecondsToMinutes(breakSeconds) {
+  const safeSeconds = Math.max(0, Number(breakSeconds) || 0);
+
+  if (safeSeconds <= 0) {
+    return 0;
+  }
+
+  return Math.ceil(safeSeconds / 60);
+}
+
 function buildDailyReportPayload({ localDate, totals, pauseTotals, totalCheckins }) {
   return {
     date: localDate,
@@ -446,6 +456,96 @@ app.post("/work-sessions/end", async (req, res) => {
 
   return res.json({
     work_session: updatedSession,
+  });
+});
+
+app.post("/work-sessions/breaks/complete", async (req, res) => {
+  if (!supabase) {
+    return res.status(500).json({
+      error: "Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in backend/.env.",
+    });
+  }
+
+  const token = getBearerToken(req);
+
+  if (!token) {
+    return res.status(401).json({
+      error: "Missing Bearer token.",
+    });
+  }
+
+  const { data: userData, error: userError } = await supabase.auth.getUser(token);
+
+  if (userError || !userData?.user) {
+    return res.status(401).json({
+      error: "Invalid or expired session.",
+    });
+  }
+
+  const pauseSeconds = Number(req.body?.break_seconds);
+
+  if (!Number.isFinite(pauseSeconds) || pauseSeconds < 0) {
+    return res.status(400).json({
+      error: "Invalid break duration.",
+    });
+  }
+
+  const addedPauseMinutes = convertBreakSecondsToMinutes(pauseSeconds);
+
+  if (addedPauseMinutes <= 0) {
+    return res.json({
+      work_session: null,
+      added_pause_minutes: 0,
+    });
+  }
+
+  const { startIso, endIso } = getTodayRange();
+
+  const { data: latestSession, error: sessionError } = await supabase
+    .from("work_sessions")
+    .select("id, total_pausetime")
+    .eq("user_id", userData.user.id)
+    .gte("start_tijd", startIso)
+    .lt("start_tijd", endIso)
+    .is("eind_tijd", null)
+    .order("start_tijd", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (sessionError) {
+    return res.status(500).json({
+      error: "Failed to load work session.",
+      details: sessionError.message,
+    });
+  }
+
+  if (!latestSession?.id) {
+    return res.status(404).json({
+      error: "No open work session found for the signed-in user.",
+    });
+  }
+
+  const nextTotalPauseMinutes = Number(latestSession.total_pausetime ?? 0) + addedPauseMinutes;
+
+  const { data: updatedSession, error: updateError } = await supabase
+    .from("work_sessions")
+    .update({
+      total_pausetime: nextTotalPauseMinutes,
+    })
+    .eq("id", latestSession.id)
+    .select("id, total_pausetime")
+    .single();
+
+  if (updateError) {
+    return res.status(500).json({
+      error: "Failed to update total pause time.",
+      details: updateError.message,
+    });
+  }
+
+  return res.json({
+    work_session: updatedSession,
+    added_pause_minutes: addedPauseMinutes,
   });
 });
 

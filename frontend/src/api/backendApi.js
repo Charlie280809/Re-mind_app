@@ -89,6 +89,25 @@ export async function incrementWorkSessionCounter(apiBaseUrl, accessToken, colum
     return body;
 }
 
+export async function completeWorkSessionBreak(apiBaseUrl, accessToken, breakSeconds) {
+    const response = await fetch(`${apiBaseUrl}/work-sessions/breaks/complete`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ break_seconds: breakSeconds }),
+    });
+
+    const body = await readJsonResponse(response, (snippet) => snippet || "Kon pauzeduur niet opslaan.");
+
+    if (!response.ok) {
+        throw new Error(body.error || "Kon pauzeduur niet opslaan.");
+    }
+
+    return body?.work_session ?? null;
+}
+
 export async function fetchLatestWorkSession(apiBaseUrl, accessToken) {
     const response = await fetchWithApiError(
         `${apiBaseUrl}/work-sessions/today/latest`,
