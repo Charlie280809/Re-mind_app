@@ -958,7 +958,6 @@ export default function App() {
               onClick={openWorkdayTasksModal}
             >
               <LuNotepadText />
-
             </button>
           </header>
 
