@@ -20,6 +20,7 @@ import SettingsNotifications from "./screens/SettingsNotifications";
 import SettingsPersonalData from "./screens/SettingsPersonalData";
 import SettingsPrivacy from "./screens/SettingsPrivacy";
 import UpgradePlan from "./screens/UpgradePlan";
+
 import notitie from "./assets/icons/Afsluitnotitie.svg";
 import spinner from "./assets/images/loadingSpinner.svg";
 
@@ -41,29 +42,6 @@ import { calculateWorkdayDurationSeconds } from "./lib/workHours";
 
 const NAV_STATE_STORAGE_KEY = "remind-navigation-state";
 const FREE_FAVORITE_LIMIT = 4;
-
-const LOCAL_TIME_PATTERN = /^\d{2}:\d{2}$/;
-
-const formatLocalDate = (date) =>
-  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-
-const buildLocalDateTime = (timeString, baseDate = new Date()) => {
-  if (typeof timeString !== "string" || !LOCAL_TIME_PATTERN.test(timeString)) {
-    return null;
-  }
-
-  const [hoursPart, minutesPart] = timeString.split(":");
-  const hours = Number.parseInt(hoursPart, 10);
-  const minutes = Number.parseInt(minutesPart, 10);
-
-  if (!Number.isFinite(hours) || !Number.isFinite(minutes)) {
-    return null;
-  }
-
-  const localDateTime = new Date(baseDate);
-  localDateTime.setHours(hours, minutes, 0, 0);
-  return localDateTime;
-};
 
 const getSessionElapsedSeconds = (sessionRow) => {
   if (!sessionRow?.start_tijd) {
@@ -261,7 +239,7 @@ export default function App() {
     const loadWorkSettings = async () => {
       const { data, error } = await supabase
         .from("settings")
-        .select("werk_startuur, werk_einduur, pause_reminder, checkin_notifications_on, werktimer_autostart")
+        .select("werk_startuur, werk_einduur, pause_reminder, checkin_notifications_on")
         .eq("user_id", session.user.id)
         .maybeSingle();
 
@@ -288,19 +266,6 @@ export default function App() {
     }
 
     let isCancelled = false;
-    let autoStartTimeout = null;
-
-    const startSessionOnServer = async (startTime, source) => {
-      const startedSession = await startWorkSession(apiBaseUrl, session.access_token, {
-        start_tijd: startTime.toISOString(),
-        source,
-        server_scheduled_day: source === "server_scheduled" ? formatLocalDate(startTime) : null,
-      });
-
-      if (!isCancelled && startedSession) {
-        applyWorkSessionState(startedSession);
-      }
-    };
 
     const loadWorkSession = async () => {
       try {
@@ -316,27 +281,6 @@ export default function App() {
         }
 
         resetTimerState();
-
-        const scheduledStart = buildLocalDateTime(workSettings?.werk_startuur);
-
-        if (!workSettings?.werktimer_autostart || !scheduledStart) {
-          return;
-        }
-
-        const delayUntilStart = scheduledStart.getTime() - Date.now();
-
-        if (delayUntilStart <= 0) {
-          await startSessionOnServer(scheduledStart, "server_scheduled");
-          return;
-        }
-
-        autoStartTimeout = window.setTimeout(() => {
-          startSessionOnServer(scheduledStart, "server_scheduled").catch((error) => {
-            if (!isCancelled) {
-              console.error("Failed to auto-start work session:", error);
-            }
-          });
-        }, delayUntilStart);
       } catch (error) {
         if (!isCancelled) {
           console.error("Failed to synchronize work session:", error);
@@ -348,11 +292,8 @@ export default function App() {
 
     return () => {
       isCancelled = true;
-      if (autoStartTimeout) {
-        clearTimeout(autoStartTimeout);
-      }
     };
-  }, [apiBaseUrl, authView, pauseReminderIntervalSeconds, session?.access_token, sessionUserId, signupCompleted, signupProvisioning, workSettings?.werk_startuur, workSettings?.werktimer_autostart]);
+  }, [apiBaseUrl, authView, session?.access_token, sessionUserId, signupCompleted, signupProvisioning]);
 
   useEffect(() => {
     if (!session?.access_token) {
@@ -966,7 +907,7 @@ export default function App() {
               <h2 className="homeSubtitle">Klaar om je werkdag te starten?</h2>
             </div>
 
-            <button className="noteButton" type="button" aria-label="Meldingen"> {/* aanpassen --> afsluitroutine van voorgaande dag */}
+            <button className="noteButton" type="button" aria-label="afsluitnotitie voorgaande dag"> {/* aanpassen --> afsluitroutine van voorgaande dag */}
               <img src={notitie} alt="Afsluitnotitie van vorige dag" />
             </button>
           </header>
