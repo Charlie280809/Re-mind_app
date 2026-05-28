@@ -9,8 +9,9 @@
     padding: var(--layout-container-padding);
     display: flex;
     flex-direction: column;
-    gap: var(--space-24);
+    gap: var(--space-32);
     color: var(--text-primary);
+    font-family: var(--font-family-body);
 }
 
 .weekReportHeader,
@@ -97,20 +98,19 @@
     font-size: var(--font-size-md);
     line-height: var(--line-height-md);
     font-weight: var(--font-weight-regular);
+    width: fit-content;
 }
 
 .weekReportValueCard {
-    margin: var(--space-12) 0 0;
     width: fit-content;
-    padding: var(--space-20) var(--space-24);
-    border-radius: 16px;
+    background-color: var(--background-50);
+    border-radius: 20px;
     border: 2px solid var(--border-color-default);
-    background: var(--surface-background);
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-s);
-    line-height: var(--line-height-sm);
-    color: var(--text-primary);
-    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03);
+    margin: 0;
+    padding: var(--space-20);
+    text-align: center;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-regular);
 }
 
 .weekReportChartBlock,
@@ -119,36 +119,33 @@
     gap: var(--space-12);
 }
 
-.weekReportSectionHeading,
+
 .weekReportSectionHeadingSplit {
     justify-content: space-between;
-    gap: var(--space-16);
-    flex-wrap: wrap;
 }
 
 .weekReportSectionMeta {
     gap: var(--space-4);
     margin: 0;
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-xxs);
+    padding: var(--space-4) 0 0 var(--space-8);
+    font-size: var(--font-size-xs);
     line-height: var(--line-height-xs);
 }
 
 .weekReportChartRow {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 190px;
+    grid-template-columns: 2.5fr 1fr;
     gap: var(--space-16);
-    align-items: stretch;
 }
 
 .weekReportLineChartCard,
 .weekReportStatsCard,
 .weekReportBarChartCard,
 .weekReportInsightsCard {
-    border: 1px solid var(--border-color-default);
-    border-radius: 18px;
-    background: var(--surface-background);
-    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+    width: 100%;
+    background-color: var(--background-50);
+    border-radius: 20px;
+    border: 2px solid var(--border-color-default);
 }
 
 .weekReportLineChartCard {
@@ -257,16 +254,13 @@
 }
 
 .weekReportStatIcon {
-    width: 24px;
-    height: 24px;
+    width: var(--icon-size-36);
+    height: var(--icon-size-36);
     color: var(--text-primary);
 }
 
 .weekReportStatLabel {
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-xxs);
-    line-height: var(--line-height-xs);
-    color: var(--text-primary);
+    font-size: var(--font-size-xs);
 }
 
 .weekReportStatValue {
@@ -285,9 +279,9 @@
 }
 
 .weekReportDivider {
-    height: 1px;
+    height: 2px;
     width: 100%;
-    background: rgba(118, 147, 130, 0.18);
+    background-color: var(--border-color-default);
 }
 
 .weekReportBarChartCard {

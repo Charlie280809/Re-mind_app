@@ -1,6 +1,6 @@
 import "../css/WeekReportPage.css";
 import { useEffect, useState } from "react";
-import { LuChevronLeft, LuChevronRight, LuSparkles, LuClock3, LuBatteryCharging  } from "react-icons/lu";
+import { LuChevronLeft, LuChevronRight, LuSparkles, LuClock3, LuBatteryCharging } from "react-icons/lu";
 import { HiOutlineTrendingUp } from "react-icons/hi";
 import { TbActivityHeartbeat, TbZzz } from "react-icons/tb";
 import { formatWeekRange, getEndOfWeek, getStartOfWeek } from "../lib/dateFormat";
@@ -81,6 +81,8 @@ export default function WeekReportPage({ accessToken }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [report, setReport] = useState(null);
+    const avgStressLabel = report?.averageStress == null ? "-" : `${report.averageStress}/5`;
+    const avgEnergyLabel = report?.averageEnergy == null ? "-" : `${report.averageEnergy}/5`;
     const stressPath = buildLinePath(stressEnergyData.map((item) => item.stress));
     const energyPath = buildLinePath(stressEnergyData.map((item) => item.energy));
     const currentWeekStart = getStartOfWeek(new Date());
@@ -163,6 +165,8 @@ export default function WeekReportPage({ accessToken }) {
                 </div>
             </header>
 
+            {error ? <p className="weekReportSectionMeta">Fout: {error}</p> : null}
+
             <section className="weekReportTopGrid" aria-label="Weekoverzicht">
                 <article className="weekReportStatBlock">
                     <h3 className="weekReportSectionTitle">Totale werktijd</h3>
@@ -172,7 +176,7 @@ export default function WeekReportPage({ accessToken }) {
                 <article className="weekReportChartBlock">
                     <div className="weekReportSectionHeading">
                         <h3 className="weekReportSectionTitle">Stress en energie</h3>
-                        <span className="weekReportSectionMeta">gemiddelde per dag</span>
+                        <span className="weekReportSectionMeta">(gemiddelde per dag)</span>
                     </div>
 
                     <div className="weekReportChartRow">
@@ -217,7 +221,7 @@ export default function WeekReportPage({ accessToken }) {
                             <div className="weekReportStatItem">
                                 <HiOutlineTrendingUp className="weekReportStatIcon" />
                                 <span className="weekReportStatLabel">Gemiddelde stress</span>
-                                <strong className="weekReportStatValue weekReportStatValueStress">3.7/5</strong>
+                                <strong className="weekReportStatValue weekReportStatValueStress">{avgStressLabel}</strong>
                             </div>
 
                             <div className="weekReportDivider" aria-hidden="true" />
@@ -225,7 +229,7 @@ export default function WeekReportPage({ accessToken }) {
                             <div className="weekReportStatItem">
                                 <LuBatteryCharging className="weekReportStatIcon" />
                                 <span className="weekReportStatLabel">Gemiddelde energie</span>
-                                <strong className="weekReportStatValue weekReportStatValueEnergy">3.2/5</strong>
+                                <strong className="weekReportStatValue weekReportStatValueEnergy">{avgEnergyLabel}</strong>
                             </div>
                         </article>
                     </div>
@@ -260,8 +264,6 @@ export default function WeekReportPage({ accessToken }) {
 
             <section className="weekReportSection weekReportInsightsSection">
                 <h3 className="weekReportSectionTitle">Inzichten van afgelopen week</h3>
-
-                {error ? <p className="weekReportSectionMeta">Fout: {error}</p> : null}
 
                 <article className="weekReportInsightsCard">
                     <div className="weekReportTimeline" aria-hidden="true" />

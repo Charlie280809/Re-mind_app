@@ -110,6 +110,17 @@ function summarizeDailyWorkSessions(workSessions) {
   );
 }
 
+function summarizeCheckins(checkins) {
+  return (checkins || []).reduce(
+    (acc, row) => {
+      acc.stress += row.stress;
+      acc.energy += row.energy;
+      return acc;
+    },
+    { stress: 0, energy: 0 }
+  );
+}
+
 function normalizeBreakSeconds(breakSeconds) {
   const safeSeconds = Math.max(0, Number(breakSeconds) || 0);
 
@@ -257,6 +268,20 @@ app.get("/report/week", async (req, res) => {
   const requestedDate = typeof req.query?.date === "string" ? req.query.date : undefined;
   const { startIso, endIso, localStartDate } = getWeekRange(requestedDate);
 
+  const { data: checkins, error: checkinError } = await supabase
+    .from("checkins")
+    .select("stress, energy")
+    .eq("user_id", userId)
+    .gte("created_at", startIso)
+    .lt("created_at", endIso);
+
+  if (checkinError) {
+    return res.status(500).json({
+      error: "Failed to load weekly check-in data from Supabase.",
+      details: checkinError.message,
+    });
+  }
+
   const { data: workSessions, error: workSessionError } = await supabase
     .from("work_sessions")
     .select("breaks_taken, breaks_skipped, total_pausetime, start_tijd, eind_tijd")
@@ -271,10 +296,14 @@ app.get("/report/week", async (req, res) => {
     });
   }
 
+  const totalCheckins = checkins.length;
+  const totals = summarizeCheckins(checkins);
   const pauseTotals = summarizeDailyWorkSessions(workSessions);
 
   return res.json({
     date: localStartDate,
+    averageStress: totalCheckins === 0 ? null : Number((totals.stress / totalCheckins).toFixed(1)),
+    averageEnergy: totalCheckins === 0 ? null : Number((totals.energy / totalCheckins).toFixed(1)),
     totalWorkTime: formatSecondsAsHoursAndMinutes(pauseTotals.totalWorkSeconds),
   });
 });
