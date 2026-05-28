@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { LuPlus, LuX } from "react-icons/lu";
+import { LuTrash2, LuX } from "react-icons/lu";
 import {
     createWorkdayTask,
     deleteWorkdayTask,
     fetchWorkdayTasksOverview,
     updateWorkdayTask,
 } from "../api/backendApi";
+import SmallLoader from "./SmallLoader";
 import "../css/WorkdayTasks.css";
 
 const EMPTY_LISTS = { today: [], tomorrow: [] };
@@ -92,7 +93,25 @@ export default function WorkdayTasksOverlay({ isOpen, onClose, apiBaseUrl, acces
         return null;
     }
 
-    const currentItems = itemsByTab[activeTab] || [];
+    if (isLoading) {
+        return (
+            <div className="workdayTasksOverlay" role="presentation" onMouseDown={onClose}>
+                <div className="workdayTasksCard" role="dialog" aria-modal="true" aria-labelledby="workday-tasks-title" onMouseDown={(event) => event.stopPropagation()}>
+                    <button className="workdayTasksCloseButton" type="button" onClick={onClose} aria-label="Sluiten">
+                        <LuX />
+                    </button>
+
+                    <h2 id="workday-tasks-title" className="workdayTasksTitle">
+                        Takenlijst
+                    </h2>
+
+                    <SmallLoader message="Takenlijst wordt geladen..." />
+                </div>
+            </div>
+        );
+    }
+
+    const currentItems = [...(itemsByTab[activeTab] || [])].reverse();
 
     const refreshTasks = async () => {
         if (!apiBaseUrl || !accessToken) {
@@ -173,16 +192,11 @@ export default function WorkdayTasksOverlay({ isOpen, onClose, apiBaseUrl, acces
                     <LuX />
                 </button>
 
-                <header className="workdayTasksHeader">
-                    <h2 id="workday-tasks-title" className="workdayTasksTitle">
-                        Werkdagtaken
-                    </h2>
-                    <p className="workdayTasksSubtitle">
-                        Voeg taken toe voor vandaag of morgen en vink ze af zodra ze klaar zijn.
-                    </p>
-                </header>
+                <h2 id="workday-tasks-title" className="workdayTasksTitle">
+                    Takenlijst
+                </h2>
 
-                <div className="workdayTasksTabs" role="tablist" aria-label="Taken per dag">
+                <div className="workdayTasksTabs" role="tablist" aria-label="Taken per dag" data-active-tab={activeTab}>
                     <button
                         className={`workdayTasksTab ${activeTab === "today" ? "isActive" : ""}`}
                         type="button"
@@ -204,39 +218,35 @@ export default function WorkdayTasksOverlay({ isOpen, onClose, apiBaseUrl, acces
                 </div>
 
                 <p className="workdayTasksQuestion">
-                    {activeTab === "today" ? "Waar wil je vandaag aan werken?" : "Waar wil je morgen aan werken?"}
+                    {activeTab === "today" ? "Waar wil je vandaag aan werken?" : "Waar wil je morgen zeker aan werken?"}
+                    {isSaving ? "Opslaan..." : error ? <span className="workdayTasksError">{error}</span> : null}
                 </p>
 
-                <form className="workdayTasksForm" onSubmit={handleAddItem}>
+                <form onSubmit={handleAddItem}>
                     <div className="workdayTasksEntryRow">
                         <input
                             className="workdayTasksInput"
                             type="text"
                             value={draftItem}
                             onChange={(event) => setDraftItem(event.target.value)}
-                            placeholder={activeTab === "today" ? "Voeg een taak voor vandaag toe" : "Voeg een taak voor morgen toe"}
-                            aria-label={activeTab === "today" ? "Taak voor vandaag" : "Taak voor morgen"}
+                            placeholder={activeTab === "today" ? "Noteer hier een taak voor vandaag" : "Noteer hier een taak voor morgen"}
+                            aria-label={activeTab === "today" ? "Noteer hier een taak voor vandaag" : "Noteer hier een taak voor morgen"}
                             autoFocus
-                            disabled={isSaving}
                         />
 
                         <button className="workdayTasksAddButton" type="submit" aria-label="Taak toevoegen" disabled={isSaving || !draftItem.trim()}>
-                            <LuPlus />
+                            Toevoegen
                         </button>
                     </div>
                 </form>
 
-                {error ? <p className="workdayTasksError">{error}</p> : null}
-
                 <ul className="workdayTasksList" aria-label={activeTab === "today" ? "Taken voor vandaag" : "Taken voor morgen"}>
-                    {isLoading ? (
-                        <li className="workdayTasksEmpty">Taken laden...</li>
-                    ) : currentItems.length ? (
+                    {currentItems.length ? (
                         currentItems.map((task) => (
                             <li className={`workdayTasksItem ${task.is_done ? "isDone" : ""}`} key={task.id}>
                                 <label className="workdayTasksCheckRow">
                                     <input
-                                        className="checkbox workdayTasksCheckbox"
+                                        className="checkbox"
                                         type="checkbox"
                                         checked={Boolean(task.is_done)}
                                         onChange={() => handleToggleDone(task)}
@@ -252,7 +262,7 @@ export default function WorkdayTasksOverlay({ isOpen, onClose, apiBaseUrl, acces
                                     aria-label={`Taak verwijderen: ${task.task_text}`}
                                     disabled={isSaving}
                                 >
-                                    <LuX />
+                                    <LuTrash2 />
                                 </button>
                             </li>
                         ))
@@ -260,12 +270,6 @@ export default function WorkdayTasksOverlay({ isOpen, onClose, apiBaseUrl, acces
                         <li className="workdayTasksEmpty">Nog geen taken toegevoegd.</li>
                     )}
                 </ul>
-
-                <div className="workdayTasksFooter">
-                    <button className="workdayTasksDoneButton" type="button" onClick={onClose}>
-                        Klaar
-                    </button>
-                </div>
             </div>
         </div>
     );
