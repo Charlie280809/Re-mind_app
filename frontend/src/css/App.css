@@ -101,9 +101,17 @@
     cursor: pointer;
 }
 
+.noteButton:hover {
+    img {
+        background-color: var(--highlight-200);
+        transition: var(--button-default-transition);
+    }
+}
+
 .noteButton img {
-    width: 64px;
-    height: 64px;
+    border-radius: 10px;
+    width: var(--icon-size-48);
+    height: var(--icon-size-48);
 }
 
 .homeSection {
