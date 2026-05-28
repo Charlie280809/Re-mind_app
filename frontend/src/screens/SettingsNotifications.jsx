@@ -67,10 +67,6 @@ export default function SettingsNotifications({ onBack }) {
                     typeof settingsRow.favorite_pauses_suggest_on === "boolean"
                         ? settingsRow.favorite_pauses_suggest_on
                         : prev.suggestFavoritesEnabled,
-                endOfDayNoteEnabled:
-                    typeof settingsRow.afsluitnotitie_popup_on === "boolean"
-                        ? settingsRow.afsluitnotitie_popup_on
-                        : prev.endOfDayNoteEnabled,
             }));
             setLoading(false);
         };
@@ -123,7 +119,6 @@ export default function SettingsNotifications({ onBack }) {
                 user_id: uid,
                 checkin_notifications_on: notificationSettings.checkInEnabled,
                 favorite_pauses_suggest_on: notificationSettings.suggestFavoritesEnabled,
-                afsluitnotitie_popup_on: notificationSettings.endOfDayNoteEnabled,
             };
 
             const { error } = await supabase.from("settings").upsert(payload, { onConflict: "user_id" });

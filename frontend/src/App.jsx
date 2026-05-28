@@ -12,7 +12,7 @@ import CheckInModal from "./components/CheckInModal";
 import PauseReminderModal from "./components/PauseReminderModal";
 import FavoriteRemovalModal from "./components/FavoriteRemovalModal";
 import PremiumModal from "./components/PremiumModal";
-import EndNote from "./components/EndNote";
+import WorkdayTasksOverlay from "./components/WorkdayTasksOverlay";
 import LoginPage from "./screens/LoginPage";
 import SignupPage from "./screens/SignupPage";
 import Settings from "./screens/Settings";
@@ -22,8 +22,7 @@ import SettingsPersonalData from "./screens/SettingsPersonalData";
 import SettingsPrivacy from "./screens/SettingsPrivacy";
 import UpgradePlan from "./screens/UpgradePlan";
 
-import notitie from "./assets/icons/Afsluitnotitie.svg";
-import notitieNormal from "./assets/icons/Afsluitnotitie_normal.svg";
+import { LuNotepadText } from "react-icons/lu";
 import spinner from "./assets/images/loadingSpinner.svg";
 
 import { DATA as PAUSE_OPTIONS } from "./screens/PauseSuggestions";
@@ -35,7 +34,6 @@ import {
   endWorkSession,
   fetchLatestWorkSessionBreaks,
   fetchLatestWorkSession,
-  fetchLatestPreviousWorkSession,
   fetchProfile,
   incrementWorkSessionCounter,
   startWorkSession,
@@ -125,12 +123,7 @@ export default function App() {
   const [favoriteRemovalTarget, setFavoriteRemovalTarget] = useState(null);
   const [favoriteLimitModalOpen, setFavoriteLimitModalOpen] = useState(false);
   const [pauseSummaryCounts, setPauseSummaryCounts] = useState({ breaks_taken: 0, breaks_skipped: 0 });
-  const [endNoteOpen, setEndNoteOpen] = useState(false);
-  const [endNoteValue, setEndNoteValue] = useState("");
-  const [endNoteSaving, setEndNoteSaving] = useState(false);
-  const [endNoteError, setEndNoteError] = useState("");
-  const [previousEndNoteOpen, setPreviousEndNoteOpen] = useState(false);
-  const [previousEndNoteValue, setPreviousEndNoteValue] = useState(null);
+  const [workdayTasksOpen, setWorkdayTasksOpen] = useState(false);
   const sessionUserId = session?.user?.id || null;
 
   // Persistent work timer state lifted here so the timer keeps running
@@ -306,40 +299,6 @@ export default function App() {
   }, [apiBaseUrl, authView, session?.access_token, sessionUserId, signupCompleted, signupProvisioning]);
 
   useEffect(() => {
-    if (!session?.access_token || !sessionUserId || signupProvisioning || (authView === "signup" && !signupCompleted)) {
-      setPreviousEndNoteValue(null);
-      return undefined;
-    }
-
-    let isCancelled = false;
-
-    const loadPreviousEndNote = async () => {
-      try {
-        const latestPreviousSession = await fetchLatestPreviousWorkSession(apiBaseUrl, session.access_token);
-
-        if (!isCancelled) {
-          setPreviousEndNoteValue(
-            typeof latestPreviousSession?.end_note === "string" && latestPreviousSession.end_note.trim()
-              ? latestPreviousSession.end_note
-              : null
-          );
-        }
-      } catch (error) {
-        if (!isCancelled) {
-          setPreviousEndNoteValue(null);
-          console.error("Failed to load previous end note:", error);
-        }
-      }
-    };
-
-    loadPreviousEndNote();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [apiBaseUrl, authView, session?.access_token, sessionUserId, signupCompleted, signupProvisioning]);
-
-  useEffect(() => {
     if (!session?.access_token) {
       setPauseSummaryCounts({ breaks_taken: 0, breaks_skipped: 0 });
       return undefined;
@@ -388,12 +347,7 @@ export default function App() {
     setBreakSeconds(0);
     setShowPauseReminderModal(false);
     setNextPauseReminderTriggerWorkSecond(null);
-    setEndNoteOpen(false);
-    setEndNoteValue("");
-    setEndNoteSaving(false);
-    setEndNoteError("");
-    setPreviousEndNoteOpen(false);
-    setPreviousEndNoteValue(null);
+    setWorkdayTasksOpen(false);
   };
 
   const applyWorkSessionState = (workSession) => {
@@ -406,7 +360,6 @@ export default function App() {
     setBreakSeconds(0);
     setShowPauseReminderModal(false);
     setNextPauseReminderTriggerWorkSecond(workSession.eind_tijd ? null : elapsedSeconds + pauseReminderIntervalSeconds);
-    setEndNoteValue(typeof workSession.end_note === "string" ? workSession.end_note : "");
   };
 
   useEffect(() => {
@@ -660,49 +613,12 @@ export default function App() {
     setNextPauseReminderTriggerWorkSecond(workSeconds + pauseReminderIntervalSeconds);
   };
 
-  const openEndNoteModal = () => {
-    setEndNoteError("");
-    setEndNoteOpen(true);
+  const openWorkdayTasksModal = () => {
+    setWorkdayTasksOpen(true);
   };
 
-  const openPreviousEndNoteModal = () => {
-    setPreviousEndNoteOpen(true);
-  };
-
-  const closePreviousEndNoteModal = () => {
-    setPreviousEndNoteOpen(false);
-  };
-
-  const closeEndNoteModal = () => {
-    if (endNoteSaving) {
-      return;
-    }
-
-    setEndNoteError("");
-    setEndNoteOpen(false);
-  };
-
-  const handleSaveEndNote = async () => {
-    if (!session?.access_token) {
-      return;
-    }
-
-    setEndNoteSaving(true);
-    setEndNoteError("");
-
-    try {
-      const savedSession = await endWorkSession(apiBaseUrl, session.access_token, { end_note: endNoteValue });
-
-      if (savedSession) {
-        setEndNoteValue(typeof savedSession.end_note === "string" ? savedSession.end_note : "");
-      }
-
-      setEndNoteOpen(false);
-    } catch (error) {
-      setEndNoteError(error.message || "Kon afsluitnotitie niet opslaan.");
-    } finally {
-      setEndNoteSaving(false);
-    }
+  const closeWorkdayTasksModal = () => {
+    setWorkdayTasksOpen(false);
   };
 
   const handlePauseReminderDismiss = () => {
@@ -912,17 +828,12 @@ export default function App() {
         workSeconds={workSeconds}
         checkInNotificationsEnabled={Boolean(workSettings?.checkin_notifications_on)}
       />
-      <EndNote
-        isOpen={endNoteOpen}
-        mode="edit"
-        value={endNoteValue}
-        onChange={setEndNoteValue}
-        onClose={closeEndNoteModal}
-        onSubmit={handleSaveEndNote}
-        isSaving={endNoteSaving}
-        error={endNoteError}
+      <WorkdayTasksOverlay
+        isOpen={workdayTasksOpen}
+        onClose={closeWorkdayTasksModal}
+        apiBaseUrl={apiBaseUrl}
+        accessToken={session.access_token}
       />
-      <EndNote isOpen={previousEndNoteOpen} mode="view" value={previousEndNoteValue} onClose={closePreviousEndNoteModal} />
       {showPauseReminderModal && (
         <PauseReminderModal onDismiss={handlePauseReminderDismiss} onTakeBreak={handlePauseReminderTakeBreak} />
       )}
@@ -1043,10 +954,11 @@ export default function App() {
             <button
               className="noteButton"
               type="button"
-              aria-label={previousEndNoteValue ? "Open afsluitnotitie van vorige dag" : "Geen afsluitnotitie van vorige dag"}
-              onClick={openPreviousEndNoteModal}
+              aria-label="Open takenlijst"
+              onClick={openWorkdayTasksModal}
             >
-              <img src={previousEndNoteValue ? notitie : notitieNormal} alt="Afsluitnotitie van vorige dag" />
+              <LuNotepadText />
+
             </button>
           </header>
 
@@ -1060,7 +972,7 @@ export default function App() {
               endDay={endDay}
               takeBreak={takeBreak}
               endBreak={endBreak}
-                onOpenEndNote={openEndNoteModal}
+              onOpenWorkdayTasks={openWorkdayTasksModal}
               dayTargetSeconds={dayTargetSeconds}
             />
           </section>

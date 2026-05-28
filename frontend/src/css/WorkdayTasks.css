@@ -1,0 +1,300 @@
+.workdayTasksOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-32);
+    background-color: var(--backdrop-darken);
+    backdrop-filter: var(--backdrop-blur-4);
+}
+
+.workdayTasksCard {
+    position: relative;
+    width: min(760px, calc(100vw - 32px));
+    max-height: calc(100vh - 64px);
+    overflow: auto;
+    padding: var(--popupcard-padding);
+    border: 2px solid var(--border-color-green);
+    border-radius: var(--popupcard-border-radius);
+    background: var(--surface-card);
+    box-shadow: var(--popupcard-box-shadow);
+    color: var(--text-primary);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-20);
+}
+
+.workdayTasksCloseButton {
+    position: absolute;
+    top: var(--space-20);
+    right: var(--space-20);
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    font-size: var(--close-button-size);
+    cursor: pointer;
+}
+
+.workdayTasksHeader {
+    padding-right: var(--space-32);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+}
+
+.workdayTasksTitle {
+    margin: 0;
+    font-family: var(--text-heading-2-font-family);
+    font-size: var(--text-heading-2-font-size);
+    line-height: var(--text-heading-2-line-height);
+    font-weight: var(--text-heading-2-font-weight);
+}
+
+.workdayTasksSubtitle,
+.workdayTasksQuestion {
+    margin: 0;
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--text-body-regular-font-size);
+    line-height: var(--text-body-regular-line-height);
+    color: var(--text-secondary);
+}
+
+.workdayTasksTabs {
+    display: inline-flex;
+    gap: var(--space-8);
+    padding: 6px;
+    border-radius: 999px;
+    background: var(--background-100);
+    width: fit-content;
+}
+
+.workdayTasksTab {
+    min-width: 110px;
+    padding: var(--button-padding-small-y) var(--button-padding-small-x);
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: var(--button-default-font-family);
+    font-size: var(--button-default-font-size);
+    cursor: pointer;
+    transition: var(--button-default-transition);
+}
+
+.workdayTasksTab.isActive {
+    background: var(--button-primary-bg);
+    border-color: var(--button-primary-border);
+    color: var(--button-primary-text);
+    font-weight: var(--button-primary-font-weight);
+}
+
+.workdayTasksForm {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-12);
+}
+
+.workdayTasksEntryRow {
+    display: flex;
+    align-items: center;
+    gap: var(--space-12);
+}
+
+.workdayTasksInput {
+    flex: 1;
+    min-width: 0;
+    border: var(--input-border-width) var(--input-border-style) var(--input-border-color);
+    border-radius: var(--input-border-radius);
+    padding: var(--layout-input-padding-y) var(--layout-input-padding-x);
+    background: var(--background-100);
+    color: var(--text-primary);
+    font-family: var(--text-input-value-font-family);
+    font-size: var(--text-input-value-font-size);
+    line-height: var(--text-input-value-line-height);
+    outline: none;
+    transition: var(--input-transition);
+}
+
+.workdayTasksInput::placeholder {
+    color: var(--text-placeholder);
+}
+
+.workdayTasksInput:focus {
+    border-color: var(--border-color-brand);
+    box-shadow: var(--input-focus-box-shadow);
+}
+
+.workdayTasksInput:disabled {
+    opacity: var(--opacity-disabled);
+    cursor: not-allowed;
+}
+
+.workdayTasksAddButton,
+.workdayTasksDeleteButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    border: 2px solid var(--button-primary-border);
+    border-radius: var(--button-radius);
+    background: var(--button-primary-bg);
+    color: var(--button-primary-text);
+    cursor: pointer;
+    transition: var(--button-default-transition);
+}
+
+.workdayTasksAddButton {
+    width: 48px;
+    height: 48px;
+    font-size: 1.2rem;
+}
+
+.workdayTasksAddButton:hover:not(:disabled),
+.workdayTasksDoneButton:hover:not(:disabled) {
+    background: var(--button-primary-hover-bg);
+    border-color: var(--button-primary-hover-border);
+    box-shadow: var(--button-default-hover-shadow);
+}
+
+.workdayTasksAddButton:disabled,
+.workdayTasksDeleteButton:disabled,
+.workdayTasksDoneButton:disabled {
+    opacity: var(--opacity-disabled);
+    cursor: not-allowed;
+}
+
+.workdayTasksError {
+    margin: 0;
+    color: var(--text-error);
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--font-size-xs);
+    line-height: var(--text-body-regular-line-height);
+}
+
+.workdayTasksList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-12);
+}
+
+.workdayTasksItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-12);
+    padding: var(--space-12) var(--space-16);
+    border-radius: var(--popupcard-border-radius);
+    background: var(--background-50);
+    border: 1px solid var(--border-color-default);
+}
+
+.workdayTasksItem.isDone {
+    opacity: 0.78;
+}
+
+.workdayTasksCheckRow {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-12);
+    min-width: 0;
+    flex: 1;
+    cursor: pointer;
+}
+
+.workdayTasksCheckbox {
+    flex: 0 0 auto;
+}
+
+.workdayTasksItemText {
+    min-width: 0;
+    color: var(--text-primary);
+    font-family: var(--text-body-regular-font-family);
+    font-size: var(--text-body-regular-font-size);
+    line-height: var(--text-body-regular-line-height);
+    word-break: break-word;
+}
+
+.workdayTasksItem.isDone .workdayTasksItemText {
+    text-decoration: line-through;
+    color: var(--text-secondary);
+}
+
+.workdayTasksDeleteButton {
+    width: 40px;
+    height: 40px;
+    border-color: var(--border-color-default);
+    background: var(--background-100);
+    color: var(--text-secondary);
+}
+
+.workdayTasksDeleteButton:hover:not(:disabled) {
+    background: var(--error-50);
+    border-color: var(--border-color-error);
+    color: var(--text-error);
+}
+
+.workdayTasksEmpty {
+    padding: var(--space-20);
+    border-radius: var(--popupcard-border-radius);
+    background: var(--background-100);
+    border: 1px dashed var(--border-color-default);
+    color: var(--text-secondary);
+    text-align: center;
+    font-family: var(--text-body-regular-font-family);
+}
+
+.workdayTasksFooter {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: var(--space-4);
+}
+
+.workdayTasksDoneButton {
+    min-width: 140px;
+    padding: var(--button-padding-y) var(--button-padding-x);
+    border-radius: var(--button-radius);
+    border: 2px solid var(--button-primary-border);
+    background: var(--button-primary-bg);
+    color: var(--button-primary-text);
+    font-family: var(--button-default-font-family);
+    font-size: var(--button-default-font-size);
+    font-weight: var(--button-primary-font-weight);
+    cursor: pointer;
+    transition: var(--button-default-transition);
+}
+
+@media (max-width: 640px) {
+    .workdayTasksOverlay {
+        padding: 16px;
+    }
+
+    .workdayTasksCard {
+        width: min(100%, calc(100vw - 32px));
+        padding: 20px;
+        gap: var(--space-16);
+    }
+
+    .workdayTasksHeader {
+        padding-right: var(--space-24);
+    }
+
+    .workdayTasksEntryRow,
+    .workdayTasksItem {
+        align-items: flex-start;
+    }
+
+    .workdayTasksTabs {
+        width: 100%;
+    }
+
+    .workdayTasksTab {
+        flex: 1;
+        min-width: 0;
+    }
+}

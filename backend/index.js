@@ -46,6 +46,17 @@ function getTodayRange() {
   return getReportRange();
 }
 
+function getLocalDateString(daysOffset = 0) {
+  const date = new Date();
+  date.setDate(date.getDate() + daysOffset);
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
 // Convert a duration in seconds to a human-readable string for the report UI.
 function formatSecondsAsDuration(totalSeconds) {
   const safeSeconds = Math.max(0, Math.floor(Number(totalSeconds) || 0));
@@ -99,7 +110,8 @@ function buildDailyReportPayload({ localDate, totals, pauseTotals, totalCheckins
   };
 }
 
-const WORK_SESSION_SELECT = "id, start_tijd, eind_tijd, end_note, source, source_details, server_scheduled_day, total_pausetime, breaks_taken, breaks_skipped";
+const WORK_SESSION_SELECT = "id, start_tijd, eind_tijd, source, source_details, server_scheduled_day, total_pausetime, breaks_taken, breaks_skipped";
+const WORKDAY_TASK_SELECT = "id, user_id, task_date, task_text, is_done, done_at, sort_order, created_at, updated_at";
 
 // --- report data ---
 
@@ -289,53 +301,6 @@ app.get("/work-sessions/today/latest", async (req, res) => {
   });
 });
 
-app.get("/work-sessions/previous/latest", async (req, res) => {
-  if (!supabase) {
-    return res.status(500).json({
-      error: "Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in backend/.env.",
-    });
-  }
-
-  const token = getBearerToken(req);
-
-  if (!token) {
-    return res.status(401).json({
-      error: "Missing Bearer token.",
-    });
-  }
-
-  const { data: userData, error: userError } = await supabase.auth.getUser(token);
-
-  if (userError || !userData?.user) {
-    return res.status(401).json({
-      error: "Invalid or expired session.",
-    });
-  }
-
-  const { startIso } = getTodayRange();
-
-  const { data: latestSession, error: sessionError } = await supabase
-    .from("work_sessions")
-    .select(WORK_SESSION_SELECT)
-    .eq("user_id", userData.user.id)
-    .lt("start_tijd", startIso)
-    .not("eind_tijd", "is", null)
-    .order("start_tijd", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  if (sessionError) {
-    return res.status(500).json({
-      error: "Failed to load previous work session.",
-      details: sessionError.message,
-    });
-  }
-
-  return res.json({
-    work_session: latestSession || null,
-  });
-});
-
 app.post("/work-sessions/start", async (req, res) => {
   if (!supabase) {
     return res.status(500).json({
@@ -450,7 +415,6 @@ app.post("/work-sessions/end", async (req, res) => {
   }
 
   const requestedEndTime = typeof req.body?.eind_tijd === "string" ? new Date(req.body.eind_tijd) : null;
-  const requestedEndNote = typeof req.body?.end_note === "string" ? req.body.end_note.trim() : null;
 
   if (requestedEndTime && Number.isNaN(requestedEndTime.getTime())) {
     return res.status(400).json({
@@ -486,7 +450,7 @@ app.post("/work-sessions/end", async (req, res) => {
 
   const { data: updatedSession, error: updateError } = await supabase
     .from("work_sessions")
-    .update(requestedEndTime ? { eind_tijd: requestedEndTime.toISOString(), ...(requestedEndNote !== null ? { end_note: requestedEndNote || null } : {}) } : { end_note: requestedEndNote || null })
+    .update(requestedEndTime ? { eind_tijd: requestedEndTime.toISOString() } : { eind_tijd: latestSession.eind_tijd })
     .eq("id", latestSession.id)
     .select(WORK_SESSION_SELECT)
     .single();
@@ -713,6 +677,241 @@ app.post("/work-sessions/breaks/increment", async (req, res) => {
   }
 
   return res.json({ ok: true, [column]: nextValue });
+});
+
+app.get("/workday-tasks/overview", async (req, res) => {
+  if (!supabase) {
+    return res.status(500).json({
+      error: "Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in backend/.env.",
+    });
+  }
+
+  const token = getBearerToken(req);
+
+  if (!token) {
+    return res.status(401).json({
+      error: "Missing Bearer token.",
+    });
+  }
+
+  const { data: userData, error: userError } = await supabase.auth.getUser(token);
+
+  if (userError || !userData?.user) {
+    return res.status(401).json({
+      error: "Invalid or expired session.",
+    });
+  }
+
+  const todayDate = getLocalDateString(0);
+  const tomorrowDate = getLocalDateString(1);
+
+  const { data: tasks, error: taskError } = await supabase
+    .from("workday_tasks")
+    .select(WORKDAY_TASK_SELECT)
+    .eq("user_id", userData.user.id)
+    .in("task_date", [todayDate, tomorrowDate])
+    .order("created_at", { ascending: true });
+
+  if (taskError) {
+    return res.status(500).json({
+      error: "Failed to load workday tasks.",
+      details: taskError.message,
+    });
+  }
+
+  const safeTasks = Array.isArray(tasks) ? tasks : [];
+
+  return res.json({
+    today_date: todayDate,
+    tomorrow_date: tomorrowDate,
+    today: safeTasks.filter((task) => task.task_date === todayDate),
+    tomorrow: safeTasks.filter((task) => task.task_date === tomorrowDate),
+  });
+});
+
+app.post("/workday-tasks", async (req, res) => {
+  if (!supabase) {
+    return res.status(500).json({
+      error: "Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in backend/.env.",
+    });
+  }
+
+  const token = getBearerToken(req);
+
+  if (!token) {
+    return res.status(401).json({
+      error: "Missing Bearer token.",
+    });
+  }
+
+  const { data: userData, error: userError } = await supabase.auth.getUser(token);
+
+  if (userError || !userData?.user) {
+    return res.status(401).json({
+      error: "Invalid or expired session.",
+    });
+  }
+
+  const taskText = typeof req.body?.task_text === "string" ? req.body.task_text.trim() : "";
+  const taskDay = req.body?.task_day === "tomorrow" ? "tomorrow" : req.body?.task_day === "today" ? "today" : null;
+
+  if (!taskText || !taskDay) {
+    return res.status(400).json({
+      error: "Missing task text or invalid task day.",
+    });
+  }
+
+  const taskDate = getLocalDateString(taskDay === "tomorrow" ? 1 : 0);
+
+  const { data: createdTask, error: createError } = await supabase
+    .from("workday_tasks")
+    .insert({
+      user_id: userData.user.id,
+      task_date: taskDate,
+      task_text: taskText,
+    })
+    .select(WORKDAY_TASK_SELECT)
+    .single();
+
+  if (createError) {
+    return res.status(500).json({
+      error: "Failed to create workday task.",
+      details: createError.message,
+    });
+  }
+
+  return res.status(201).json({
+    workday_task: createdTask,
+  });
+});
+
+app.patch("/workday-tasks/:id", async (req, res) => {
+  if (!supabase) {
+    return res.status(500).json({
+      error: "Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in backend/.env.",
+    });
+  }
+
+  const token = getBearerToken(req);
+
+  if (!token) {
+    return res.status(401).json({
+      error: "Missing Bearer token.",
+    });
+  }
+
+  const { data: userData, error: userError } = await supabase.auth.getUser(token);
+
+  if (userError || !userData?.user) {
+    return res.status(401).json({
+      error: "Invalid or expired session.",
+    });
+  }
+
+  const taskId = typeof req.params?.id === "string" ? req.params.id : "";
+  if (!taskId) {
+    return res.status(400).json({
+      error: "Missing task id.",
+    });
+  }
+
+  const updates = {};
+
+  if (typeof req.body?.task_text === "string") {
+    const nextText = req.body.task_text.trim();
+    if (!nextText) {
+      return res.status(400).json({
+        error: "Task text cannot be empty.",
+      });
+    }
+    updates.task_text = nextText;
+  }
+
+  if (typeof req.body?.task_day === "string") {
+    if (req.body.task_day !== "today" && req.body.task_day !== "tomorrow") {
+      return res.status(400).json({
+        error: "Invalid task day.",
+      });
+    }
+
+    updates.task_date = getLocalDateString(req.body.task_day === "tomorrow" ? 1 : 0);
+  }
+
+  if (typeof req.body?.is_done === "boolean") {
+    updates.is_done = req.body.is_done;
+    updates.done_at = req.body.is_done ? new Date().toISOString() : null;
+  }
+
+  if (Object.keys(updates).length === 0) {
+    return res.status(400).json({
+      error: "No valid task updates provided.",
+    });
+  }
+
+  const { data: updatedTask, error: updateError } = await supabase
+    .from("workday_tasks")
+    .update(updates)
+    .eq("id", taskId)
+    .eq("user_id", userData.user.id)
+    .select(WORKDAY_TASK_SELECT)
+    .single();
+
+  if (updateError) {
+    return res.status(500).json({
+      error: "Failed to update workday task.",
+      details: updateError.message,
+    });
+  }
+
+  return res.json({
+    workday_task: updatedTask,
+  });
+});
+
+app.delete("/workday-tasks/:id", async (req, res) => {
+  if (!supabase) {
+    return res.status(500).json({
+      error: "Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in backend/.env.",
+    });
+  }
+
+  const token = getBearerToken(req);
+
+  if (!token) {
+    return res.status(401).json({
+      error: "Missing Bearer token.",
+    });
+  }
+
+  const { data: userData, error: userError } = await supabase.auth.getUser(token);
+
+  if (userError || !userData?.user) {
+    return res.status(401).json({
+      error: "Invalid or expired session.",
+    });
+  }
+
+  const taskId = typeof req.params?.id === "string" ? req.params.id : "";
+  if (!taskId) {
+    return res.status(400).json({
+      error: "Missing task id.",
+    });
+  }
+
+  const { error: deleteError } = await supabase
+    .from("workday_tasks")
+    .delete()
+    .eq("id", taskId)
+    .eq("user_id", userData.user.id);
+
+  if (deleteError) {
+    return res.status(500).json({
+      error: "Failed to delete workday task.",
+      details: deleteError.message,
+    });
+  }
+
+  return res.json({ ok: true });
 });
 
 // --- signup flow ---
@@ -1102,7 +1301,7 @@ app.delete("/account/me", async (req, res) => {
   }
 
   const userId = userData.user.id;
-  const tablesToDelete = ["favorite_pauses", "settings", "checkins", "work_sessions", "profiles"];
+  const tablesToDelete = ["favorite_pauses", "settings", "checkins", "work_sessions", "workday_tasks", "profiles"];
 
   for (const tableName of tablesToDelete) {
     const { error } = await supabase.from(tableName).delete().eq("user_id", userId);

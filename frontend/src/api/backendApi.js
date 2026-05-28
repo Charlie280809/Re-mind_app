@@ -129,25 +129,85 @@ export async function fetchLatestWorkSession(apiBaseUrl, accessToken) {
     return body?.work_session ?? null;
 }
 
-export async function fetchLatestPreviousWorkSession(apiBaseUrl, accessToken) {
+export async function fetchWorkdayTasksOverview(apiBaseUrl, accessToken) {
     const response = await fetchWithApiError(
-        `${apiBaseUrl}/work-sessions/previous/latest`,
+        `${apiBaseUrl}/workday-tasks/overview`,
         {
             headers: {
                 Authorization: `Bearer ${accessToken}`,
             },
         },
         (detail) =>
-            `Kan backend niet bereiken op ${apiBaseUrl}/work-sessions/previous/latest. Controleer of de backend draait en of VITE_API_BASE_URL klopt. ${detail ? `(${detail})` : ""}`
+            `Kan backend niet bereiken op ${apiBaseUrl}/workday-tasks/overview. Controleer of de backend draait en of VITE_API_BASE_URL klopt. ${detail ? `(${detail})` : ""}`
     );
 
-    const body = await readJsonResponse(response, (snippet) => snippet || "Kon vorige afsluitnotitie niet laden.");
+    const body = await readJsonResponse(response, (snippet) => snippet || "Kon takenlijst niet laden.");
 
     if (!response.ok) {
-        throw new Error(body.error || "Kon vorige afsluitnotitie niet laden.");
+        throw new Error(body.error || "Kon takenlijst niet laden.");
     }
 
-    return body?.work_session ?? null;
+    return {
+        todayDate: body?.today_date || null,
+        tomorrowDate: body?.tomorrow_date || null,
+        today: Array.isArray(body?.today) ? body.today : [],
+        tomorrow: Array.isArray(body?.tomorrow) ? body.tomorrow : [],
+    };
+}
+
+export async function createWorkdayTask(apiBaseUrl, accessToken, payload) {
+    const response = await fetch(`${apiBaseUrl}/workday-tasks`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(payload),
+    });
+
+    const body = await readJsonResponse(response, (snippet) => snippet || "Kon taak niet toevoegen.");
+
+    if (!response.ok) {
+        throw new Error(body.error || "Kon taak niet toevoegen.");
+    }
+
+    return body?.workday_task ?? null;
+}
+
+export async function updateWorkdayTask(apiBaseUrl, accessToken, taskId, payload) {
+    const response = await fetch(`${apiBaseUrl}/workday-tasks/${taskId}`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(payload),
+    });
+
+    const body = await readJsonResponse(response, (snippet) => snippet || "Kon taak niet bijwerken.");
+
+    if (!response.ok) {
+        throw new Error(body.error || "Kon taak niet bijwerken.");
+    }
+
+    return body?.workday_task ?? null;
+}
+
+export async function deleteWorkdayTask(apiBaseUrl, accessToken, taskId) {
+    const response = await fetch(`${apiBaseUrl}/workday-tasks/${taskId}`, {
+        method: "DELETE",
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+        },
+    });
+
+    const body = await readJsonResponse(response, (snippet) => snippet || "Kon taak niet verwijderen.");
+
+    if (!response.ok) {
+        throw new Error(body.error || "Kon taak niet verwijderen.");
+    }
+
+    return Boolean(body?.ok);
 }
 
 export async function startWorkSession(apiBaseUrl, accessToken, payload) {
