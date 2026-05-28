@@ -76,7 +76,7 @@
 }
 
 .pauseTimePanel {
-  margin: 100% 0 0 var(--space-12);
+  margin: var(--space-8) 0 0 var(--space-12);
   padding: var(--space-12);
   border-radius: 18px;
   background-color: var(--primary-200);
