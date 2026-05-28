@@ -14,6 +14,151 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const supabase = supabaseUrl && supabaseServiceRoleKey ? createClient(supabaseUrl, supabaseServiceRoleKey) : null;
+const WORK_SESSION_AUTOSTART_TICK_MS = 60 * 1000;
+
+let autostartSyncInProgress = false;
+
+function formatLocalDate(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+function getWorkdayKey(date) {
+  const keys = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+  return keys[date.getDay()];
+}
+
+function parseTimeString(timeValue) {
+  if (typeof timeValue !== "string") {
+    return null;
+  }
+
+  const match = timeValue.match(/^(\d{2}):(\d{2})(?::\d{2})?$/);
+
+  if (!match) {
+    return null;
+  }
+
+  const hours = Number.parseInt(match[1], 10);
+  const minutes = Number.parseInt(match[2], 10);
+
+  if (!Number.isFinite(hours) || !Number.isFinite(minutes)) {
+    return null;
+  }
+
+  return { hours, minutes };
+}
+
+function buildLocalStartTime(baseDate, timeValue) {
+  const parsed = parseTimeString(timeValue);
+
+  if (!parsed) {
+    return null;
+  }
+
+  const value = new Date(baseDate);
+  value.setHours(parsed.hours, parsed.minutes, 0, 0);
+  return value;
+}
+
+async function ensureScheduledWorkSessionsForToday() {
+  if (!supabase || autostartSyncInProgress) {
+    return;
+  }
+
+  autostartSyncInProgress = true;
+
+  try {
+    const now = new Date();
+    const localDate = formatLocalDate(now);
+    const dayKey = getWorkdayKey(now);
+    const dayFlagColumn = `${dayKey}_isworkday`;
+    const dayStart = new Date(now);
+    dayStart.setHours(0, 0, 0, 0);
+    const dayEnd = new Date(dayStart);
+    dayEnd.setDate(dayEnd.getDate() + 1);
+
+    const { data: settingsRows, error: settingsError } = await supabase
+      .from("settings")
+      .select("user_id, werktimer_autostart, werk_startuur, mon_isworkday, tue_isworkday, wed_isworkday, thu_isworkday, fri_isworkday, sat_isworkday, sun_isworkday")
+      .eq("werktimer_autostart", true)
+      .eq(dayFlagColumn, true)
+      .not("werk_startuur", "is", null);
+
+    if (settingsError) {
+      console.error("Autostart scheduler failed to load settings:", settingsError.message);
+      return;
+    }
+
+    const dueSettings = (settingsRows || []).filter((row) => {
+      const scheduledStart = buildLocalStartTime(now, row.werk_startuur);
+      return scheduledStart && scheduledStart.getTime() <= now.getTime();
+    });
+
+    if (dueSettings.length === 0) {
+      return;
+    }
+
+    const userIds = dueSettings.map((row) => row.user_id);
+
+    const { data: existingSessions, error: existingError } = await supabase
+      .from("work_sessions")
+      .select("user_id")
+      .in("user_id", userIds)
+      .gte("start_tijd", dayStart.toISOString())
+      .lt("start_tijd", dayEnd.toISOString());
+
+    if (existingError) {
+      console.error("Autostart scheduler failed to load existing sessions:", existingError.message);
+      return;
+    }
+
+    const usersWithSessionToday = new Set((existingSessions || []).map((row) => row.user_id));
+    const rowsToInsert = dueSettings
+      .filter((row) => !usersWithSessionToday.has(row.user_id))
+      .map((row) => {
+        const scheduledStart = buildLocalStartTime(now, row.werk_startuur);
+
+        return {
+          user_id: row.user_id,
+          start_tijd: scheduledStart.toISOString(),
+          eind_tijd: null,
+          source: "server_scheduled",
+          source_details: {
+            source: "backend_scheduler",
+            scheduled_for: localDate,
+            generated_at: now.toISOString(),
+          },
+          server_scheduled_day: localDate,
+        };
+      });
+
+    if (rowsToInsert.length === 0) {
+      return;
+    }
+
+    for (const row of rowsToInsert) {
+      const { error: insertError } = await supabase.from("work_sessions").insert(row);
+
+      if (insertError && insertError.code !== "23505") {
+        console.error("Autostart scheduler failed to insert session:", insertError.message);
+      }
+    }
+  } finally {
+    autostartSyncInProgress = false;
+  }
+}
+
+function startWorkSessionAutostartScheduler() {
+  ensureScheduledWorkSessionsForToday().catch((error) => {
+    console.error("Autostart scheduler tick failed:", error);
+  });
+
+  setInterval(() => {
+    ensureScheduledWorkSessionsForToday().catch((error) => {
+      console.error("Autostart scheduler tick failed:", error);
+    });
+  }, WORK_SESSION_AUTOSTART_TICK_MS);
+}
 
 // --- shared request helpers ---
 
@@ -985,4 +1130,5 @@ app.delete("/account/me", async (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Backend running on port ${PORT}`);
+  startWorkSessionAutostartScheduler();
 });

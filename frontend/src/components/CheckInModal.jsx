@@ -45,9 +45,9 @@ export default function CheckInModal({
         }
 
         if (nextCheckInTriggerWorkSecond == null) {
-            // setNextCheckInTriggerWorkSecond(getRandomCheckInIntervalSeconds());
+            setNextCheckInTriggerWorkSecond(getRandomCheckInIntervalSeconds());
             //for demo purposes, trigger first check-in after 10 seconds
-            setNextCheckInTriggerWorkSecond(10);
+            // setNextCheckInTriggerWorkSecond(10);
             return;
         }
 
