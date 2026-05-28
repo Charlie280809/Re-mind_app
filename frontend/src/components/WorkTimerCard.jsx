@@ -111,7 +111,7 @@ export default function WorkTimerCard({
             <>
               <div className="finishedText">Je bent klaar voor vandaag!</div>
               <button className="btn" onClick={onOpenWorkdayTasks} type="button">
-                Takenlijst aanvullen
+                Notitie invullen
               </button>
             </>
           )}
