@@ -129,6 +129,27 @@ export async function fetchLatestWorkSession(apiBaseUrl, accessToken) {
     return body?.work_session ?? null;
 }
 
+export async function fetchLatestPreviousWorkSession(apiBaseUrl, accessToken) {
+    const response = await fetchWithApiError(
+        `${apiBaseUrl}/work-sessions/previous/latest`,
+        {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            },
+        },
+        (detail) =>
+            `Kan backend niet bereiken op ${apiBaseUrl}/work-sessions/previous/latest. Controleer of de backend draait en of VITE_API_BASE_URL klopt. ${detail ? `(${detail})` : ""}`
+    );
+
+    const body = await readJsonResponse(response, (snippet) => snippet || "Kon vorige afsluitnotitie niet laden.");
+
+    if (!response.ok) {
+        throw new Error(body.error || "Kon vorige afsluitnotitie niet laden.");
+    }
+
+    return body?.work_session ?? null;
+}
+
 export async function startWorkSession(apiBaseUrl, accessToken, payload) {
     const response = await fetch(`${apiBaseUrl}/work-sessions/start`, {
         method: "POST",

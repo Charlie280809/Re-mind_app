@@ -23,6 +23,7 @@ import SettingsPrivacy from "./screens/SettingsPrivacy";
 import UpgradePlan from "./screens/UpgradePlan";
 
 import notitie from "./assets/icons/Afsluitnotitie.svg";
+import notitieNormal from "./assets/icons/Afsluitnotitie_normal.svg";
 import spinner from "./assets/images/loadingSpinner.svg";
 
 import { DATA as PAUSE_OPTIONS } from "./screens/PauseSuggestions";
@@ -34,6 +35,7 @@ import {
   endWorkSession,
   fetchLatestWorkSessionBreaks,
   fetchLatestWorkSession,
+  fetchLatestPreviousWorkSession,
   fetchProfile,
   incrementWorkSessionCounter,
   startWorkSession,
@@ -127,6 +129,8 @@ export default function App() {
   const [endNoteValue, setEndNoteValue] = useState("");
   const [endNoteSaving, setEndNoteSaving] = useState(false);
   const [endNoteError, setEndNoteError] = useState("");
+  const [previousEndNoteOpen, setPreviousEndNoteOpen] = useState(false);
+  const [previousEndNoteValue, setPreviousEndNoteValue] = useState(null);
   const sessionUserId = session?.user?.id || null;
 
   // Persistent work timer state lifted here so the timer keeps running
@@ -302,6 +306,40 @@ export default function App() {
   }, [apiBaseUrl, authView, session?.access_token, sessionUserId, signupCompleted, signupProvisioning]);
 
   useEffect(() => {
+    if (!session?.access_token || !sessionUserId || signupProvisioning || (authView === "signup" && !signupCompleted)) {
+      setPreviousEndNoteValue(null);
+      return undefined;
+    }
+
+    let isCancelled = false;
+
+    const loadPreviousEndNote = async () => {
+      try {
+        const latestPreviousSession = await fetchLatestPreviousWorkSession(apiBaseUrl, session.access_token);
+
+        if (!isCancelled) {
+          setPreviousEndNoteValue(
+            typeof latestPreviousSession?.end_note === "string" && latestPreviousSession.end_note.trim()
+              ? latestPreviousSession.end_note
+              : null
+          );
+        }
+      } catch (error) {
+        if (!isCancelled) {
+          setPreviousEndNoteValue(null);
+          console.error("Failed to load previous end note:", error);
+        }
+      }
+    };
+
+    loadPreviousEndNote();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [apiBaseUrl, authView, session?.access_token, sessionUserId, signupCompleted, signupProvisioning]);
+
+  useEffect(() => {
     if (!session?.access_token) {
       setPauseSummaryCounts({ breaks_taken: 0, breaks_skipped: 0 });
       return undefined;
@@ -354,6 +392,8 @@ export default function App() {
     setEndNoteValue("");
     setEndNoteSaving(false);
     setEndNoteError("");
+    setPreviousEndNoteOpen(false);
+    setPreviousEndNoteValue(null);
   };
 
   const applyWorkSessionState = (workSession) => {
@@ -625,6 +665,14 @@ export default function App() {
     setEndNoteOpen(true);
   };
 
+  const openPreviousEndNoteModal = () => {
+    setPreviousEndNoteOpen(true);
+  };
+
+  const closePreviousEndNoteModal = () => {
+    setPreviousEndNoteOpen(false);
+  };
+
   const closeEndNoteModal = () => {
     if (endNoteSaving) {
       return;
@@ -866,6 +914,7 @@ export default function App() {
       />
       <EndNote
         isOpen={endNoteOpen}
+        mode="edit"
         value={endNoteValue}
         onChange={setEndNoteValue}
         onClose={closeEndNoteModal}
@@ -873,6 +922,7 @@ export default function App() {
         isSaving={endNoteSaving}
         error={endNoteError}
       />
+      <EndNote isOpen={previousEndNoteOpen} mode="view" value={previousEndNoteValue} onClose={closePreviousEndNoteModal} />
       {showPauseReminderModal && (
         <PauseReminderModal onDismiss={handlePauseReminderDismiss} onTakeBreak={handlePauseReminderTakeBreak} />
       )}
@@ -990,8 +1040,13 @@ export default function App() {
               <h2 className="homeSubtitle">Klaar om je werkdag te starten?</h2>
             </div>
 
-            <button className="noteButton" type="button" aria-label="afsluitnotitie voorgaande dag"> {/* aanpassen --> afsluitroutine van voorgaande dag */}
-              <img src={notitie} alt="Afsluitnotitie van vorige dag" />
+            <button
+              className="noteButton"
+              type="button"
+              aria-label={previousEndNoteValue ? "Open afsluitnotitie van vorige dag" : "Geen afsluitnotitie van vorige dag"}
+              onClick={openPreviousEndNoteModal}
+            >
+              <img src={previousEndNoteValue ? notitie : notitieNormal} alt="Afsluitnotitie van vorige dag" />
             </button>
           </header>
 

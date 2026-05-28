@@ -289,6 +289,53 @@ app.get("/work-sessions/today/latest", async (req, res) => {
   });
 });
 
+app.get("/work-sessions/previous/latest", async (req, res) => {
+  if (!supabase) {
+    return res.status(500).json({
+      error: "Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in backend/.env.",
+    });
+  }
+
+  const token = getBearerToken(req);
+
+  if (!token) {
+    return res.status(401).json({
+      error: "Missing Bearer token.",
+    });
+  }
+
+  const { data: userData, error: userError } = await supabase.auth.getUser(token);
+
+  if (userError || !userData?.user) {
+    return res.status(401).json({
+      error: "Invalid or expired session.",
+    });
+  }
+
+  const { startIso } = getTodayRange();
+
+  const { data: latestSession, error: sessionError } = await supabase
+    .from("work_sessions")
+    .select(WORK_SESSION_SELECT)
+    .eq("user_id", userData.user.id)
+    .lt("start_tijd", startIso)
+    .not("eind_tijd", "is", null)
+    .order("start_tijd", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (sessionError) {
+    return res.status(500).json({
+      error: "Failed to load previous work session.",
+      details: sessionError.message,
+    });
+  }
+
+  return res.json({
+    work_session: latestSession || null,
+  });
+});
+
 app.post("/work-sessions/start", async (req, res) => {
   if (!supabase) {
     return res.status(500).json({
