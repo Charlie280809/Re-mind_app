@@ -46,17 +46,13 @@ function getTodayRange() {
   return getReportRange();
 }
 
-// Convert a duration in minutes to a human-readable string for the report UI.
-function formatMinutesAsDuration(totalMinutes) {
-  const safeMinutes = Math.max(0, Math.round(Number(totalMinutes) || 0));
-  const hours = Math.floor(safeMinutes / 60);
-  const minutes = safeMinutes % 60;
+// Convert a duration in seconds to a human-readable string for the report UI.
+function formatSecondsAsDuration(totalSeconds) {
+  const safeSeconds = Math.max(0, Math.floor(Number(totalSeconds) || 0));
+  const minutes = Math.floor(safeSeconds / 60);
+  const seconds = safeSeconds % 60;
 
-  if (hours === 0) {
-    return `${minutes} minuten`;
-  }
-
-  return `${hours} uur en ${minutes} minuten`;
+  return `${minutes} minuten ${seconds} seconden`;
 }
 
 function summarizeDailyWorkSessions(workSessions) {
@@ -64,29 +60,29 @@ function summarizeDailyWorkSessions(workSessions) {
     (acc, session) => {
       const startTime = new Date(session.start_tijd);
       const endTime = new Date(session.eind_tijd);
-      const sessionDurationMinutes = Number.isFinite(startTime.getTime()) && Number.isFinite(endTime.getTime())
-        ? Math.max(0, Math.round((endTime.getTime() - startTime.getTime()) / 60000))
+      const sessionDurationSeconds = Number.isFinite(startTime.getTime()) && Number.isFinite(endTime.getTime())
+        ? Math.max(0, Math.floor((endTime.getTime() - startTime.getTime()) / 1000))
         : 0;
-      const sessionPauseMinutes = Math.max(0, Number(session.total_pausetime ?? 0));
+      const sessionPauseSeconds = Math.max(0, Number(session.total_pausetime ?? 0));
 
       acc.breaksTaken += Number(session.breaks_taken ?? 0);
       acc.breaksSkipped += Number(session.breaks_skipped ?? 0);
-      acc.totalBreakMinutes += sessionPauseMinutes;
-      acc.totalWorkMinutes += Math.max(0, sessionDurationMinutes - sessionPauseMinutes);
+      acc.totalBreakSeconds += sessionPauseSeconds;
+      acc.totalWorkSeconds += Math.max(0, sessionDurationSeconds - sessionPauseSeconds);
       return acc;
     },
-    { breaksTaken: 0, breaksSkipped: 0, totalBreakMinutes: 0, totalWorkMinutes: 0 }
+    { breaksTaken: 0, breaksSkipped: 0, totalBreakSeconds: 0, totalWorkSeconds: 0 }
   );
 }
 
-function convertBreakSecondsToMinutes(breakSeconds) {
+function normalizeBreakSeconds(breakSeconds) {
   const safeSeconds = Math.max(0, Number(breakSeconds) || 0);
 
   if (safeSeconds <= 0) {
     return 0;
   }
 
-  return Math.ceil(safeSeconds / 60);
+  return Math.floor(safeSeconds);
 }
 
 function buildDailyReportPayload({ localDate, totals, pauseTotals, totalCheckins }) {
@@ -98,8 +94,8 @@ function buildDailyReportPayload({ localDate, totals, pauseTotals, totalCheckins
     pauseRecommendations: totals.pauseRecommendations,
     breaks_taken: pauseTotals.breaksTaken,
     breaks_skipped: pauseTotals.breaksSkipped,
-    totalBreakTime: formatMinutesAsDuration(pauseTotals.totalBreakMinutes),
-    totalWorkTime: formatMinutesAsDuration(pauseTotals.totalWorkMinutes),
+    totalBreakTime: formatSecondsAsDuration(pauseTotals.totalBreakSeconds),
+    totalWorkTime: formatSecondsAsDuration(pauseTotals.totalWorkSeconds),
   };
 }
 
@@ -490,12 +486,12 @@ app.post("/work-sessions/breaks/complete", async (req, res) => {
     });
   }
 
-  const addedPauseMinutes = convertBreakSecondsToMinutes(pauseSeconds);
+  const addedPauseSeconds = normalizeBreakSeconds(pauseSeconds);
 
-  if (addedPauseMinutes <= 0) {
+  if (addedPauseSeconds <= 0) {
     return res.json({
       work_session: null,
-      added_pause_minutes: 0,
+      added_pause_seconds: 0,
     });
   }
 
@@ -525,12 +521,12 @@ app.post("/work-sessions/breaks/complete", async (req, res) => {
     });
   }
 
-  const nextTotalPauseMinutes = Number(latestSession.total_pausetime ?? 0) + addedPauseMinutes;
+  const nextTotalPauseSeconds = Number(latestSession.total_pausetime ?? 0) + addedPauseSeconds;
 
   const { data: updatedSession, error: updateError } = await supabase
     .from("work_sessions")
     .update({
-      total_pausetime: nextTotalPauseMinutes,
+      total_pausetime: nextTotalPauseSeconds,
     })
     .eq("id", latestSession.id)
     .select("id, total_pausetime")
@@ -545,7 +541,7 @@ app.post("/work-sessions/breaks/complete", async (req, res) => {
 
   return res.json({
     work_session: updatedSession,
-    added_pause_minutes: addedPauseMinutes,
+    added_pause_seconds: addedPauseSeconds,
   });
 });
 
