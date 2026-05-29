@@ -60,9 +60,10 @@ export default function CheckInModal({
 
         if (!showCheckInModal && workSeconds >= nextCheckInTriggerWorkSecond) {
             if (!hasShownCheckInNotificationRef.current) {
-                showNativeNotification({
+                showNativeNotification({ /* invulbaar maken? */
                     title: "Hoe voel je je op dit moment?",
                     body: "Vul je stress en energie niveau in om een beter beeld te krijgen van je huidige toestand.",
+                    // actie, stress en energie ingeven?
                     onClick: () => setShowCheckInModal(true),
                 });
                 hasShownCheckInNotificationRef.current = true;

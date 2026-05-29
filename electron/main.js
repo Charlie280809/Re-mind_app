@@ -20,6 +20,7 @@ const showSystemNotification = ({ title, body }) => {
   const notification = new Notification({
     title,
     body,
+    icon: path.join(__dirname, "assets/favicon.ico"),
   });
 
   notification.on("click", () => {
@@ -91,6 +92,9 @@ app.whenReady().then(() => {
   if (process.platform === "win32") {
     app.setAppUserModelId(app.isPackaged ? "com.remind.app" : process.execPath);
   }
+
+  app.setName("Re:Mind");
+  app.setAppUserModelId("Re:Mind");
 
   createWindow();
 });

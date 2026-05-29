@@ -47,8 +47,8 @@ export default function PauseReminderModal({
         if (!showPauseReminderModal && workSeconds >= nextPauseReminderTriggerWorkSecond) {
             if (!hasShownPauseReminderNotificationRef.current) {
                 showNativeNotification({
-                    title: "Je werkt nu al een tijdje aan een stuk. Tijd voor een pauze?",
-                    body: "Pauzeren is niet lui, het is een noodzaak.",
+                    title: "⏰ Tijd voor een pauze?",
+                    body: "Je werkt al een tijdje aan een stuk. Neem even een moment om tot rust te komen.",
                     onClick: () => setShowPauseReminderModal(true),
                 });
                 hasShownPauseReminderNotificationRef.current = true;
