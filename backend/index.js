@@ -381,7 +381,7 @@ app.get("/calendar/connect-url", async (req, res) => {
 
   if (!settingsData || settingsData.allow_agenda_sync !== true) {
     return res.status(403).json({
-      error: "Agenda sync is disabled in privacy settings.",
+      error: "Geen agenda gekoppeld. Ga naar de privacy instellingen om sync in te schakelen.",
     });
   }
 
@@ -508,7 +508,7 @@ app.get("/calendar/events", async (req, res) => {
 
   if (!settingsData || settingsData.allow_agenda_sync !== true) {
     return res.status(403).json({
-      error: "Agenda sync is disabled in privacy settings.",
+      error: "Geen agenda gekoppeld. Ga naar de privacy instellingen om sync in te schakelen.",
     });
   }
 
