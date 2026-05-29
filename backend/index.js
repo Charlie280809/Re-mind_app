@@ -515,7 +515,7 @@ app.get("/calendar/events", async (req, res) => {
   const connection = await loadCalendarConnection(userData.user.id, provider);
   if (!connection) {
     return res.status(404).json({
-      error: "Agenda is niet gekoppeld.",
+      error: "Geen agenda gekoppeld, klik op è'Google Agenda kopplen' of 'Outlook koppelen' om je agenda te koppelen.",
     });
   }
 
