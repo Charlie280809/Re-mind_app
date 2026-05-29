@@ -296,6 +296,13 @@
     gap: var(--space-16);
 }
 
+.reportAgendaActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-8);
+    justify-content: flex-end;
+}
+
 .reportAgendaButton {
     font-family: var(--button-default-font-family);
     font-size: var(--button-default-font-size);
@@ -313,4 +320,63 @@
 .reportAgendaCard {
     min-height: 220px;
     padding: var(--space-20) var(--space-32);
+}
+
+.reportAgendaList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-12);
+}
+
+.reportAgendaItem {
+    border: 2px solid var(--border-color-default);
+    border-radius: 18px;
+    background-color: var(--background-50);
+    padding: var(--space-16) var(--space-20);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+}
+
+.reportAgendaItemHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-12);
+}
+
+.reportAgendaItemTitle {
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-md);
+    line-height: var(--line-height-md);
+}
+
+.reportAgendaItemSource {
+    flex: 0 0 auto;
+    border-radius: 999px;
+    background-color: var(--highlight-100);
+    color: var(--text-primary);
+    padding: var(--space-4) var(--space-12);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xs);
+}
+
+.reportAgendaItemMeta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+}
+
+.reportAgendaEmpty {
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-s);
+    line-height: var(--text-body-regular-line-height);
+    color: var(--text-secondary);
 }

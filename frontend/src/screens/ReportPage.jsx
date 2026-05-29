@@ -6,6 +6,8 @@ import { TbCrown } from "react-icons/tb";
 import PremiumModal from "../components/PremiumModal";
 import SmallLoader from "../components/SmallLoader";
 import { fetchTodayReport } from "../api/reportApi";
+import { fetchCalendarConnectUrl, fetchCalendarEvents } from "../api/backendApi";
+import { getApiBaseUrl } from "../api/apiBaseUrl";
 import { formatReportDate } from "../lib/dateFormat";
 
 function formatDateKey(date = new Date()) {
@@ -20,6 +22,49 @@ function shiftDateKey(dateKey, offsetDays) {
     const nextDate = new Date(year, month - 1, day);
     nextDate.setDate(nextDate.getDate() + offsetDays);
     return formatDateKey(nextDate);
+}
+
+function formatAgendaTime(value) {
+    if (!value) {
+        return "";
+    }
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+        return "";
+    }
+
+    return new Intl.DateTimeFormat("nl-BE", {
+        hour: "2-digit",
+        minute: "2-digit",
+    }).format(date);
+}
+
+function formatAgendaRange(event) {
+    if (event?.allDay) {
+        return "Hele dag";
+    }
+
+    const start = formatAgendaTime(event?.start);
+    const end = formatAgendaTime(event?.end);
+
+    if (start && end) {
+        return `${start} - ${end}`;
+    }
+
+    return start || end || "Tijd niet beschikbaar";
+}
+
+function getAgendaProviderLabel(provider) {
+    return provider === "microsoft" ? "Outlook" : "Google";
+}
+
+function sortAgendaEvents(events) {
+    return [...events].sort((first, second) => {
+        const firstStart = new Date(first?.start || 0).getTime();
+        const secondStart = new Date(second?.start || 0).getTime();
+        return firstStart - secondStart;
+    });
 }
 
 function renderBreakRow(label, count, dotClass, countClass, keyPrefix) {
@@ -37,11 +82,16 @@ function renderBreakRow(label, count, dotClass, countClass, keyPrefix) {
 }
 
 export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken }) {
+    const apiBaseUrl = getApiBaseUrl();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [report, setReport] = useState(null);
     const [selectedReportDate, setSelectedReportDate] = useState(() => formatDateKey(new Date()));
     const [premiumModalContent, setPremiumModalContent] = useState(null);
+    const [agendaEvents, setAgendaEvents] = useState([]);
+    const [agendaLoading, setAgendaLoading] = useState(false);
+    const [agendaError, setAgendaError] = useState("");
+    const [agendaConnectingProvider, setAgendaConnectingProvider] = useState("");
 
     const breaksTaken = Number(report?.breaks_taken ?? 0);
     const breaksSkipped = Number(report?.breaks_skipped ?? 0);
@@ -64,7 +114,68 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
         }
 
         loadReport();
-    }, [accessToken, selectedReportDate]);
+    }, [accessToken, apiBaseUrl, selectedReportDate]);
+
+    useEffect(() => {
+        if (!accessToken) {
+            setAgendaEvents([]);
+            setAgendaError("");
+            setAgendaLoading(false);
+            return undefined;
+        }
+
+        let cancelled = false;
+
+        const loadAgenda = async () => {
+            setAgendaLoading(true);
+            setAgendaError("");
+
+            try {
+                const results = await Promise.allSettled(
+                    ["google", "microsoft"].map((provider) => fetchCalendarEvents(apiBaseUrl, accessToken, provider, selectedReportDate))
+                );
+
+                if (cancelled) {
+                    return;
+                }
+
+                const nextEvents = [];
+                const errors = [];
+
+                results.forEach((result) => {
+                    if (result.status === "fulfilled") {
+                        nextEvents.push(...(Array.isArray(result.value?.events) ? result.value.events : []));
+                    } else if (result.reason?.message) {
+                        errors.push(result.reason.message);
+                    }
+                });
+
+                const sortedEvents = sortAgendaEvents(nextEvents);
+                setAgendaEvents(sortedEvents);
+
+                if (sortedEvents.length === 0) {
+                    setAgendaError(errors[0] || "Koppel je agenda via Google of Outlook om afspraken te zien.");
+                } else {
+                    setAgendaError("");
+                }
+            } catch (agendaLoadError) {
+                if (!cancelled) {
+                    setAgendaEvents([]);
+                    setAgendaError(agendaLoadError.message || "Koppel je agenda via Google of Outlook om afspraken te zien.");
+                }
+            } finally {
+                if (!cancelled) {
+                    setAgendaLoading(false);
+                }
+            }
+        };
+
+        loadAgenda();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [accessToken, apiBaseUrl, selectedReportDate]);
 
     const reportTitle = (() => {
         const reportDate = new Date(`${selectedReportDate}T00:00:00`);
@@ -98,6 +209,28 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
         }
 
         setSelectedReportDate((currentDate) => shiftDateKey(currentDate, 1));
+    }
+
+    async function handleConnectAgenda(provider) {
+        if (!accessToken || agendaConnectingProvider) {
+            return;
+        }
+
+        setAgendaConnectingProvider(provider);
+        setAgendaError("");
+
+        try {
+            const connectUrl = await fetchCalendarConnectUrl(apiBaseUrl, accessToken, provider);
+            const openedWindow = window.open(connectUrl, "_blank", "noopener,noreferrer");
+
+            if (!openedWindow) {
+                window.location.href = connectUrl;
+            }
+        } catch (connectError) {
+            setAgendaError(connectError.message || "Kon agenda-koppeling niet starten.");
+        } finally {
+            setAgendaConnectingProvider("");
+        }
     }
 
     if (loading) {
@@ -204,13 +337,37 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
             <section className="reportSection reportAgendaSection">
                 <div className="reportSectionHeader">
                     <h3 className="reportSectionTitle reportSectionTitleLarge">Jouw agenda vandaag</h3>
-                    <button className="reportAgendaButton" type="button">
-                        Link agenda
-                    </button>
+                    <div className="reportAgendaActions">
+                        <button className="reportAgendaButton" type="button" onClick={() => handleConnectAgenda("google")} disabled={Boolean(agendaConnectingProvider)}>
+                            {agendaConnectingProvider === "google" ? "Google wordt gekoppeld..." : "Google koppelen"}
+                        </button>
+                        <button className="reportAgendaButton" type="button" onClick={() => handleConnectAgenda("microsoft")} disabled={Boolean(agendaConnectingProvider)}>
+                            {agendaConnectingProvider === "microsoft" ? "Outlook wordt gekoppeld..." : "Outlook koppelen"}
+                        </button>
+                    </div>
                 </div>
 
                 <article className="reportAgendaCard">
-                    {/* agenda integratie */}
+                    {agendaLoading ? (
+                        <SmallLoader message="Agenda wordt geladen..." />
+                    ) : agendaEvents.length ? (
+                        <ul className="reportAgendaList" aria-label="Afspraken voor deze dag">
+                            {agendaEvents.map((event) => (
+                                <li className="reportAgendaItem" key={`${event.provider}-${event.id}`}>
+                                    <div className="reportAgendaItemHeader">
+                                        <strong className="reportAgendaItemTitle">{event.title}</strong>
+                                        <span className="reportAgendaItemSource">{getAgendaProviderLabel(event.provider)}</span>
+                                    </div>
+                                    <div className="reportAgendaItemMeta">
+                                        <span>{formatAgendaRange(event)}</span>
+                                        {event.location ? <span>{event.location}</span> : null}
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p className="reportAgendaEmpty">{agendaError || "Nog geen afspraken gevonden voor deze dag."}</p>
+                    )}
                 </article>
             </section>
 
