@@ -266,3 +266,57 @@ export async function fetchLatestWorkSessionBreaks(apiBaseUrl, accessToken) {
         breaks_skipped: Number(body?.breaks_skipped ?? 0),
     };
 }
+
+export async function fetchCalendarConnectUrl(apiBaseUrl, accessToken, provider) {
+    const url = new URL(`${apiBaseUrl}/calendar/connect-url`);
+    url.searchParams.set("provider", provider);
+
+    const response = await fetchWithApiError(
+        url,
+        {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            },
+        },
+        (detail) => `Kan agenda-koppeling niet starten op ${url.toString()}. ${detail ? `(${detail})` : ""}`
+    );
+
+    const body = await readJsonResponse(response, (snippet) => snippet || "Kon agenda-koppeling niet starten.");
+
+    if (!response.ok) {
+        throw new Error(body.error || "Kon agenda-koppeling niet starten.");
+    }
+
+    return body?.url || "";
+}
+
+export async function fetchCalendarEvents(apiBaseUrl, accessToken, provider, date) {
+    const url = new URL(`${apiBaseUrl}/calendar/events`);
+    url.searchParams.set("provider", provider);
+
+    if (date) {
+        url.searchParams.set("date", date);
+    }
+
+    const response = await fetchWithApiError(
+        url,
+        {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            },
+        },
+        (detail) => `Kan agenda niet ophalen op ${url.toString()}. ${detail ? `(${detail})` : ""}`
+    );
+
+    const body = await readJsonResponse(response, (snippet) => snippet || "Kon agenda niet laden.");
+
+    if (!response.ok) {
+        throw new Error(body.error || "Kon agenda niet laden.");
+    }
+
+    return {
+        provider: body?.provider || provider,
+        date: body?.date || date || null,
+        events: Array.isArray(body?.events) ? body.events : [],
+    };
+}

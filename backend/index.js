@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const crypto = require("crypto");
 const { createClient } = require("@supabase/supabase-js");
 
 const PORT = process.env.PORT || 3000;
@@ -14,6 +15,8 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const supabase = supabaseUrl && supabaseServiceRoleKey ? createClient(supabaseUrl, supabaseServiceRoleKey) : null;
+const calendarOAuthStates = new Map();
+const calendarStateTtlMs = 10 * 60 * 1000;
 
 // --- shared request helpers ---
 
@@ -26,6 +29,523 @@ function getBearerToken(req) {
 
   return header.slice(7).trim() || null;
 }
+
+function isSupportedCalendarProvider(provider) {
+  return provider === "google" || provider === "microsoft";
+}
+
+function getCalendarBaseUrl(req) {
+  return process.env.CALENDAR_REDIRECT_BASE_URL || `${req.protocol}://${req.get("host")}`;
+}
+
+function getCalendarProviderConfig(provider) {
+  if (provider === "google") {
+    return {
+      authorizationEndpoint: "https://accounts.google.com/o/oauth2/v2/auth",
+      tokenEndpoint: "https://oauth2.googleapis.com/token",
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      scope: "https://www.googleapis.com/auth/calendar.readonly",
+      responseMode: undefined,
+      extraAuthorizeParams: {
+        access_type: "offline",
+        prompt: "consent",
+      },
+    };
+  }
+
+  return {
+    authorizationEndpoint: "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
+    tokenEndpoint: "https://login.microsoftonline.com/common/oauth2/v2.0/token",
+    clientId: process.env.MS_CLIENT_ID,
+    clientSecret: process.env.MS_CLIENT_SECRET,
+    scope: "Calendars.Read offline_access",
+    responseMode: "query",
+    extraAuthorizeParams: {
+      prompt: "consent",
+    },
+  };
+}
+
+function generatePkcePair() {
+  const codeVerifier = crypto.randomBytes(64).toString("base64url");
+  const codeChallenge = crypto.createHash("sha256").update(codeVerifier).digest("base64url");
+
+  return { codeVerifier, codeChallenge };
+}
+
+function cleanupCalendarOAuthStates() {
+  const now = Date.now();
+
+  for (const [state, payload] of calendarOAuthStates.entries()) {
+    if (!payload || now - payload.createdAt > calendarStateTtlMs) {
+      calendarOAuthStates.delete(state);
+    }
+  }
+}
+
+function createCalendarOAuthState(payload) {
+  cleanupCalendarOAuthStates();
+
+  const state = crypto.randomUUID();
+  calendarOAuthStates.set(state, {
+    ...payload,
+    createdAt: Date.now(),
+  });
+
+  return state;
+}
+
+function consumeCalendarOAuthState(state) {
+  cleanupCalendarOAuthStates();
+
+  const payload = calendarOAuthStates.get(state) || null;
+  if (payload) {
+    calendarOAuthStates.delete(state);
+  }
+
+  return payload;
+}
+
+function getCalendarEncryptionKey() {
+  const secret = process.env.CALENDAR_TOKEN_SECRET || process.env.CALENDAR_ENCRYPTION_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || "re-mind-calendar-dev-secret";
+  return crypto.createHash("sha256").update(secret).digest();
+}
+
+function encryptCalendarToken(token) {
+  const iv = crypto.randomBytes(12);
+  const cipher = crypto.createCipheriv("aes-256-gcm", getCalendarEncryptionKey(), iv);
+  const encrypted = Buffer.concat([cipher.update(token, "utf8"), cipher.final()]);
+  const authTag = cipher.getAuthTag();
+
+  return Buffer.concat([iv, authTag, encrypted]).toString("base64");
+}
+
+function decryptCalendarToken(encryptedValue) {
+  const buffer = Buffer.from(String(encryptedValue || ""), "base64");
+
+  if (buffer.length <= 28) {
+    throw new Error("Invalid encrypted calendar token.");
+  }
+
+  const iv = buffer.subarray(0, 12);
+  const authTag = buffer.subarray(12, 28);
+  const payload = buffer.subarray(28);
+  const decipher = crypto.createDecipheriv("aes-256-gcm", getCalendarEncryptionKey(), iv);
+  decipher.setAuthTag(authTag);
+
+  return Buffer.concat([decipher.update(payload), decipher.final()]).toString("utf8");
+}
+
+function buildCalendarAuthorizeUrl(provider, req, state, codeChallenge) {
+  const config = getCalendarProviderConfig(provider);
+  const redirectUri = `${getCalendarBaseUrl(req)}/calendar/callback/${provider}`;
+  const params = new URLSearchParams({
+    client_id: config.clientId,
+    redirect_uri: redirectUri,
+    response_type: "code",
+    scope: config.scope,
+    code_challenge: codeChallenge,
+    code_challenge_method: "S256",
+    state,
+  });
+
+  if (config.responseMode) {
+    params.set("response_mode", config.responseMode);
+  }
+
+  for (const [key, value] of Object.entries(config.extraAuthorizeParams || {})) {
+    if (value) {
+      params.set(key, value);
+    }
+  }
+
+  return `${config.authorizationEndpoint}?${params.toString()}`;
+}
+
+async function exchangeCalendarAuthorizationCode(provider, req, code, codeVerifier) {
+  const config = getCalendarProviderConfig(provider);
+  const redirectUri = `${getCalendarBaseUrl(req)}/calendar/callback/${provider}`;
+  const response = await fetch(config.tokenEndpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: new URLSearchParams({
+      client_id: config.clientId,
+      client_secret: config.clientSecret,
+      code,
+      redirect_uri: redirectUri,
+      grant_type: "authorization_code",
+      code_verifier: codeVerifier,
+    }),
+  });
+
+  const payload = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(payload.error_description || payload.error || "Could not exchange authorization code.");
+  }
+
+  return payload;
+}
+
+async function refreshCalendarAccessToken(provider, refreshToken) {
+  const config = getCalendarProviderConfig(provider);
+  const body = {
+    client_id: config.clientId,
+    client_secret: config.clientSecret,
+    refresh_token: refreshToken,
+    grant_type: "refresh_token",
+  };
+
+  if (provider === "microsoft") {
+    body.scope = config.scope;
+  }
+
+  const response = await fetch(config.tokenEndpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: new URLSearchParams(body),
+  });
+
+  const payload = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(payload.error_description || payload.error || "Could not refresh calendar access token.");
+  }
+
+  return payload.access_token;
+}
+
+async function loadCalendarConnection(userId, provider) {
+  const { data, error } = await supabase
+    .from("calendar_connections")
+    .select("encrypted_refresh_token")
+    .eq("user_id", userId)
+    .eq("provider", provider)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  if (!data?.encrypted_refresh_token) {
+    return null;
+  }
+
+  return data;
+}
+
+async function fetchCalendarEvents(provider, accessToken, startIso, endIso) {
+  if (provider === "google") {
+    const url = new URL("https://www.googleapis.com/calendar/v3/calendars/primary/events");
+    url.searchParams.set("timeMin", startIso);
+    url.searchParams.set("timeMax", endIso);
+    url.searchParams.set("singleEvents", "true");
+    url.searchParams.set("orderBy", "startTime");
+    url.searchParams.set("maxResults", "50");
+
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    const payload = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(payload.error?.message || payload.error || "Could not load Google Calendar events.");
+    }
+
+    return (Array.isArray(payload.items) ? payload.items : []).map((event) => ({
+      id: event.id,
+      provider: "google",
+      title: event.summary || "Afspraak",
+      start: event.start?.dateTime || event.start?.date || null,
+      end: event.end?.dateTime || event.end?.date || null,
+      allDay: Boolean(event.start?.date && !event.start?.dateTime),
+      location: event.location || "",
+    }));
+  }
+
+  const url = new URL("https://graph.microsoft.com/v1.0/me/calendarview");
+  url.searchParams.set("startDateTime", startIso);
+  url.searchParams.set("endDateTime", endIso);
+  url.searchParams.set("$select", "subject,start,end,location,showAs");
+  url.searchParams.set("$orderby", "start/dateTime");
+  url.searchParams.set("$top", "50");
+
+  const response = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  const payload = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(payload.error?.message || payload.error || "Could not load Microsoft Calendar events.");
+  }
+
+  return (Array.isArray(payload.value) ? payload.value : []).map((event) => ({
+    id: event.id,
+    provider: "microsoft",
+    title: event.subject || "Afspraak",
+    start: event.start?.dateTime || null,
+    end: event.end?.dateTime || null,
+    allDay: Boolean(event.isAllDay),
+    location: event.location?.displayName || "",
+  }));
+}
+
+function renderCalendarConnectionSuccessPage(provider) {
+  return `<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Agenda gekoppeld</title>
+    <style>
+      body { font-family: Arial, sans-serif; padding: 32px; background: #f5f7fb; color: #14213d; }
+      .card { max-width: 520px; margin: 8vh auto 0; background: white; border-radius: 20px; padding: 28px; box-shadow: 0 12px 40px rgba(20, 33, 61, 0.12); }
+      h1 { margin: 0 0 12px; font-size: 24px; }
+      p { margin: 0 0 16px; line-height: 1.5; }
+      .muted { color: #5d6b85; }
+      .button { display: inline-block; padding: 10px 16px; border-radius: 12px; background: #1f6feb; color: white; text-decoration: none; }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>${provider === "google" ? "Google Agenda" : "Outlook Agenda"} gekoppeld</h1>
+      <p>Je kunt dit venster sluiten en terugkeren naar de app.</p>
+      <p class="muted">De koppeling is opgeslagen. Open het rapport opnieuw om je afspraken te zien.</p>
+      <a class="button" href="javascript:window.close()">Venster sluiten</a>
+    </div>
+    <script>
+      setTimeout(() => window.close(), 1000);
+    </script>
+  </body>
+</html>`;
+}
+
+app.get("/calendar/connect-url", async (req, res) => {
+  if (!supabase) {
+    return res.status(500).json({
+      error: "Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in backend/.env.",
+    });
+  }
+
+  const token = getBearerToken(req);
+  if (!token) {
+    return res.status(401).json({
+      error: "Missing Bearer token.",
+    });
+  }
+
+  const provider = typeof req.query?.provider === "string" ? req.query.provider : "";
+  if (!isSupportedCalendarProvider(provider)) {
+    return res.status(400).json({
+      error: "Invalid provider. Use google or microsoft.",
+    });
+  }
+
+  const config = getCalendarProviderConfig(provider);
+  if (!config.clientId || !config.clientSecret) {
+    return res.status(500).json({
+      error: `${provider} OAuth is not configured in the backend environment.`,
+    });
+  }
+
+  const { data: userData, error: userError } = await supabase.auth.getUser(token);
+  if (userError || !userData?.user) {
+    return res.status(401).json({
+      error: "Invalid or expired session.",
+    });
+  }
+
+  const { data: settingsData, error: settingsError } = await supabase
+    .from("settings")
+    .select("allow_agenda_sync")
+    .eq("user_id", userData.user.id)
+    .maybeSingle();
+
+  if (settingsError) {
+    return res.status(500).json({
+      error: "Failed to load privacy settings.",
+      details: settingsError.message,
+    });
+  }
+
+  if (!settingsData || settingsData.allow_agenda_sync !== true) {
+    return res.status(403).json({
+      error: "Agenda sync is disabled in privacy settings.",
+    });
+  }
+
+  const { codeVerifier, codeChallenge } = generatePkcePair();
+  const state = createCalendarOAuthState({
+    userId: userData.user.id,
+    provider,
+    codeVerifier,
+  });
+
+  return res.json({
+    provider,
+    url: buildCalendarAuthorizeUrl(provider, req, state, codeChallenge),
+  });
+});
+
+app.get("/calendar/callback/:provider", async (req, res) => {
+  if (!supabase) {
+    return res.status(500).send("Supabase is not configured.");
+  }
+
+  const provider = typeof req.params?.provider === "string" ? req.params.provider : "";
+  if (!isSupportedCalendarProvider(provider)) {
+    return res.status(400).send("Invalid provider.");
+  }
+
+  const code = typeof req.query?.code === "string" ? req.query.code : "";
+  const state = typeof req.query?.state === "string" ? req.query.state : "";
+  const oauthError = typeof req.query?.error === "string" ? req.query.error : "";
+
+  if (oauthError) {
+    return res.status(400).send(`OAuth error: ${oauthError}`);
+  }
+
+  if (!code || !state) {
+    return res.status(400).send("Missing authorization code or state.");
+  }
+
+  const statePayload = consumeCalendarOAuthState(state);
+  if (!statePayload || statePayload.provider !== provider) {
+    return res.status(400).send("Invalid or expired OAuth state.");
+  }
+
+  try {
+    const tokenData = await exchangeCalendarAuthorizationCode(provider, req, code, statePayload.codeVerifier);
+    const refreshToken = typeof tokenData.refresh_token === "string" ? tokenData.refresh_token : "";
+
+    if (!refreshToken) {
+      return res.status(500).send("No refresh token was returned by the provider.");
+    }
+
+    const encryptedRefreshToken = encryptCalendarToken(refreshToken);
+    const accessTokenExpiresAt = tokenData.expires_in ? new Date(Date.now() + Number(tokenData.expires_in) * 1000).toISOString() : new Date(Date.now() + 3600 * 1000).toISOString();
+
+    const deleteResult = await supabase
+      .from("calendar_connections")
+      .delete()
+      .eq("user_id", statePayload.userId)
+      .eq("provider", provider);
+
+    if (deleteResult.error) {
+      throw deleteResult.error;
+    }
+
+    const { error: insertError } = await supabase.from("calendar_connections").insert({
+      user_id: statePayload.userId,
+      provider,
+      encrypted_refresh_token: encryptedRefreshToken,
+      access_token_expires_at: accessTokenExpiresAt,
+    });
+
+    if (insertError) {
+      throw insertError;
+    }
+
+    return res.status(200).send(renderCalendarConnectionSuccessPage(provider));
+  } catch (error) {
+    return res.status(500).send(error.message || "Could not complete calendar connection.");
+  }
+});
+
+app.get("/calendar/events", async (req, res) => {
+  if (!supabase) {
+    return res.status(500).json({
+      error: "Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in backend/.env.",
+    });
+  }
+
+  const token = getBearerToken(req);
+  if (!token) {
+    return res.status(401).json({
+      error: "Missing Bearer token.",
+    });
+  }
+
+  const provider = typeof req.query?.provider === "string" ? req.query.provider : "";
+  const requestedDate = typeof req.query?.date === "string" ? req.query.date : undefined;
+
+  if (!isSupportedCalendarProvider(provider)) {
+    return res.status(400).json({
+      error: "Invalid provider. Use google or microsoft.",
+    });
+  }
+
+  const { data: userData, error: userError } = await supabase.auth.getUser(token);
+  if (userError || !userData?.user) {
+    return res.status(401).json({
+      error: "Invalid or expired session.",
+    });
+  }
+
+  const { data: settingsData, error: settingsError } = await supabase
+    .from("settings")
+    .select("allow_agenda_sync")
+    .eq("user_id", userData.user.id)
+    .maybeSingle();
+
+  if (settingsError) {
+    return res.status(500).json({
+      error: "Failed to load privacy settings.",
+      details: settingsError.message,
+    });
+  }
+
+  if (!settingsData || settingsData.allow_agenda_sync !== true) {
+    return res.status(403).json({
+      error: "Agenda sync is disabled in privacy settings.",
+    });
+  }
+
+  const connection = await loadCalendarConnection(userData.user.id, provider);
+  if (!connection) {
+    return res.status(404).json({
+      error: "Agenda is niet gekoppeld.",
+    });
+  }
+
+  let refreshToken;
+  try {
+    refreshToken = decryptCalendarToken(connection.encrypted_refresh_token);
+  } catch (error) {
+    return res.status(500).json({
+      error: "Stored calendar token could not be decrypted.",
+      details: error.message,
+    });
+  }
+
+  const { startIso, endIso, localDate } = getReportRange(requestedDate);
+
+  try {
+    const accessToken = await refreshCalendarAccessToken(provider, refreshToken);
+    const events = await fetchCalendarEvents(provider, accessToken, startIso, endIso);
+
+    return res.json({
+      provider,
+      date: localDate,
+      events,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: error.message || "Could not load calendar events.",
+    });
+  }
+});
 
 function getReportRange(dateInput) {
   const startDate = typeof dateInput === "string" && /^\d{4}-\d{2}-\d{2}$/.test(dateInput) ? new Date(`${dateInput}T00:00:00`) : new Date();
