@@ -360,7 +360,7 @@ export default function App() {
     setWorkSeconds(elapsedSeconds);
     setBreakSeconds(0);
     setShowPauseReminderModal(false);
-    setNextPauseReminderTriggerWorkSecond(workSession.eind_tijd ? null : elapsedSeconds + pauseReminderIntervalSeconds);
+    setNextPauseReminderTriggerWorkSecond(null);
   };
 
   useEffect(() => {
@@ -428,14 +428,13 @@ export default function App() {
     };
   }, [session]);
 
-  // Pause reminder trigger: first after the configured interval, then after each dismissal.
   useEffect(() => {
-    if (workStarted && !finished && nextPauseReminderTriggerWorkSecond == null) {
-      setNextPauseReminderTriggerWorkSecond(workSeconds + pauseReminderIntervalSeconds);
+    if (!workStarted || finished || onBreak || showPauseReminderModal) {
       return;
     }
 
-    if (!workStarted || finished || onBreak || showPauseReminderModal || nextPauseReminderTriggerWorkSecond == null) {
+    if (nextPauseReminderTriggerWorkSecond == null) {
+      setNextPauseReminderTriggerWorkSecond(workSeconds + pauseReminderIntervalSeconds);
       return;
     }
 
@@ -603,6 +602,7 @@ export default function App() {
       await persistCurrentBreakDuration();
       setOnBreak(false);
       setBreakSeconds(0);
+      setNextPauseReminderTriggerWorkSecond(null);
     } catch (error) {
       console.error("Failed to save break duration:", error);
     }
@@ -610,8 +610,7 @@ export default function App() {
 
   const closePauseReminderModal = () => {
     setShowPauseReminderModal(false);
-    // setNextPauseReminderTriggerWorkSecond(workSeconds + 15); // For demo purposes, trigger next reminder after 15 seconds
-    setNextPauseReminderTriggerWorkSecond(workSeconds + pauseReminderIntervalSeconds);
+    setNextPauseReminderTriggerWorkSecond(null);
   };
 
   const openWorkdayTasksModal = () => {
