@@ -56,7 +56,7 @@ function formatAgendaRange(event) {
 }
 
 function getAgendaProviderLabel(provider) {
-    return provider === "microsoft" ? "Outlook" : "Google";
+    return provider === "microsoft" ? "Microsoft Outlook" : "Google Agenda";
 }
 
 function sortAgendaEvents(events) {
@@ -92,6 +92,7 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
     const [agendaLoading, setAgendaLoading] = useState(false);
     const [agendaError, setAgendaError] = useState("");
     const [agendaConnectingProvider, setAgendaConnectingProvider] = useState("");
+    const [agendaLinked, setAgendaLinked] = useState(false);
 
     const breaksTaken = Number(report?.breaks_taken ?? 0);
     const breaksSkipped = Number(report?.breaks_skipped ?? 0);
@@ -121,6 +122,7 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
             setAgendaEvents([]);
             setAgendaError("");
             setAgendaLoading(false);
+            setAgendaLinked(false);
             return undefined;
         }
 
@@ -129,6 +131,7 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
         const loadAgenda = async () => {
             setAgendaLoading(true);
             setAgendaError("");
+            setAgendaLinked(false);
 
             try {
                 const results = await Promise.allSettled(
@@ -145,6 +148,9 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
                 results.forEach((result) => {
                     if (result.status === "fulfilled") {
                         nextEvents.push(...(Array.isArray(result.value?.events) ? result.value.events : []));
+                        if (result.value?.connected) {
+                            setAgendaLinked(true);
+                        }
                     } else if (result.reason?.message) {
                         errors.push(result.reason.message);
                     }
@@ -162,6 +168,7 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
                 if (!cancelled) {
                     setAgendaEvents([]);
                     setAgendaError(agendaLoadError.message || "Koppel je agenda via Google of Outlook om afspraken te zien.");
+                    setAgendaLinked(false);
                 }
             } finally {
                 if (!cancelled) {
@@ -226,11 +233,19 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
             if (!openedWindow) {
                 window.location.href = connectUrl;
             }
+
+            setAgendaLinked(true);
         } catch (connectError) {
             setAgendaError(connectError.message || "Kon agenda-koppeling niet starten.");
         } finally {
             setAgendaConnectingProvider("");
         }
+    }
+
+    function handleDisconnectAgenda() {
+        setAgendaLinked(false);
+        setAgendaEvents([]);
+        setAgendaError("Koppel je agenda via Google of Outlook om afspraken te zien.");
     }
 
     if (loading) {
@@ -334,17 +349,23 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
                 </article>
             </section>
 
-            <section className="reportSection reportAgendaSection">
+            <section className="reportSection">
                 <div className="reportSectionHeader">
                     <h3 className="reportSectionTitle reportSectionTitleLarge">Jouw agenda vandaag</h3>
-                    <div className="reportAgendaActions">
-                        <button className="reportAgendaButton" type="button" onClick={() => handleConnectAgenda("google")} disabled={Boolean(agendaConnectingProvider)}>
-                            {agendaConnectingProvider === "google" ? "Google wordt gekoppeld..." : "Google koppelen"}
+                    {agendaLinked ? (
+                        <button className="reportAgendaButton" type="button" onClick={handleDisconnectAgenda}>
+                            Agenda loskoppelen
                         </button>
-                        <button className="reportAgendaButton" type="button" onClick={() => handleConnectAgenda("microsoft")} disabled={Boolean(agendaConnectingProvider)}>
-                            {agendaConnectingProvider === "microsoft" ? "Outlook wordt gekoppeld..." : "Outlook koppelen"}
-                        </button>
-                    </div>
+                    ) : (
+                        <div className="reportAgendaActions">
+                            <button className="reportAgendaButton" type="button" onClick={() => handleConnectAgenda("google")} disabled={Boolean(agendaConnectingProvider)}>
+                                {agendaConnectingProvider === "google" ? "Google wordt gekoppeld..." : "Google Agenda koppelen"}
+                            </button>
+                            <button className="reportAgendaButton" type="button" onClick={() => handleConnectAgenda("microsoft")} disabled={Boolean(agendaConnectingProvider)}>
+                                {agendaConnectingProvider === "microsoft" ? "Outlook wordt gekoppeld..." : "Outlook koppelen"}
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 <article className="reportAgendaCard">
@@ -355,7 +376,7 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
                             {agendaEvents.map((event) => (
                                 <li className="reportAgendaItem" key={`${event.provider}-${event.id}`}>
                                     <div className="reportAgendaItemHeader">
-                                        <strong className="reportAgendaItemTitle">{event.title}</strong>
+                                        <p className="reportAgendaItemTitle">{event.title}</p>
                                         <span className="reportAgendaItemSource">{getAgendaProviderLabel(event.provider)}</span>
                                     </div>
                                     <div className="reportAgendaItemMeta">
