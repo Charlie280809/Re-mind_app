@@ -136,10 +136,6 @@ export default function App() {
   const [workSeconds, setWorkSeconds] = useState(0);
   const [breakSeconds, setBreakSeconds] = useState(0);
 
-  // Pause reminder modal state
-  const [showPauseReminderModal, setShowPauseReminderModal] = useState(false);
-  const [nextPauseReminderTriggerWorkSecond, setNextPauseReminderTriggerWorkSecond] = useState(null);
-
   const pauseReminderIntervalSeconds = Math.max(1, Number(workSettings?.pause_reminder ?? 120)) * 60;
 
   useEffect(() => {
@@ -346,8 +342,6 @@ export default function App() {
     setFinished(false);
     setWorkSeconds(0);
     setBreakSeconds(0);
-    setShowPauseReminderModal(false);
-    setNextPauseReminderTriggerWorkSecond(null);
     setWorkdayTasksOpen(false);
   };
 
@@ -359,8 +353,6 @@ export default function App() {
     setFinished(Boolean(workSession.eind_tijd));
     setWorkSeconds(elapsedSeconds);
     setBreakSeconds(0);
-    setShowPauseReminderModal(false);
-    setNextPauseReminderTriggerWorkSecond(null);
   };
 
   useEffect(() => {
@@ -427,29 +419,6 @@ export default function App() {
       isCancelled = true;
     };
   }, [session]);
-
-  useEffect(() => {
-    if (!workStarted || finished || onBreak || showPauseReminderModal) {
-      return;
-    }
-
-    if (nextPauseReminderTriggerWorkSecond == null) {
-      setNextPauseReminderTriggerWorkSecond(workSeconds + pauseReminderIntervalSeconds);
-      return;
-    }
-
-    if (workSeconds >= nextPauseReminderTriggerWorkSecond) {
-      setShowPauseReminderModal(true);
-    }
-  }, [
-    finished,
-    nextPauseReminderTriggerWorkSecond,
-    onBreak,
-    pauseReminderIntervalSeconds,
-    showPauseReminderModal,
-    workSeconds,
-    workStarted,
-  ]);
 
   const persistFavoriteToggle = async (id, previouslyHad) => {
     setPauseFavorites((prev) => {
@@ -602,15 +571,9 @@ export default function App() {
       await persistCurrentBreakDuration();
       setOnBreak(false);
       setBreakSeconds(0);
-      setNextPauseReminderTriggerWorkSecond(null);
     } catch (error) {
       console.error("Failed to save break duration:", error);
     }
-  };
-
-  const closePauseReminderModal = () => {
-    setShowPauseReminderModal(false);
-    setNextPauseReminderTriggerWorkSecond(null);
   };
 
   const openWorkdayTasksModal = () => {
@@ -629,11 +592,9 @@ export default function App() {
 
   const handlePauseReminderDismiss = () => {
     incrementWorkSessionCounterOnServer("breaks_skipped");
-    closePauseReminderModal();
   };
 
   const handlePauseReminderTakeBreak = () => {
-    closePauseReminderModal();
     takeBreak();
   };
 
@@ -834,6 +795,15 @@ export default function App() {
         workSeconds={workSeconds}
         checkInNotificationsEnabled={Boolean(workSettings?.checkin_notifications_on)}
       />
+      <PauseReminderModal
+        workStarted={workStarted}
+        onBreak={onBreak}
+        finished={finished}
+        workSeconds={workSeconds}
+        pauseReminderIntervalSeconds={pauseReminderIntervalSeconds}
+        onDismiss={handlePauseReminderDismiss}
+        onTakeBreak={handlePauseReminderTakeBreak}
+      />
       <WorkdayTasksOverlay
         isOpen={workdayTasksOpen}
         onClose={closeWorkdayTasksModal}
@@ -841,9 +811,6 @@ export default function App() {
         accessToken={session.access_token}
         initialTab={workdayTasksInitialTab}
       />
-      {showPauseReminderModal && (
-        <PauseReminderModal onDismiss={handlePauseReminderDismiss} onTakeBreak={handlePauseReminderTakeBreak} />
-      )}
       {favoriteLimitModalOpen ? (
         <PremiumModal
           title="Meer pauzes toevoegen?"

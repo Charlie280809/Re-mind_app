@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "../css/CheckInModal.css";
 import { HiOutlineTrendingUp  } from "react-icons/hi";
 import { LuZap } from "react-icons/lu";
 import { submitCheckIn } from "../api/checkInApi";
+import { showNativeNotification } from "../lib/nativeNotification";
 
 // const CHECK_IN_MIN_INTERVAL_SECONDS = 30 * 60; // 30 minuten
 // const CHECK_IN_MAX_INTERVAL_SECONDS = 90 * 60; // 90 minuten
@@ -28,33 +29,45 @@ export default function CheckInModal({
     const [error, setError] = useState("");
     const [showCheckInModal, setShowCheckInModal] = useState(false);
     const [nextCheckInTriggerWorkSecond, setNextCheckInTriggerWorkSecond] = useState(null);
+    const hasShownCheckInNotificationRef = useRef(false);
 
     useEffect(() => {
         if (!checkInNotificationsEnabled) {
             setShowCheckInModal(false);
             setNextCheckInTriggerWorkSecond(null);
+            hasShownCheckInNotificationRef.current = false;
             return;
         }
 
         if (!workStarted || finished) {
             setShowCheckInModal(false);
             setNextCheckInTriggerWorkSecond(null);
+            hasShownCheckInNotificationRef.current = false;
             return;
         }
 
         if (onBreak) {
             setShowCheckInModal(false);
+            hasShownCheckInNotificationRef.current = false;
             return;
         }
 
         if (nextCheckInTriggerWorkSecond == null) {
+            hasShownCheckInNotificationRef.current = false;
             setNextCheckInTriggerWorkSecond(getRandomCheckInIntervalSeconds());
-            //for demo purposes, trigger first check-in after 10 seconds
-            // setNextCheckInTriggerWorkSecond(10);
             return;
         }
 
         if (!showCheckInModal && workSeconds >= nextCheckInTriggerWorkSecond) {
+            if (!hasShownCheckInNotificationRef.current) {
+                showNativeNotification({
+                    title: "Hoe voel je je op dit moment?",
+                    body: "Vul je stress en energie niveau in om een beter beeld te krijgen van je huidige toestand.",
+                    onClick: () => setShowCheckInModal(true),
+                });
+                hasShownCheckInNotificationRef.current = true;
+            }
+
             setShowCheckInModal(true);
         }
     }, [
@@ -81,6 +94,7 @@ export default function CheckInModal({
 
     const closeCheckInModal = () => {
         setShowCheckInModal(false);
+        hasShownCheckInNotificationRef.current = false;
         setNextCheckInTriggerWorkSecond(workSeconds + getRandomCheckInIntervalSeconds());
     };
 
@@ -107,7 +121,7 @@ export default function CheckInModal({
             <div className="checkInModalContent">
                 <header className="checkInModalHeader">
                     <div className="checkInModalTitle">
-                        <h2 className="checkInTitle">Dagelijkse check-in</h2>
+                        <h2 className="checkInTitle">Check-in</h2>
                         <p className="checkInSubtitle">
                             Sta even stil bij hoe je je op dit moment voelt.
                         </p>
