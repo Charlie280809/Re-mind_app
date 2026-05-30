@@ -19,3 +19,9 @@ contextBridge.exposeInMainWorld("reMindNotifications", {
         pendingNotificationClickHandler = typeof handler === "function" ? handler : null;
     },
 });
+
+contextBridge.exposeInMainWorld("reMindPlatform", {
+    openExternal(url) {
+        return ipcRenderer.invoke("re-mind:open-external", url);
+    }
+});

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Notification, ipcMain } = require("electron");
+const { app, BrowserWindow, Notification, ipcMain, shell } = require("electron");
 const path = require("path");
 
 let mainWindow = null;
@@ -39,6 +39,17 @@ ipcMain.handle("re-mind:show-notification", (_event, payload) => {
 
   showSystemNotification(payload);
   return true;
+});
+
+ipcMain.handle("re-mind:open-external", async (_event, url) => {
+  try {
+    if (!url) return false;
+    await shell.openExternal(url);
+    focusMainWindow();
+    return true;
+  } catch (e) {
+    return false;
+  }
 });
 
 const createWindow = () => {

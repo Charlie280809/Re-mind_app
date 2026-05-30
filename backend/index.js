@@ -302,6 +302,7 @@ async function fetchCalendarEvents(provider, accessToken, startIso, endIso) {
 }
 
 function renderCalendarConnectionSuccessPage(provider) {
+  // This page will try to notify an opener window (postMessage) then close itself.
   return `<!doctype html>
 <html lang="nl">
   <head>
@@ -318,14 +319,34 @@ function renderCalendarConnectionSuccessPage(provider) {
     </style>
   </head>
   <body>
-    <div class="card">
+    <div class="card" id="card">
       <h1>${provider === "google" ? "Google Agenda" : "Outlook Agenda"} gekoppeld</h1>
-      <p>Je kunt dit venster sluiten en terugkeren naar de app.</p>
+      <p id="message">Je kunt dit venster sluiten en terugkeren naar de app.</p>
       <p class="muted">De koppeling is opgeslagen. Open het rapport opnieuw om je afspraken te zien.</p>
-      <a class="button" href="javascript:window.close()">Venster sluiten</a>
+      <a class="button" id="closeBtn" href="javascript:window.close()">Venster sluiten</a>
     </div>
     <script>
-      setTimeout(() => window.close(), 1000);
+      (function(){
+        // Try to notify opener (web popup flow). The opener can listen for the
+        // 're-mind:calendar-connected' message and refresh its state.
+        try {
+          if (window.opener && typeof window.opener.postMessage === 'function') {
+            window.opener.postMessage({ type: 're-mind:calendar-connected', provider: '${provider}' }, '*');
+            // give opener a moment to receive the message before closing
+            setTimeout(() => { try { window.close(); } catch (e) {} }, 600);
+            return;
+          }
+        } catch (e) {
+          // ignore
+        }
+
+        // If no opener exists (opened in same tab or external browser), keep the
+        // success UI visible and offer a close button. Attempt to auto-close
+        // after a short delay for convenience.
+        setTimeout(() => {
+          try { window.close(); } catch (e) { /* ignore */ }
+        }, 2000);
+      })();
     </script>
   </body>
 </html>`;
