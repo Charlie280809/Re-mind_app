@@ -25,7 +25,6 @@ const showSystemNotification = ({ title, body }) => {
   const notification = new Notification({
     title,
     body,
-    // icon: path.join(__dirname, "assets/favicon.ico"),
   });
 
   notification.on("click", () => {
@@ -34,7 +33,6 @@ const showSystemNotification = ({ title, body }) => {
       mainWindow.webContents.send("re-mind:notification-clicked", { title, body });
     }
   });
-  // keep a reference so renderer can request it to be closed
   lastNotification = notification;
   notification.on("close", () => {
     if (lastNotification === notification) {

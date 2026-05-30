@@ -646,9 +646,14 @@ export default function App() {
       return;
     }
 
-    await incrementWorkSessionCounterOnServer("breaks_taken");
     setOnBreak(true);
     setCurrentPage("pause");
+
+    try {
+      await incrementWorkSessionCounterOnServer("breaks_taken");
+    } catch (error) {
+      console.error("Failed to register break start:", error);
+    }
   };
   const endBreak = async () => {
     try {
