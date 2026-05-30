@@ -5,6 +5,8 @@ import { LuZap } from "react-icons/lu";
 import { submitCheckIn } from "../api/checkInApi";
 import { showNativeNotification } from "../lib/nativeNotification";
 
+const CHECK_IN_STATE_STORAGE_KEY = "remind-checkin-state";
+
 // const CHECK_IN_MIN_INTERVAL_SECONDS = 30 * 60; // 30 minuten
 // const CHECK_IN_MAX_INTERVAL_SECONDS = 90 * 60; // 90 minuten
 // Voor demo doeleinden kortere intervallen:
@@ -16,6 +18,30 @@ const getRandomCheckInIntervalSeconds = () => {
     return CHECK_IN_MIN_INTERVAL_SECONDS + Math.floor(Math.random() * (range + 1));
 };
 
+const getStoredCheckInState = () => {
+    if (typeof window === "undefined") {
+        return null;
+    }
+
+    try {
+        const rawState = window.sessionStorage.getItem(CHECK_IN_STATE_STORAGE_KEY);
+
+        if (!rawState) {
+            return null;
+        }
+
+        const parsedState = JSON.parse(rawState);
+
+        return {
+            nextCheckInTriggerWorkSecond: Number.isFinite(Number(parsedState?.nextCheckInTriggerWorkSecond))
+                ? Math.max(0, Number(parsedState.nextCheckInTriggerWorkSecond))
+                : null,
+        };
+    } catch {
+        return null;
+    }
+};
+
 export default function CheckInModal({
     workStarted,
     onBreak,
@@ -23,13 +49,42 @@ export default function CheckInModal({
     workSeconds,
     checkInNotificationsEnabled,
 }) {
+    const [storedCheckInState] = useState(() => getStoredCheckInState());
     const [stress, setStress] = useState(3);
     const [energy, setEnergy] = useState(3);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [showCheckInModal, setShowCheckInModal] = useState(false);
-    const [nextCheckInTriggerWorkSecond, setNextCheckInTriggerWorkSecond] = useState(null);
+    const [nextCheckInTriggerWorkSecond, setNextCheckInTriggerWorkSecond] = useState(
+        storedCheckInState?.nextCheckInTriggerWorkSecond ?? null
+    );
     const hasShownCheckInNotificationRef = useRef(false);
+
+    useEffect(() => {
+        if (typeof window === "undefined") {
+            return undefined;
+        }
+
+        if (!checkInNotificationsEnabled || !workStarted || finished) {
+            window.sessionStorage.removeItem(CHECK_IN_STATE_STORAGE_KEY);
+            return undefined;
+        }
+
+        if (onBreak) {
+            return undefined;
+        }
+
+        if (nextCheckInTriggerWorkSecond == null) {
+            return undefined;
+        }
+
+        window.sessionStorage.setItem(
+            CHECK_IN_STATE_STORAGE_KEY,
+            JSON.stringify({ nextCheckInTriggerWorkSecond })
+        );
+
+        return undefined;
+    }, [checkInNotificationsEnabled, finished, nextCheckInTriggerWorkSecond, onBreak, workStarted]);
 
     useEffect(() => {
         if (!checkInNotificationsEnabled) {

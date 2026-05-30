@@ -3,7 +3,7 @@ import { LuAlarmClock, LuX } from "react-icons/lu";
 import "../css/PauseReminderModal.css";
 import { showNativeNotification } from "../lib/nativeNotification";
 
-const getRandomPauseReminderOffsetSeconds = (pauseReminderIntervalSeconds) => {
+const getPauseReminderOffsetSeconds = (pauseReminderIntervalSeconds) => {
     const safeIntervalSeconds = Math.max(1, Number(pauseReminderIntervalSeconds) || 0);
     return safeIntervalSeconds;
 };
@@ -39,7 +39,7 @@ export default function PauseReminderModal({
         if (nextPauseReminderTriggerWorkSecond == null) {
             hasShownPauseReminderNotificationRef.current = false;
             setNextPauseReminderTriggerWorkSecond(
-                workSeconds + getRandomPauseReminderOffsetSeconds(pauseReminderIntervalSeconds)
+                workSeconds + getPauseReminderOffsetSeconds(pauseReminderIntervalSeconds)
             );
             return;
         }
@@ -78,10 +78,15 @@ export default function PauseReminderModal({
         };
     }, [showPauseReminderModal]);
 
-    const closePauseReminderModal = () => {
+    const closePauseReminderModal = (shouldRescheduleNextTrigger = true) => {
         setShowPauseReminderModal(false);
         hasShownPauseReminderNotificationRef.current = false;
-        setNextPauseReminderTriggerWorkSecond(workSeconds + getRandomPauseReminderOffsetSeconds(pauseReminderIntervalSeconds));
+
+        if (shouldRescheduleNextTrigger) {
+            setNextPauseReminderTriggerWorkSecond(
+                workSeconds + getPauseReminderOffsetSeconds(pauseReminderIntervalSeconds)
+            );
+        }
     };
 
     const handleDismiss = () => {
@@ -91,7 +96,7 @@ export default function PauseReminderModal({
 
     const handleTakeBreak = () => {
         onTakeBreak?.();
-        closePauseReminderModal();
+        closePauseReminderModal(false);
     };
 
     if (!showPauseReminderModal) {
