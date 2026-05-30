@@ -239,9 +239,8 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
             if (window.reMindPlatform && typeof window.reMindPlatform.openExternal === "function") {
                 try {
                     await window.reMindPlatform.openExternal(connectUrl);
-                    // Start a short poll to refresh calendar state after external auth
-                    setAgendaLinked(true);
-                    // Attempt to refresh events once after a delay
+                    // Attempt to refresh events once after a delay.
+                    // Only mark as linked after backend confirms `connected: true`.
                     setTimeout(() => {
                         // fire-and-forget
                         fetchCalendarEvents(apiBaseUrl, accessToken, provider, selectedReportDate).then((r) => {
@@ -266,12 +265,12 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
                         try {
                             if (event?.data?.type === "re-mind:calendar-connected" && event.data.provider === provider) {
                                 window.removeEventListener("message", handleMessage);
-                                setAgendaLinked(true);
 
                                 // Refresh events for this provider
                                 try {
                                     const result = await fetchCalendarEvents(apiBaseUrl, accessToken, provider, selectedReportDate);
                                     if (result?.connected) {
+                                        setAgendaLinked(true);
                                         setAgendaEvents(sortAgendaEvents(Array.isArray(result.events) ? result.events : []));
                                         setAgendaError("");
                                     }
