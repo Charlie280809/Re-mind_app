@@ -603,12 +603,24 @@ function getLocalDateString(daysOffset = 0) {
 }
 
 // Convert a duration in seconds to a human-readable string for the report UI.
+function formatDurationUnit(value, singular, plural) {
+  return `${value} ${value === 1 ? singular : plural}`;
+}
+
 function formatSecondsAsDuration(totalSeconds) {
   const safeSeconds = Math.max(0, Math.floor(Number(totalSeconds) || 0));
   const minutes = Math.floor(safeSeconds / 60);
   const seconds = safeSeconds % 60;
 
-  return `${minutes} minuten ${seconds} seconden`;
+  if (minutes === 0) {
+    return formatDurationUnit(seconds, "seconde", "seconden");
+  }
+
+  if (seconds === 0) {
+    return formatDurationUnit(minutes, "minuut", "minuten");
+  }
+
+  return `${formatDurationUnit(minutes, "minuut", "minuten")} en ${formatDurationUnit(seconds, "seconde", "seconden")}`;
 }
 
 function formatSecondsAsHoursAndMinutes(totalSeconds) {
@@ -616,7 +628,11 @@ function formatSecondsAsHoursAndMinutes(totalSeconds) {
   const hours = Math.floor(safeSeconds / 3600);
   const minutes = Math.floor((safeSeconds % 3600) / 60);
 
-  return `${hours} uur en ${minutes} minuten`;
+  if (minutes === 0) {
+    return formatDurationUnit(hours, "uur", "uur");
+  }
+
+  return `${formatDurationUnit(hours, "uur", "uur")} en ${formatDurationUnit(minutes, "minuut", "minuten")}`;
 }
 
 function summarizeDailyWorkSessions(workSessions) {
