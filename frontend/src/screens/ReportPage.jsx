@@ -271,8 +271,7 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
         setAgendaError("");
 
         try {
-            const returnTo = window.reMindPlatform ? "re-mind://calendar-connected" : (typeof window !== "undefined" && typeof window.location?.href === "string" ? window.location.href : "");
-            const connectUrl = await fetchCalendarConnectUrl(apiBaseUrl, accessToken, provider, returnTo);
+            const connectUrl = await fetchCalendarConnectUrl(apiBaseUrl, accessToken, provider);
 
             if (window.reMindPlatform && typeof window.reMindPlatform.openExternal === "function") {
                 await window.reMindPlatform.openExternal(connectUrl);

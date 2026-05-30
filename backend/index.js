@@ -38,28 +38,6 @@ function getCalendarBaseUrl(req) {
   return process.env.CALENDAR_REDIRECT_BASE_URL || `${req.protocol}://${req.get("host")}`;
 }
 
-function parseCalendarReturnUrl(rawReturnUrl) {
-  if (typeof rawReturnUrl !== "string") {
-    return null;
-  }
-
-  const trimmed = rawReturnUrl.trim();
-  if (!trimmed) {
-    return null;
-  }
-
-  try {
-    const parsed = new URL(trimmed);
-    if (parsed.protocol !== "http:" && parsed.protocol !== "https:" && parsed.protocol !== "re-mind:") {
-      return null;
-    }
-
-    return parsed.toString();
-  } catch {
-    return null;
-  }
-}
-
 function getCalendarProviderConfig(provider) {
   if (provider === "google") {
     return {
@@ -323,11 +301,7 @@ async function fetchCalendarEvents(provider, accessToken, startIso, endIso) {
   }));
 }
 
-function renderCalendarConnectionSuccessPage(provider, returnUrl) {
-  const safeProvider = provider === "microsoft" ? "microsoft" : "google";
-  const safeReturnUrl = typeof returnUrl === "string" && returnUrl ? JSON.stringify(returnUrl) : "null";
-
-  // This page notifies opener (popup flow) and closes, or redirects to the app.
+function renderCalendarConnectionSuccessPage(provider) {
   return `<!doctype html>
 <html lang="nl">
   <head>
@@ -335,40 +309,14 @@ function renderCalendarConnectionSuccessPage(provider, returnUrl) {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Agenda gekoppeld</title>
     <style>
-      body { font-family: Arial, sans-serif; padding: 32px; background: #f5f7fb; color: #14213d; }
-      .card { max-width: 560px; margin: 10vh auto 0; background: white; border-radius: 20px; padding: 24px; box-shadow: 0 12px 40px rgba(20, 33, 61, 0.12); }
-      h1 { margin: 0 0 10px; font-size: 24px; }
-      p { margin: 0; line-height: 1.5; color: #5d6b85; }
+      body { font-family: Lora, sans-serif; margin: 0; min-height: 100vh; display: grid; place-items: center; background: #f5f7fb; color: #14213d; }
+      .card { width: 520px); background: #F4EDD9; border-radius: 20px; padding: 32px; }
+      h1 { margin: 0 0 10px; font-size: 24px; color: #1A1A1A; }
+      p { margin: 0; line-height: 1.5; color: #a19e98; }
     </style>
   </head>
   <body>
-    <div class="card"><h1>Agenda gekoppeld</h1><p>Je wordt teruggestuurd naar de app...</p></div>
-    <script>
-      (function(){
-        var payload = { type: 're-mind:calendar-connected', provider: '${safeProvider}' };
-        var returnUrl = ${safeReturnUrl};
-
-        try {
-          if (window.opener && typeof window.opener.postMessage === 'function') {
-            window.opener.postMessage(payload, '*');
-            setTimeout(() => { try { window.close(); } catch (e) {} }, 600);
-            return;
-          }
-        } catch (e) {
-          // ignore and continue to redirect fallback
-        }
-
-        if (returnUrl) {
-          var separator = returnUrl.indexOf('?') === -1 ? '?' : '&';
-          window.location.replace(returnUrl + separator + 'calendar_connected=${safeProvider}');
-          return;
-        }
-
-        setTimeout(function () {
-          try { window.close(); } catch (e) {}
-        }, 1000);
-      })();
-    </script>
+    <div class="card"><h1>Je agenda is gekoppeld</h1><p>Open Re:Mind om je afspraken te bekijken.</p></div>
   </body>
 </html>`;
 }
@@ -427,14 +375,11 @@ app.get("/calendar/connect-url", async (req, res) => {
     });
   }
 
-  const returnUrl = parseCalendarReturnUrl(req.query?.return_to);
-
   const { codeVerifier, codeChallenge } = generatePkcePair();
   const state = createCalendarOAuthState({
     userId: userData.user.id,
     provider,
     codeVerifier,
-    returnUrl,
   });
 
   return res.json({
@@ -502,7 +447,7 @@ app.get("/calendar/callback/:provider", async (req, res) => {
       throw insertError;
     }
 
-    return res.status(200).send(renderCalendarConnectionSuccessPage(provider, statePayload.returnUrl));
+    return res.status(200).send(renderCalendarConnectionSuccessPage(provider));
   } catch (error) {
     return res.status(500).send(error.message || "Could not complete calendar connection.");
   }

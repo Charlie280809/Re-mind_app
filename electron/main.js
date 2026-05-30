@@ -3,10 +3,6 @@ const path = require("path");
 
 let mainWindow = null;
 
-if (!app.requestSingleInstanceLock()) {
-  app.quit();
-}
-
 const focusMainWindow = () => {
   if (!mainWindow || mainWindow.isDestroyed()) {
     return;
@@ -56,21 +52,6 @@ ipcMain.handle("re-mind:open-external", async (_event, url) => {
     return true;
   } catch (e) {
     return false;
-  }
-});
-
-const handleAppLink = () => {
-  focusMainWindow();
-  if (mainWindow && !mainWindow.isDestroyed()) {
-    mainWindow.reload();
-  }
-};
-
-app.on("second-instance", (_event, argv) => {
-  if (argv.some((value) => typeof value === "string" && value.startsWith("re-mind://"))) {
-    handleAppLink();
-  } else {
-    focusMainWindow();
   }
 });
 
@@ -130,8 +111,6 @@ app.whenReady().then(() => {
     app.setAppUserModelId("com.remind.app");
   } catch (e) {
   }
-
-  app.setAsDefaultProtocolClient("re-mind");
 
   createWindow();
 });
