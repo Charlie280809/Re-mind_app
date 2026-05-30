@@ -877,7 +877,7 @@ export default function App() {
         onBreak={onBreak}
         finished={finished}
         workSeconds={workSeconds}
-        checkInNotificationsEnabled={Boolean(workSettings?.checkin_notifications_on)}
+        checkInNotificationsEnabled={workSettings == null ? null : Boolean(workSettings.checkin_notifications_on)}
       />
       <PauseReminderModal
         workStarted={workStarted}

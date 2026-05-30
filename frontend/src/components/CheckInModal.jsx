@@ -65,6 +65,10 @@ export default function CheckInModal({
             return undefined;
         }
 
+        if (checkInNotificationsEnabled == null) {
+            return undefined;
+        }
+
         if (!checkInNotificationsEnabled || !workStarted || finished) {
             window.sessionStorage.removeItem(CHECK_IN_STATE_STORAGE_KEY);
             return undefined;
@@ -87,6 +91,10 @@ export default function CheckInModal({
     }, [checkInNotificationsEnabled, finished, nextCheckInTriggerWorkSecond, onBreak, workStarted]);
 
     useEffect(() => {
+        if (checkInNotificationsEnabled == null) {
+            return;
+        }
+
         if (!checkInNotificationsEnabled) {
             setShowCheckInModal(false);
             setNextCheckInTriggerWorkSecond(null);
