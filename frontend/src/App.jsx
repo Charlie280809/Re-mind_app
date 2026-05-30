@@ -983,7 +983,19 @@ export default function App() {
           }}
         />
       ) : currentPage === "settings-notifications" ? (
-        <SettingsNotifications onBack={() => setCurrentPage("settings")} />
+        <SettingsNotifications
+          onBack={() => setCurrentPage("settings")}
+          onSaved={(payload) => {
+            try {
+              setWorkSettings((prev) => ({
+                ...(prev || {}),
+                checkin_notifications_on: Boolean(payload?.checkin_notifications_on),
+              }));
+            } catch (e) {
+              // ignore
+            }
+          }}
+        />
       ) : currentPage === "settings-personal" ? (
         <SettingsPersonalData
           onBack={() => setCurrentPage("settings")}

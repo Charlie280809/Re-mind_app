@@ -117,7 +117,7 @@ export default function CheckInModal({
 
         if (nextCheckInTriggerWorkSecond == null) {
             hasShownCheckInNotificationRef.current = false;
-            setNextCheckInTriggerWorkSecond(getRandomCheckInIntervalSeconds());
+            setNextCheckInTriggerWorkSecond(workSeconds + getRandomCheckInIntervalSeconds());
             return;
         }
 

@@ -12,7 +12,7 @@ function createDefaultNotificationState() {
     };
 }
 
-export default function SettingsNotifications({ onBack }) {
+export default function SettingsNotifications({ onBack, onSaved }) {
     const [notificationSettings, setNotificationSettings] = useState(() => createDefaultNotificationState());
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState("");
@@ -125,6 +125,13 @@ export default function SettingsNotifications({ onBack }) {
                 setMessage("Opslaan niet gelukt.");
             } else {
                 setSavedMessage("Instellingen opgeslagen.");
+                try {
+                    if (typeof onSaved === "function") {
+                        onSaved(payload);
+                    }
+                } catch (e) {
+                    // ignore
+                }
             }
         } catch (e) {
             console.error(e);
