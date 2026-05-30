@@ -858,7 +858,7 @@ app.get("/report/week", async (req, res) => {
 
   const { data: checkins, error: checkinError } = await supabase
     .from("checkins")
-    .select("stress, energy")
+    .select("stress, energy, created_at")
     .eq("user_id", userId)
     .gte("created_at", startIso)
     .lt("created_at", endIso);
