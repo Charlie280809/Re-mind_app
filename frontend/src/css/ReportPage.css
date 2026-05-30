@@ -364,4 +364,7 @@
     font-size: var(--font-size-s);
     line-height: var(--text-body-regular-line-height);
     color: var(--text-secondary);
+    padding: var(--space-20);
+    color: var(--text-secondary);
+    text-align: center;
 }

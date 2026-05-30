@@ -563,6 +563,7 @@ app.get("/calendar/events", async (req, res) => {
       provider,
       date: localDate,
       events,
+      connected: true,
     });
   } catch (error) {
     return res.status(500).json({
