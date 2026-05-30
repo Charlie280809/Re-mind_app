@@ -972,7 +972,16 @@ export default function App() {
           onLogout={handleLogout}
         />
       ) : currentPage === "settings-workhours" ? (
-        <SettingsWorkHours onBack={() => setCurrentPage("settings")} />
+        <SettingsWorkHours
+          onBack={() => setCurrentPage("settings")}
+          onSaved={(payload) => {
+            try {
+              setWorkSettings(payload || null);
+            } catch (e) {
+              // ignore
+            }
+          }}
+        />
       ) : currentPage === "settings-notifications" ? (
         <SettingsNotifications onBack={() => setCurrentPage("settings")} />
       ) : currentPage === "settings-personal" ? (

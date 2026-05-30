@@ -84,7 +84,7 @@ function isValidWorkdayTimeRange(startTime, endTime) {
     return Boolean(startTime && endTime && startTime < endTime);
 }
 
-export default function SettingsWorkHours({ onBack, userId }) {
+export default function SettingsWorkHours({ onBack, userId, onSaved }) {
     const [settings, setSettings] = useState(() => createEmptySettingsState());
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState("");
@@ -387,6 +387,14 @@ export default function SettingsWorkHours({ onBack, userId }) {
                     setMessage("Opslaan niet gelukt.");
                 } else {
                     setSavedMessage("Instellingen opgeslagen!");
+                    try {
+                        // notify parent (App) that settings changed so it can update immediately
+                        if (typeof onSaved === "function") {
+                            onSaved(payload);
+                        }
+                    } catch (e) {
+                        // ignore
+                    }
                 }
             } else {
                 console.log("Prepared work hours payload:", payload);

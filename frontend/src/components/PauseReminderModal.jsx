@@ -66,6 +66,19 @@ export default function PauseReminderModal({
         workStarted,
     ]);
 
+    // if the user updates the pause reminder frequency in settings, reschedule the next trigger
+    useEffect(() => {
+        if (!workStarted || finished || onBreak) {
+            return;
+        }
+
+        // always reset the 'has shown' flag so a new notification can be shown with the new interval
+        hasShownPauseReminderNotificationRef.current = false;
+
+        // recalculate next trigger relative to current workSeconds
+        setNextPauseReminderTriggerWorkSecond(workSeconds + getPauseReminderOffsetSeconds(pauseReminderIntervalSeconds));
+    }, [pauseReminderIntervalSeconds]);
+
     useEffect(() => {
         if (!showPauseReminderModal) {
             return undefined;
