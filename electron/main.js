@@ -89,12 +89,14 @@ app.on("activate", () => {
 });
 
 app.whenReady().then(() => {
-  if (process.platform === "win32") {
-    app.setAppUserModelId(app.isPackaged ? "com.remind.app" : process.execPath);
+  // Set a stable app identity for Windows notifications. The installer will
+  // create a Start Menu shortcut that ties this AppUserModelID to the app,
+  // which makes Action Center show the correct app name and icon.
+  try {
+    app.setName("Re:Mind");
+    app.setAppUserModelId("com.remind.app");
+  } catch (e) {
   }
-
-  app.setName("Re:Mind");
-  app.setAppUserModelId("Re:Mind");
 
   createWindow();
 });

@@ -318,6 +318,6 @@ export async function fetchCalendarEvents(apiBaseUrl, accessToken, provider, dat
         provider: body?.provider || provider,
         date: body?.date || date || null,
         events: Array.isArray(body?.events) ? body.events : [],
-        connected: true,
+        connected: Boolean(body?.connected),
     };
 }

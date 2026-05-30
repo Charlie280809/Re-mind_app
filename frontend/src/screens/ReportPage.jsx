@@ -144,12 +144,13 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
 
                 const nextEvents = [];
                 const errors = [];
+                let anyConnected = false;
 
                 results.forEach((result) => {
                     if (result.status === "fulfilled") {
-                        nextEvents.push(...(Array.isArray(result.value?.events) ? result.value.events : []));
                         if (result.value?.connected) {
-                            setAgendaLinked(true);
+                            anyConnected = true;
+                            nextEvents.push(...(Array.isArray(result.value?.events) ? result.value.events : []));
                         }
                     } else if (result.reason?.message) {
                         errors.push(result.reason.message);
@@ -158,9 +159,14 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
 
                 const sortedEvents = sortAgendaEvents(nextEvents);
                 setAgendaEvents(sortedEvents);
+                setAgendaLinked(anyConnected);
 
                 if (sortedEvents.length === 0) {
-                    setAgendaError(errors[0] || "Koppel je agenda via Google of Outlook om afspraken te zien.");
+                    if (anyConnected) {
+                        setAgendaError("Nog geen afspraken gevonden voor deze dag.");
+                    } else {
+                        setAgendaError(errors[0] || "Koppel je agenda via Google of Outlook om afspraken te zien.");
+                    }
                 } else {
                     setAgendaError("");
                 }
