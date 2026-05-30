@@ -152,6 +152,18 @@
     padding: var(--space-12) var(--space-16) var(--space-8);
 }
 
+.weekReportChartCanvasWrap {
+    position: relative;
+    width: 100%;
+    min-height: 320px;
+}
+
+.weekReportBarCanvasWrap {
+    position: relative;
+    width: 100%;
+    min-height: 300px;
+}
+
 .weekReportLineChart {
     width: 100%;
     height: auto;

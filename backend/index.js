@@ -587,6 +587,45 @@ function getWeekRange(dateInput) {
   };
 }
 
+function toIsoDateKey(value) {
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime())) {
+    return null;
+  }
+
+  return date.toISOString().slice(0, 10);
+}
+
+function getWeekDayLabel(dayIndex) {
+  const labels = ["Ma", "Di", "Wo", "Do", "Vr", "Za", "Zo"];
+  return labels[dayIndex] || "";
+}
+
+function buildWeekDays(localStartDate) {
+  const start = new Date(`${localStartDate}T00:00:00`);
+  const days = [];
+
+  for (let index = 0; index < 7; index += 1) {
+    const current = new Date(start);
+    current.setDate(start.getDate() + index);
+    const dateKey = `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, "0")}-${String(current.getDate()).padStart(2, "0")}`;
+
+    days.push({
+      date: dateKey,
+      label: getWeekDayLabel(index),
+      stressSum: 0,
+      energySum: 0,
+      totalCheckins: 0,
+      breaksTaken: 0,
+      breaksSkipped: 0,
+      totalBreakSeconds: 0,
+      totalWorkSeconds: 0,
+    });
+  }
+
+  return days;
+}
+
 function getTodayRange() {
   return getReportRange();
 }
@@ -848,12 +887,60 @@ app.get("/report/week", async (req, res) => {
   const totalCheckins = checkins.length;
   const totals = summarizeCheckins(checkins);
   const pauseTotals = summarizeDailyWorkSessions(workSessions);
+  const weekDays = buildWeekDays(localStartDate);
+  const dayByDate = new Map(weekDays.map((day) => [day.date, day]));
+
+  for (const row of checkins) {
+    const dateKey = toIsoDateKey(row.created_at);
+    if (!dateKey || !dayByDate.has(dateKey)) {
+      continue;
+    }
+
+    const day = dayByDate.get(dateKey);
+    day.stressSum += Number(row.stress ?? 0);
+    day.energySum += Number(row.energy ?? 0);
+    day.totalCheckins += 1;
+  }
+
+  for (const session of workSessions) {
+    const dateKey = toIsoDateKey(session.start_tijd);
+    if (!dateKey || !dayByDate.has(dateKey)) {
+      continue;
+    }
+
+    const startTime = new Date(session.start_tijd);
+    const endTime = new Date(session.eind_tijd);
+    const sessionDurationSeconds = Number.isFinite(startTime.getTime()) && Number.isFinite(endTime.getTime())
+      ? Math.max(0, Math.floor((endTime.getTime() - startTime.getTime()) / 1000))
+      : 0;
+    const sessionPauseSeconds = Math.max(0, Number(session.total_pausetime ?? 0));
+    const day = dayByDate.get(dateKey);
+
+    day.breaksTaken += Number(session.breaks_taken ?? 0);
+    day.breaksSkipped += Number(session.breaks_skipped ?? 0);
+    day.totalBreakSeconds += sessionPauseSeconds;
+    day.totalWorkSeconds += Math.max(0, sessionDurationSeconds - sessionPauseSeconds);
+  }
+
+  const daily = weekDays.map((day) => ({
+    date: day.date,
+    label: day.label,
+    totalCheckins: day.totalCheckins,
+    averageStress: day.totalCheckins === 0 ? null : Number((day.stressSum / day.totalCheckins).toFixed(1)),
+    averageEnergy: day.totalCheckins === 0 ? null : Number((day.energySum / day.totalCheckins).toFixed(1)),
+    breaks_taken: day.breaksTaken,
+    breaks_skipped: day.breaksSkipped,
+    totalBreakSeconds: day.totalBreakSeconds,
+    totalWorkSeconds: day.totalWorkSeconds,
+  }));
 
   return res.json({
     date: localStartDate,
     averageStress: totalCheckins === 0 ? null : Number((totals.stress / totalCheckins).toFixed(1)),
     averageEnergy: totalCheckins === 0 ? null : Number((totals.energy / totalCheckins).toFixed(1)),
+    totalBreakTime: formatSecondsAsDuration(pauseTotals.totalBreakSeconds),
     totalWorkTime: formatSecondsAsHoursAndMinutes(pauseTotals.totalWorkSeconds),
+    daily,
   });
 });
 
