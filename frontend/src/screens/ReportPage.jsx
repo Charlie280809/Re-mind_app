@@ -67,6 +67,12 @@ function sortAgendaEvents(events) {
     });
 }
 
+function waitFor(milliseconds) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, milliseconds);
+    });
+}
+
 function renderBreakRow(label, count, dotClass, countClass, keyPrefix) {
     return (
         <div className="reportBreakRow">
@@ -224,90 +230,81 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
         setSelectedReportDate((currentDate) => shiftDateKey(currentDate, 1));
     }
 
+    async function pollAgendaConnection(provider) {
+        let lastError = "";
+
+        for (let attempt = 0; attempt < 45; attempt += 1) {
+            try {
+                const result = await fetchCalendarEvents(apiBaseUrl, accessToken, provider, selectedReportDate);
+
+                if (result?.connected) {
+                    setAgendaLinked(true);
+                    setAgendaEvents(sortAgendaEvents(Array.isArray(result.events) ? result.events : []));
+                    setAgendaError("");
+                    return true;
+                }
+            } catch (error) {
+                lastError = error?.message || "";
+            }
+
+            await waitFor(1500);
+        }
+
+        setAgendaLinked(false);
+        if (lastError) {
+            setAgendaError(lastError);
+        } else {
+            setAgendaError("De koppeling lijkt nog niet afgerond. Probeer opnieuw of wacht even.");
+        }
+
+        return false;
+    }
+
     async function handleConnectAgenda(provider) {
         if (!accessToken || agendaConnectingProvider) {
             return;
         }
 
         setAgendaConnectingProvider(provider);
+        setAgendaLoading(true);
         setAgendaError("");
 
         try {
-            const connectUrl = await fetchCalendarConnectUrl(apiBaseUrl, accessToken, provider);
-            // If running inside Electron and a platform helper is exposed, open
-            // the URL in the user's external browser to avoid navigating the app.
+            const returnTo = typeof window !== "undefined" && typeof window.location?.href === "string" ? window.location.href : "";
+            const connectUrl = await fetchCalendarConnectUrl(apiBaseUrl, accessToken, provider, returnTo);
+
             if (window.reMindPlatform && typeof window.reMindPlatform.openExternal === "function") {
-                try {
-                    await window.reMindPlatform.openExternal(connectUrl);
-                    // Attempt to refresh events once after a delay.
-                    // Only mark as linked after backend confirms `connected: true`.
-                    setTimeout(() => {
-                        // fire-and-forget
-                        fetchCalendarEvents(apiBaseUrl, accessToken, provider, selectedReportDate).then((r) => {
-                            if (r?.connected) {
-                                setAgendaLinked(true);
-                                setAgendaEvents(sortAgendaEvents(Array.isArray(r.events) ? r.events : []));
-                                setAgendaError("");
-                            }
-                        }).catch(() => {});
-                    }, 1500);
-                } catch (e) {
-                    setAgendaError("Kon externe browser niet openen. Probeer het opnieuw.");
-                }
+                await window.reMindPlatform.openExternal(connectUrl);
+                await pollAgendaConnection(provider);
             } else {
-                const popup = window.open(connectUrl, "re-mind-calendar-connect", "width=600,height=700,noopener");
+                const popup = window.open(connectUrl, "re-mind-calendar-connect", "width=600,height=700");
 
                 if (!popup) {
-                    setAgendaError("Pop-ups geblokkeerd. Sta pop-ups toe of open de koppeling handmatig.");
+                    window.location.assign(connectUrl);
+                    return;
                 } else {
-                    // Listen for the popup to post a message when connection completes.
-                    const handleMessage = async (event) => {
-                        try {
-                            if (event?.data?.type === "re-mind:calendar-connected" && event.data.provider === provider) {
-                                window.removeEventListener("message", handleMessage);
+                    try {
+                        popup.focus();
+                    } catch (error) {
+                        // ignore
+                    }
 
-                                // Refresh events for this provider
-                                try {
-                                    const result = await fetchCalendarEvents(apiBaseUrl, accessToken, provider, selectedReportDate);
-                                    if (result?.connected) {
-                                        setAgendaLinked(true);
-                                        setAgendaEvents(sortAgendaEvents(Array.isArray(result.events) ? result.events : []));
-                                        setAgendaError("");
-                                    }
-                                } catch (e) {
-                                    // ignore - fetch will be retried by existing effect
-                                }
-                            }
-                        } catch (err) {
+                    const isConnected = await pollAgendaConnection(provider);
+                    if (isConnected && !popup.closed) {
+                        try {
+                            popup.close();
+                        } catch (error) {
                             // ignore
                         }
-                    };
-
-                    window.addEventListener("message", handleMessage);
-
-                    // Fallback: poll for popup.close to attempt a refresh once the user finished auth.
-                    const poll = setInterval(async () => {
-                        if (popup.closed) {
-                            clearInterval(poll);
-                            window.removeEventListener("message", handleMessage);
-                            try {
-                                const result = await fetchCalendarEvents(apiBaseUrl, accessToken, provider, selectedReportDate);
-                                if (result?.connected) {
-                                    setAgendaLinked(true);
-                                    setAgendaEvents(sortAgendaEvents(Array.isArray(result.events) ? result.events : []));
-                                    setAgendaError("");
-                                }
-                            } catch (e) {
-                                // ignore
-                            }
-                        }
-                    }, 500);
+                    }
                 }
             }
         } catch (connectError) {
             setAgendaError(connectError.message || "Kon agenda-koppeling niet starten.");
+            setAgendaLinked(false);
         } finally {
             setAgendaConnectingProvider("");
+            setAgendaLoading(false);
         }
     }
 
@@ -428,10 +425,10 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
                     ) : (
                         <div className="reportAgendaActions">
                             <button className="reportAgendaButton" type="button" onClick={() => handleConnectAgenda("google")} disabled={Boolean(agendaConnectingProvider)}>
-                                {agendaConnectingProvider === "google" ? "Google wordt gekoppeld..." : "Google Agenda koppelen"}
+                                {agendaConnectingProvider === "google" ? "Bezig met koppelen..." : "Google Agenda koppelen"}
                             </button>
                             <button className="reportAgendaButton" type="button" onClick={() => handleConnectAgenda("microsoft")} disabled={Boolean(agendaConnectingProvider)}>
-                                {agendaConnectingProvider === "microsoft" ? "Outlook wordt gekoppeld..." : "Outlook koppelen"}
+                                {agendaConnectingProvider === "microsoft" ? "Bezig met koppelen..." : "Outlook koppelen"}
                             </button>
                         </div>
                     )}

@@ -38,6 +38,28 @@ function getCalendarBaseUrl(req) {
   return process.env.CALENDAR_REDIRECT_BASE_URL || `${req.protocol}://${req.get("host")}`;
 }
 
+function parseCalendarReturnUrl(rawReturnUrl) {
+  if (typeof rawReturnUrl !== "string") {
+    return null;
+  }
+
+  const trimmed = rawReturnUrl.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      return null;
+    }
+
+    return parsed.toString();
+  } catch {
+    return null;
+  }
+}
+
 function getCalendarProviderConfig(provider) {
   if (provider === "google") {
     return {
@@ -301,8 +323,11 @@ async function fetchCalendarEvents(provider, accessToken, startIso, endIso) {
   }));
 }
 
-function renderCalendarConnectionSuccessPage(provider) {
-  // This page will try to notify an opener window (postMessage) then close itself.
+function renderCalendarConnectionSuccessPage(provider, returnUrl) {
+  const safeProvider = provider === "microsoft" ? "microsoft" : "google";
+  const safeReturnUrl = typeof returnUrl === "string" && returnUrl ? JSON.stringify(returnUrl) : "null";
+
+  // This page notifies opener (popup flow) and closes, or redirects to the app.
   return `<!doctype html>
 <html lang="nl">
   <head>
@@ -311,41 +336,37 @@ function renderCalendarConnectionSuccessPage(provider) {
     <title>Agenda gekoppeld</title>
     <style>
       body { font-family: Arial, sans-serif; padding: 32px; background: #f5f7fb; color: #14213d; }
-      .card { max-width: 520px; margin: 8vh auto 0; background: white; border-radius: 20px; padding: 28px; box-shadow: 0 12px 40px rgba(20, 33, 61, 0.12); }
-      h1 { margin: 0 0 12px; font-size: 24px; }
-      p { margin: 0 0 16px; line-height: 1.5; }
-      .muted { color: #5d6b85; }
-      .button { display: inline-block; padding: 10px 16px; border-radius: 12px; background: #1f6feb; color: white; text-decoration: none; }
+      .card { max-width: 560px; margin: 10vh auto 0; background: white; border-radius: 20px; padding: 24px; box-shadow: 0 12px 40px rgba(20, 33, 61, 0.12); }
+      h1 { margin: 0 0 10px; font-size: 24px; }
+      p { margin: 0; line-height: 1.5; color: #5d6b85; }
     </style>
   </head>
   <body>
-    <div class="card" id="card">
-      <h1>${provider === "google" ? "Google Agenda" : "Outlook Agenda"} gekoppeld</h1>
-      <p id="message">Je kunt dit venster sluiten en terugkeren naar de app.</p>
-      <p class="muted">De koppeling is opgeslagen. Open het rapport opnieuw om je afspraken te zien.</p>
-      <a class="button" id="closeBtn" href="javascript:window.close()">Venster sluiten</a>
-    </div>
+    <div class="card"><h1>Agenda gekoppeld</h1><p>Je wordt teruggestuurd naar de app...</p></div>
     <script>
       (function(){
-        // Try to notify opener (web popup flow). The opener can listen for the
-        // 're-mind:calendar-connected' message and refresh its state.
+        var payload = { type: 're-mind:calendar-connected', provider: '${safeProvider}' };
+        var returnUrl = ${safeReturnUrl};
+
         try {
           if (window.opener && typeof window.opener.postMessage === 'function') {
-            window.opener.postMessage({ type: 're-mind:calendar-connected', provider: '${provider}' }, '*');
-            // give opener a moment to receive the message before closing
+            window.opener.postMessage(payload, '*');
             setTimeout(() => { try { window.close(); } catch (e) {} }, 600);
             return;
           }
         } catch (e) {
-          // ignore
+          // ignore and continue to redirect fallback
         }
 
-        // If no opener exists (opened in same tab or external browser), keep the
-        // success UI visible and offer a close button. Attempt to auto-close
-        // after a short delay for convenience.
-        setTimeout(() => {
-          try { window.close(); } catch (e) { /* ignore */ }
-        }, 2000);
+        if (returnUrl) {
+          var separator = returnUrl.indexOf('?') === -1 ? '?' : '&';
+          window.location.replace(returnUrl + separator + 'calendar_connected=${safeProvider}');
+          return;
+        }
+
+        setTimeout(function () {
+          try { window.close(); } catch (e) {}
+        }, 1000);
       })();
     </script>
   </body>
@@ -406,11 +427,14 @@ app.get("/calendar/connect-url", async (req, res) => {
     });
   }
 
+  const returnUrl = parseCalendarReturnUrl(req.query?.return_to);
+
   const { codeVerifier, codeChallenge } = generatePkcePair();
   const state = createCalendarOAuthState({
     userId: userData.user.id,
     provider,
     codeVerifier,
+    returnUrl,
   });
 
   return res.json({
@@ -478,7 +502,7 @@ app.get("/calendar/callback/:provider", async (req, res) => {
       throw insertError;
     }
 
-    return res.status(200).send(renderCalendarConnectionSuccessPage(provider));
+    return res.status(200).send(renderCalendarConnectionSuccessPage(provider, statePayload.returnUrl));
   } catch (error) {
     return res.status(500).send(error.message || "Could not complete calendar connection.");
   }

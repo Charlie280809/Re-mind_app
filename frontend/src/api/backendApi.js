@@ -267,9 +267,13 @@ export async function fetchLatestWorkSessionBreaks(apiBaseUrl, accessToken) {
     };
 }
 
-export async function fetchCalendarConnectUrl(apiBaseUrl, accessToken, provider) {
+export async function fetchCalendarConnectUrl(apiBaseUrl, accessToken, provider, returnTo) {
     const url = new URL(`${apiBaseUrl}/calendar/connect-url`);
     url.searchParams.set("provider", provider);
+
+    if (typeof returnTo === "string" && returnTo.trim()) {
+        url.searchParams.set("return_to", returnTo.trim());
+    }
 
     const response = await fetchWithApiError(
         url,
