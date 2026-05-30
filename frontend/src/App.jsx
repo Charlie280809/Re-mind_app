@@ -160,6 +160,7 @@ export default function App() {
   const [favoriteRemovalTarget, setFavoriteRemovalTarget] = useState(null);
   const [favoriteLimitModalOpen, setFavoriteLimitModalOpen] = useState(false);
   const [pauseSummaryCounts, setPauseSummaryCounts] = useState({ breaks_taken: 0, breaks_skipped: 0 });
+  const [pauseSuggestionsInitialTab, setPauseSuggestionsInitialTab] = useState("all");
   const [workdayTasksOpen, setWorkdayTasksOpen] = useState(false);
   const [workdayTasksInitialTab, setWorkdayTasksInitialTab] = useState("today");
   const sessionUserId = session?.user?.id || null;
@@ -278,7 +279,7 @@ export default function App() {
     const loadWorkSettings = async () => {
       const { data, error } = await supabase
         .from("settings")
-        .select("werk_startuur, werk_einduur, pause_reminder, checkin_notifications_on")
+        .select("werk_startuur, werk_einduur, pause_reminder, checkin_notifications_on, favorite_pauses_suggest_on")
         .eq("user_id", session.user.id)
         .maybeSingle();
 
@@ -647,6 +648,7 @@ export default function App() {
     }
 
     setOnBreak(true);
+    setPauseSuggestionsInitialTab(Boolean(workSettings?.favorite_pauses_suggest_on) ? "fav" : "all");
     setCurrentPage("pause");
 
     try {
@@ -955,7 +957,10 @@ export default function App() {
           profile={profile}
           favorites={pauseFavorites}
           onToggleFavorite={togglePauseFavorite}
-          onNavigateToPause={() => setCurrentPage("pause")}
+          onNavigateToPause={() => {
+            setPauseSuggestionsInitialTab("all");
+            setCurrentPage("pause");
+          }}
           favoriteLimit={FREE_FAVORITE_LIMIT}
           onNavigateToUpgrade={() => {
             setCurrentPage("upgrade");
@@ -990,6 +995,7 @@ export default function App() {
               setWorkSettings((prev) => ({
                 ...(prev || {}),
                 checkin_notifications_on: Boolean(payload?.checkin_notifications_on),
+                favorite_pauses_suggest_on: Boolean(payload?.favorite_pauses_suggest_on),
               }));
             } catch (e) {
               // ignore
@@ -1022,6 +1028,7 @@ export default function App() {
         />
       ) : currentPage === "pause" ? (
         <PauseSuggestions
+          initialTab={pauseSuggestionsInitialTab}
           favorites={pauseFavorites}
           onToggleFavorite={togglePauseFavorite}
           onNavigateToBreathing={() => setCurrentPage("breathing")}

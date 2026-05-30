@@ -104,8 +104,8 @@ export const DATA = [
   },
 ];
 
-export default function PauseSuggestions({ favorites = new Set(), onToggleFavorite, onNavigateToBreathing }) {
-  const [tab, setTab] = useState("all");
+export default function PauseSuggestions({ initialTab = "all", favorites = new Set(), onToggleFavorite, onNavigateToBreathing }) {
+  const [tab, setTab] = useState(initialTab);
   const [selectedPause, setSelectedPause] = useState(null);
 
   const filtered = useMemo(() => {
