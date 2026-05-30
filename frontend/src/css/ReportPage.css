@@ -247,11 +247,11 @@
 .reportDots {
     display: flex;
     align-items: center;
-    gap: var(--space-8);
+    gap: 6px;
 }
 
 .reportDot {
-    width: var(--space-24);
+    width: var(--space-16);
     height: var(--space-24);
     border-radius: 4px;
 }

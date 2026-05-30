@@ -157,7 +157,7 @@
 .pauseSummaryDots {
     display: flex;
     align-items: center;
-    gap: var(--space-8);
+    gap: 6px;
 }
 
 .pauseSummaryCount {
@@ -175,7 +175,7 @@
 }
 
 .dot {
-    width: var(--icon-size-24);
+    width: var(--icon-size-16);
     height: var(--icon-size-24);
     border-radius: 4px;
 }
