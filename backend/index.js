@@ -670,7 +670,7 @@ function buildDailyReportPayload({ localDate, totals, pauseTotals, totalCheckins
     breaks_taken: pauseTotals.breaksTaken,
     breaks_skipped: pauseTotals.breaksSkipped,
     totalBreakTime: formatSecondsAsDuration(pauseTotals.totalBreakSeconds),
-    totalWorkTime: formatSecondsAsDuration(pauseTotals.totalWorkSeconds),
+    totalWorkTime: formatSecondsAsHoursAndMinutes(pauseTotals.totalWorkSeconds),
   };
 }
 
