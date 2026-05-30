@@ -50,7 +50,7 @@ function parseCalendarReturnUrl(rawReturnUrl) {
 
   try {
     const parsed = new URL(trimmed);
-    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:" && parsed.protocol !== "re-mind:") {
       return null;
     }
 

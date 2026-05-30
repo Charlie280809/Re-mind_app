@@ -98,6 +98,7 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
     const [agendaLoading, setAgendaLoading] = useState(false);
     const [agendaError, setAgendaError] = useState("");
     const [agendaConnectingProvider, setAgendaConnectingProvider] = useState("");
+    const [agendaDisconnecting, setAgendaDisconnecting] = useState(false);
     const [agendaLinked, setAgendaLinked] = useState(false);
 
     const breaksTaken = Number(report?.breaks_taken ?? 0);
@@ -270,7 +271,7 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
         setAgendaError("");
 
         try {
-            const returnTo = typeof window !== "undefined" && typeof window.location?.href === "string" ? window.location.href : "";
+            const returnTo = window.reMindPlatform ? "re-mind://calendar-connected" : (typeof window !== "undefined" && typeof window.location?.href === "string" ? window.location.href : "");
             const connectUrl = await fetchCalendarConnectUrl(apiBaseUrl, accessToken, provider, returnTo);
 
             if (window.reMindPlatform && typeof window.reMindPlatform.openExternal === "function") {
@@ -314,6 +315,7 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
         }
 
         setAgendaLoading(true);
+        setAgendaDisconnecting(true);
         setAgendaError("");
 
         try {
@@ -324,6 +326,7 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
         } catch (disconnectError) {
             setAgendaError(disconnectError.message || "Agenda loskoppelen mislukt.");
         } finally {
+            setAgendaDisconnecting(false);
             setAgendaLoading(false);
         }
     }
@@ -450,7 +453,7 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
 
                 <article className="reportAgendaCard">
                     {agendaLoading ? (
-                        <SmallLoader message="Agenda wordt geladen..." />
+                        <SmallLoader message={agendaDisconnecting ? "Agenda wordt losgekoppeld." : "Agenda wordt geladen..."} />
                     ) : agendaEvents.length ? (
                         <ul className="reportAgendaList" aria-label="Afspraken voor deze dag">
                             {agendaEvents.map((event) => (
