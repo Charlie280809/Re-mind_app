@@ -309,10 +309,10 @@ function renderCalendarConnectionSuccessPage(provider) {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Agenda gekoppeld</title>
     <style>
-      body { font-family: Lora, sans-serif; margin: 0; min-height: 100vh; display: grid; place-items: center; background: #f5f7fb; color: #14213d; }
-      .card { width: 520px); background: #F4EDD9; border-radius: 20px; padding: 32px; }
+      body { font-family: Lora, serif; margin: 0; min-height: 100vh; display: grid; place-items: center; background: #FFFCF5; }
+      .card { width: 520px); background: #FFFCF5; border-radius: 20px; padding: 32px; }
       h1 { margin: 0 0 10px; font-size: 24px; color: #1A1A1A; }
-      p { margin: 0; line-height: 1.5; color: #a19e98; }
+      p { margin: 0; line-height: 1.5; color: #605E5B; }
     </style>
   </head>
   <body>
