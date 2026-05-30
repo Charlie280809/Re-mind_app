@@ -8,6 +8,15 @@ export function showNativeNotification({ title, body, onClick }) {
                             window.focus();
                         }
 
+                        // ask the host (Electron main) to close the native notification
+                        if (typeof window.reMindNotifications.close === "function") {
+                            try {
+                                void window.reMindNotifications.close();
+                            } catch (e) {
+                                // ignore
+                            }
+                        }
+
                         onClick();
                     }
                     : null
@@ -30,6 +39,13 @@ export function showNativeNotification({ title, body, onClick }) {
             notification.onclick = () => {
                 if (typeof window.focus === "function") {
                     window.focus();
+                }
+
+                // explicitly close the notification so it is removed from the panel
+                try {
+                    notification.close();
+                } catch (e) {
+                    // ignore
                 }
 
                 onClick();

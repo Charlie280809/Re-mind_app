@@ -18,6 +18,10 @@ contextBridge.exposeInMainWorld("reMindNotifications", {
     setClickHandler(handler) {
         pendingNotificationClickHandler = typeof handler === "function" ? handler : null;
     },
+    // request the main process to close the last shown notification
+    close() {
+        return ipcRenderer.invoke("re-mind:close-notification");
+    },
 });
 
 contextBridge.exposeInMainWorld("reMindPlatform", {

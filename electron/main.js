@@ -2,6 +2,7 @@ const { app, BrowserWindow, Notification, ipcMain, shell } = require("electron")
 const path = require("path");
 
 let mainWindow = null;
+let lastNotification = null;
 
 const focusMainWindow = () => {
   if (!mainWindow || mainWindow.isDestroyed()) {
@@ -24,13 +25,20 @@ const showSystemNotification = ({ title, body }) => {
   const notification = new Notification({
     title,
     body,
-    icon: path.join(__dirname, "assets/favicon.ico"),
+    // icon: path.join(__dirname, "assets/favicon.ico"),
   });
 
   notification.on("click", () => {
     focusMainWindow();
     if (mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.webContents.send("re-mind:notification-clicked", { title, body });
+    }
+  });
+  // keep a reference so renderer can request it to be closed
+  lastNotification = notification;
+  notification.on("close", () => {
+    if (lastNotification === notification) {
+      lastNotification = null;
     }
   });
   notification.show();
@@ -43,6 +51,24 @@ ipcMain.handle("re-mind:show-notification", (_event, payload) => {
 
   showSystemNotification(payload);
   return true;
+});
+
+ipcMain.handle("re-mind:close-notification", () => {
+  try {
+    if (lastNotification) {
+      try {
+        lastNotification.close();
+      } catch (e) {
+        // ignore
+      }
+      lastNotification = null;
+      return true;
+    }
+
+    return false;
+  } catch (e) {
+    return false;
+  }
 });
 
 ipcMain.handle("re-mind:open-external", async (_event, url) => {
