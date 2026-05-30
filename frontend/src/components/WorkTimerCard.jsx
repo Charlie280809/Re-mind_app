@@ -1,10 +1,15 @@
 import "../css/worktimercard.css";
-import { useMemo } from "react";
 
 function formatTime(totalSeconds) {
-  const m = Math.floor(totalSeconds / 60);
-  const s = totalSeconds % 60;
-  return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  if (hours > 0) {
+    return `${hours}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+  }
+
+  return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 }
 
 function CircleProgress({ progress = 0 }) {
@@ -36,15 +41,6 @@ function CircleProgress({ progress = 0 }) {
         strokeDashoffset={dash}
         transform={`rotate(-90 ${size / 2} ${size / 2})`}
       />
-      {/* dunne “wijzer” */}
-      {/* <line
-        x1={size / 2}
-        y1={size / 2}
-        x2={size / 2}
-        y2={size / 2 - r + 6}
-        stroke="#46696F"
-        strokeWidth="2"
-      /> */}
     </svg>
   );
 }
@@ -54,6 +50,7 @@ export default function WorkTimerCard({
   onBreak,
   finished,
   workSeconds,
+  elapsedSeconds,
   startDay,
   endDay,
   takeBreak,
@@ -61,12 +58,8 @@ export default function WorkTimerCard({
   onOpenWorkdayTasks,
   dayTargetSeconds = 8 * 60,
 }) {
-  const mainTime = useMemo(() => formatTime(workSeconds), [workSeconds]);
-
-  const progress = useMemo(() => {
-    // toon voortgang van werkdag (0..1)
-    return Math.min(1, workSeconds / dayTargetSeconds);
-  }, [workSeconds]);
+  const mainTime = formatTime(workSeconds);
+  const progress = Math.min(1, Math.max(0, elapsedSeconds / dayTargetSeconds));
 
   return (
     <div className="card">

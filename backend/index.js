@@ -612,6 +612,10 @@ function formatSecondsAsDuration(totalSeconds) {
   const minutes = Math.floor(safeSeconds / 60);
   const seconds = safeSeconds % 60;
 
+  if (minutes >= 60) {
+    return formatSecondsAsHoursAndMinutes(safeSeconds);
+  }
+
   if (minutes === 0) {
     return formatDurationUnit(seconds, "seconde", "seconden");
   }

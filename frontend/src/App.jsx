@@ -43,6 +43,7 @@ import {
 import { calculateWorkdayDurationSeconds } from "./lib/workHours";
 
 const NAV_STATE_STORAGE_KEY = "remind-navigation-state";
+const TIMER_STATE_STORAGE_KEY = "remind-worktimer-state";
 const FREE_FAVORITE_LIMIT = 4;
 
 const getSessionElapsedSeconds = (sessionRow) => {
@@ -58,6 +59,13 @@ const getSessionElapsedSeconds = (sessionRow) => {
   }
 
   return Math.max(0, Math.floor((endTime.getTime() - startTime.getTime()) / 1000));
+};
+
+const getSessionWorkedSeconds = (sessionRow) => {
+  const elapsedSeconds = getSessionElapsedSeconds(sessionRow);
+  const pauseSeconds = Math.max(0, Number(sessionRow?.total_pausetime ?? 0));
+
+  return Math.max(0, elapsedSeconds - pauseSeconds);
 };
 
 const getStoredNavigationState = () => {
@@ -101,8 +109,37 @@ const getStoredNavigationState = () => {
   }
 };
 
+const getStoredTimerState = () => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    const rawState = window.sessionStorage.getItem(TIMER_STATE_STORAGE_KEY);
+
+    if (!rawState) {
+      return null;
+    }
+
+    const parsedState = JSON.parse(rawState);
+
+    return {
+      start_tijd: typeof parsedState?.start_tijd === "string" ? parsedState.start_tijd : null,
+      workStarted: Boolean(parsedState?.workStarted),
+      onBreak: Boolean(parsedState?.onBreak),
+      finished: Boolean(parsedState?.finished),
+      workSeconds: Number.isFinite(Number(parsedState?.workSeconds)) ? Math.max(0, Number(parsedState.workSeconds)) : 0,
+      elapsedSeconds: Number.isFinite(Number(parsedState?.elapsedSeconds)) ? Math.max(0, Number(parsedState.elapsedSeconds)) : 0,
+      breakSeconds: Number.isFinite(Number(parsedState?.breakSeconds)) ? Math.max(0, Number(parsedState.breakSeconds)) : 0,
+    };
+  } catch {
+    return null;
+  }
+};
+
 export default function App() {
   const apiBaseUrl = getApiBaseUrl();
+  const [storedTimerState] = useState(() => getStoredTimerState());
 
   const [session, setSession] = useState(null);
   const [profile, setProfile] = useState(null);
@@ -129,12 +166,14 @@ export default function App() {
 
   // Persistent work timer state lifted here so the timer keeps running
   // even when `WorkTimerCard` unmounts during navigation.
-  const [workStarted, setWorkStarted] = useState(false);
-  const [onBreak, setOnBreak] = useState(false);
-  const [finished, setFinished] = useState(false);
+  const [workStarted, setWorkStarted] = useState(Boolean(storedTimerState?.workStarted));
+  const [onBreak, setOnBreak] = useState(Boolean(storedTimerState?.onBreak));
+  const [finished, setFinished] = useState(Boolean(storedTimerState?.finished));
 
-  const [workSeconds, setWorkSeconds] = useState(0);
-  const [breakSeconds, setBreakSeconds] = useState(0);
+  const [workSeconds, setWorkSeconds] = useState(() => Number(storedTimerState?.workSeconds ?? 0));
+  const [elapsedSeconds, setElapsedSeconds] = useState(() => Number(storedTimerState?.elapsedSeconds ?? 0));
+  const [breakSeconds, setBreakSeconds] = useState(() => Number(storedTimerState?.breakSeconds ?? 0));
+  const [workSessionStartTime, setWorkSessionStartTime] = useState(() => storedTimerState?.start_tijd ?? null);
 
   const pauseReminderIntervalSeconds = Math.max(1, Number(workSettings?.pause_reminder ?? 120)) * 60;
 
@@ -327,7 +366,6 @@ export default function App() {
   }, [apiBaseUrl, sessionUserId]);
 
   const displayName = profile?.username || session?.user?.email?.split("@")[0] || "Gebruiker";
-  const companyName = profile?.bedrijfsnaam || "";
 
   const handleProfileUpdated = (nextProfile) => {
     setProfile((currentProfile) => ({
@@ -341,18 +379,32 @@ export default function App() {
     setOnBreak(false);
     setFinished(false);
     setWorkSeconds(0);
+    setElapsedSeconds(0);
     setBreakSeconds(0);
+    setWorkSessionStartTime(null);
     setWorkdayTasksOpen(false);
+
+    if (typeof window !== "undefined") {
+      window.sessionStorage.removeItem(TIMER_STATE_STORAGE_KEY);
+    }
   };
 
   const applyWorkSessionState = (workSession) => {
-    const elapsedSeconds = getSessionElapsedSeconds(workSession);
+    const nextElapsedSeconds = getSessionElapsedSeconds(workSession);
+    const nextWorkSeconds = getSessionWorkedSeconds(workSession);
+    const shouldRestoreStoredBreak =
+      Boolean(storedTimerState?.start_tijd) &&
+      storedTimerState.start_tijd === workSession.start_tijd &&
+      storedTimerState.onBreak &&
+      !workSession.eind_tijd;
 
     setWorkStarted(true);
-    setOnBreak(false);
+    setOnBreak(shouldRestoreStoredBreak);
     setFinished(Boolean(workSession.eind_tijd));
-    setWorkSeconds(elapsedSeconds);
-    setBreakSeconds(0);
+    setWorkSeconds(shouldRestoreStoredBreak ? Number(storedTimerState?.workSeconds ?? nextWorkSeconds) : nextWorkSeconds);
+    setElapsedSeconds(nextElapsedSeconds);
+    setBreakSeconds(shouldRestoreStoredBreak ? Number(storedTimerState?.breakSeconds ?? 0) : 0);
+    setWorkSessionStartTime(workSession.start_tijd || null);
   };
 
   useEffect(() => {
@@ -372,12 +424,44 @@ export default function App() {
   }, [currentPage, selectedExercise]);
 
   useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    if (!session?.user?.id || !workStarted || !workSessionStartTime) {
+      window.sessionStorage.removeItem(TIMER_STATE_STORAGE_KEY);
+      return undefined;
+    }
+
+    window.sessionStorage.setItem(
+      TIMER_STATE_STORAGE_KEY,
+      JSON.stringify({
+        start_tijd: workSessionStartTime,
+        workStarted,
+        onBreak,
+        finished,
+        workSeconds,
+        elapsedSeconds,
+        breakSeconds,
+      })
+    );
+
+    return undefined;
+  }, [breakSeconds, elapsedSeconds, finished, onBreak, session?.user?.id, workSeconds, workSessionStartTime, workStarted]);
+
+  useEffect(() => {
     let timer = null;
 
-    if (workStarted && !finished && !onBreak) {
-      timer = setInterval(() => setWorkSeconds((p) => p + 1), 1000);
-    } else if (workStarted && !finished && onBreak) {
-      timer = setInterval(() => setBreakSeconds((p) => p + 1), 1000);
+    if (workStarted && !finished) {
+      timer = setInterval(() => {
+        setElapsedSeconds((currentElapsedSeconds) => currentElapsedSeconds + 1);
+
+        if (onBreak) {
+          setBreakSeconds((currentBreakSeconds) => currentBreakSeconds + 1);
+        } else {
+          setWorkSeconds((currentWorkSeconds) => currentWorkSeconds + 1);
+        }
+      }, 1000);
     }
 
     return () => {
@@ -793,7 +877,7 @@ export default function App() {
         onBreak={onBreak}
         finished={finished}
         workSeconds={workSeconds}
-        checkInNotificationsEnabled={Boolean(workSettings?.checkin_notifications_on)}
+        checkInNotificationsEnabled={workSettings == null ? null : Boolean(workSettings.checkin_notifications_on)}
       />
       <PauseReminderModal
         workStarted={workStarted}
@@ -941,6 +1025,7 @@ export default function App() {
               onBreak={onBreak}
               finished={finished}
               workSeconds={workSeconds}
+              elapsedSeconds={elapsedSeconds}
               startDay={startDay}
               endDay={endDay}
               takeBreak={takeBreak}
