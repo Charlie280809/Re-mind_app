@@ -325,3 +325,14 @@ export async function fetchCalendarEvents(apiBaseUrl, accessToken, provider, dat
         connected: Boolean(body?.connected),
     };
 }
+
+export async function disconnectCalendar(apiBaseUrl, accessToken) {
+    const response = await fetchWithApiError(`${apiBaseUrl}/calendar/connections`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${accessToken}` },
+    }, (detail) => `Kan agenda niet loskoppelen. ${detail ? `(${detail})` : ""}`);
+
+    const body = await readJsonResponse(response, () => "Agenda loskoppelen mislukt.");
+    if (!response.ok) throw new Error(body.error || "Agenda loskoppelen mislukt.");
+    return body;
+}

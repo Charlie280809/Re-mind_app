@@ -6,7 +6,7 @@ import { TbCrown } from "react-icons/tb";
 import PremiumModal from "../components/PremiumModal";
 import SmallLoader from "../components/SmallLoader";
 import { fetchTodayReport } from "../api/reportApi";
-import { fetchCalendarConnectUrl, fetchCalendarEvents } from "../api/backendApi";
+import { fetchCalendarConnectUrl, fetchCalendarEvents, disconnectCalendar } from "../api/backendApi";
 import { getApiBaseUrl } from "../api/apiBaseUrl";
 import { formatReportDate } from "../lib/dateFormat";
 
@@ -308,10 +308,24 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
         }
     }
 
-    function handleDisconnectAgenda() {
-        setAgendaLinked(false);
-        setAgendaEvents([]);
-        setAgendaError("Koppel je agenda via Google of Outlook om afspraken te zien.");
+    async function handleDisconnectAgenda() {
+        if (!accessToken) {
+            return;
+        }
+
+        setAgendaLoading(true);
+        setAgendaError("");
+
+        try {
+            await disconnectCalendar(apiBaseUrl, accessToken);
+            setAgendaLinked(false);
+            setAgendaEvents([]);
+            setAgendaError("Koppel je agenda via Google of Outlook om afspraken te zien.");
+        } catch (disconnectError) {
+            setAgendaError(disconnectError.message || "Agenda loskoppelen mislukt.");
+        } finally {
+            setAgendaLoading(false);
+        }
     }
 
     if (loading) {

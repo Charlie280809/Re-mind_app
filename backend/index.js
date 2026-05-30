@@ -508,6 +508,21 @@ app.get("/calendar/callback/:provider", async (req, res) => {
   }
 });
 
+app.delete("/calendar/connections", async (req, res) => {
+  if (!supabase) return res.status(500).json({ error: "Supabase is not configured." });
+
+  const token = getBearerToken(req);
+  if (!token) return res.status(401).json({ error: "Missing Bearer token." });
+
+  const { data: userData, error: userError } = await supabase.auth.getUser(token);
+  if (userError || !userData?.user) return res.status(401).json({ error: "Invalid or expired session." });
+
+  const { error } = await supabase.from("calendar_connections").delete().eq("user_id", userData.user.id);
+  if (error) return res.status(500).json({ error: "Could not disconnect calendar.", details: error.message });
+
+  return res.json({ ok: true });
+});
+
 app.get("/calendar/events", async (req, res) => {
   if (!supabase) {
     return res.status(500).json({
