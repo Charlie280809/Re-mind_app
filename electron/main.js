@@ -1,5 +1,9 @@
 const { app, BrowserWindow, Notification, ipcMain, shell } = require("electron");
 const path = require("path");
+const { autoUpdater }=require("electron-updater");
+const { dialog }=require("electron");
+
+const isDev = !app.isPackaged;
 
 let mainWindow = null;
 let lastNotification = null;
@@ -108,8 +112,29 @@ const createWindow = () => {
     mainWindow = null;
   });
 
-  mainWindow.loadURL("http://localhost:5173"); //local vite dev server, will be replaced with production build in the future
+  mainWindow.loadURL("https://re-mind-app-tjmo.vercel.app/"); //local vite dev server, will be replaced with production build in the future
   return mainWindow;
+};
+
+const setupAutoUpdates = () => {
+  if (isDev) {
+    return;
+  }
+
+  autoUpdater.on("update-downloaded", async () => {
+    const result = await dialog.showMessageBox({
+      type: "info",
+      title: "Update beschikbaar",
+      message: "Nieuwe versie gedownload",
+      buttons: ["Nu updaten"],
+    });
+
+    if (result.response === 0) {
+      autoUpdater.quitAndInstall();
+    }
+  });
+
+  autoUpdater.checkForUpdatesAndNotify();
 };
 
 app.on("window-all-closed", (event) => {
@@ -132,9 +157,10 @@ app.whenReady().then(() => {
   // which makes Action Center show the correct app name and icon.
   try {
     app.setName("Re:Mind");
-    app.setAppUserModelId("com.remind.app");
+    app.setAppUserModelId("be.remind.app");
   } catch (e) {
   }
 
   createWindow();
+  setupAutoUpdates();
 });
