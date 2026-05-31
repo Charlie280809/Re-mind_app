@@ -28,6 +28,12 @@ export default function Navbar({ currentPage, setCurrentPage, onSettingsNavigate
       onClick: () => setCurrentPage("home"),
     },
     {
+      key: "pause",
+      label: "Pauzes",
+      icon: <LuPause />,
+      onClick: () => setCurrentPage("pause"),
+    },
+    {
       key: "report",
       label: "Dagrapport",
       icon: <HiOutlineChartBar />,
@@ -38,12 +44,6 @@ export default function Navbar({ currentPage, setCurrentPage, onSettingsNavigate
       label: "Weekrapport",
       icon: <HiOutlineChartSquareBar />,
       onClick: () => setCurrentPage("weekreport"),
-    },
-    {
-      key: "pause",
-      label: "Pauzes",
-      icon: <LuPause />,
-      onClick: () => setCurrentPage("pause"),
     },
     {
       key: "profile",
