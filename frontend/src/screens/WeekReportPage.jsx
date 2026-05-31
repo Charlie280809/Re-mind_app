@@ -2,7 +2,6 @@ import "../css/WeekReportPage.css";
 import { useEffect, useState } from "react";
 import { LuChevronLeft, LuChevronRight, LuSparkles, LuClock3, LuBatteryCharging } from "react-icons/lu";
 import { HiOutlineTrendingUp } from "react-icons/hi";
-import { TbActivityHeartbeat, TbZzz } from "react-icons/tb";
 import { Bar, Line } from "react-chartjs-2";
 import {
     CategoryScale,
@@ -30,7 +29,7 @@ const insights = [
     },
     {
         day: "Dinsdag",
-        icon: <TbZzz />,
+        icon: <LuBatteryCharging />,
         text: "Door minder pauzes zakt je energie, terwijl het stressniveau tijdelijk lager blijft.",
     },
     {
@@ -40,7 +39,7 @@ const insights = [
     },
     {
         day: "Donderdag",
-        icon: <TbActivityHeartbeat />,
+        icon: <LuSparkles />,
         text: "Extra pauzemomenten, zoals een lunchpauze, helpen om hogere stress onder controle te houden.",
     },
     {
@@ -81,24 +80,24 @@ export default function WeekReportPage({ accessToken }) {
             {
                 label: "Stress",
                 data: daily.map((item) => item.averageStress),
-                borderColor: "#C67052",
-                backgroundColor: "rgba(198, 112, 82, 0.18)",
-                pointBackgroundColor: "#C67052",
-                pointBorderColor: "#FFFCF5",
-                pointBorderWidth: 2,
-                pointRadius: 4,
+                borderColor: "#CCB783",
+                backgroundColor: "#E3CB91",
+                pointBackgroundColor: "#E3CB91",
+                pointBorderColor: "#E3CB91",
+                pointBorderWidth: 4,
+                pointRadius: 6,
                 tension: 0.35,
                 spanGaps: true,
             },
             {
                 label: "Energie",
                 data: daily.map((item) => item.averageEnergy),
-                borderColor: "#5A8A74",
-                backgroundColor: "rgba(90, 138, 116, 0.16)",
-                pointBackgroundColor: "#5A8A74",
-                pointBorderColor: "#FFFCF5",
-                pointBorderWidth: 2,
-                pointRadius: 4,
+                borderColor: "#7EA0B4",
+                backgroundColor: "#8CB2C8",
+                pointBackgroundColor: "#8CB2C8",
+                pointBorderColor: "#8CB2C8",
+                pointBorderWidth: 4,
+                pointRadius: 6,
                 tension: 0.35,
                 spanGaps: true,
             },
@@ -109,8 +108,14 @@ export default function WeekReportPage({ accessToken }) {
         maintainAspectRatio: false,
         plugins: {
             legend: {
+                usepointStyle: true,
+                pointStyle: "circle",
                 display: true,
                 position: "bottom",
+                ticks: {
+                    color: "#414141",
+                    font: { family: "nunito, sans-serif", size: 16 },
+                },
             },
             tooltip: {
                 callbacks: {
@@ -123,18 +128,24 @@ export default function WeekReportPage({ accessToken }) {
         },
         scales: {
             y: {
-                min: 0,
+                min: 1,
                 max: 5,
                 ticks: {
                     stepSize: 1,
+                    color: "#414141",
+                    font: { family: "nunito, sans-serif", size: 16 },
                 },
                 grid: {
-                    color: "rgba(118, 147, 130, 0.14)",
+                    color: "#E3E3E3",
                 },
             },
             x: {
+                ticks: {
+                    color: "#414141",
+                    font: { family: "nunito, sans-serif", size: 16 },
+                },
                 grid: {
-                    color: "rgba(118, 147, 130, 0.08)",
+                    color: "#E3E3E3",
                 },
             },
         },
@@ -145,16 +156,16 @@ export default function WeekReportPage({ accessToken }) {
             {
                 label: "Pauzes genomen",
                 data: daily.map((item) => Number(item.breaks_taken ?? 0)),
-                backgroundColor: "#769382",
+                backgroundColor: "#A8BFAF",
                 borderRadius: 6,
-                maxBarThickness: 26,
+                maxBarThickness: 32,
             },
             {
                 label: "Pauzes genegeerd",
                 data: daily.map((item) => Number(item.breaks_skipped ?? 0)),
-                backgroundColor: "#C67052",
+                backgroundColor: "#DA8383",
                 borderRadius: 6,
-                maxBarThickness: 26,
+                maxBarThickness: 32,
             },
         ],
     };
@@ -172,15 +183,21 @@ export default function WeekReportPage({ accessToken }) {
                 beginAtZero: true,
                 ticks: {
                     precision: 0,
-                    stepSize: 1,
+                    stepSize: 2,
+                    color: "#414141",
+                    font: { family: "nunito, sans-serif", size: 16 },
                 },
                 grid: {
-                    color: "rgba(118, 147, 130, 0.14)",
+                    color: "#E3E3E3",
                 },
             },
             x: {
+                ticks: {
+                    color: "#414141",
+                    font: { family: "nunito, sans-serif", size: 16 },
+                },
                 grid: {
-                    display: false,
+                    color: "#E3E3E3",
                 },
             },
         },
