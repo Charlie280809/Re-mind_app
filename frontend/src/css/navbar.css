@@ -202,10 +202,10 @@
   gap: var(--space-20);
   height: fit-content;
   padding: 0 0 var(--space-20);
+  margin: 0 0 0 var(--space-12);
 }
 
 .premiumButton {
-  margin: 0 0 0 var(--space-12);
   border: 2px solid var(--primary-700);
   background-color: var(--brand-primary);
   color: var(--text-on-dark);
@@ -222,7 +222,7 @@
 }
 
 .sideNav.collapsed .premiumButton {
-  margin: 0 0 0 var(--space-12);
+  /* margin: 0 0 0 var(--space-12); */
   padding: var(--space-4);
   border-radius: 8px;
   width: 48px;
@@ -250,6 +250,10 @@
   width: var(--icon-size-36);
   height: var(--icon-size-36);
   transition: var(--button-default-transition);
+}
+
+.settingsLink {
+  margin: 0;
 }
 
 .settingsLink:active svg {

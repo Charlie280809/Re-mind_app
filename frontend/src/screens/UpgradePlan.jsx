@@ -6,7 +6,7 @@ import { useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { setPremiumStatus } from "../api/profileApi";
 
-export default function SettingsUpgrade({ isPremium, onProfileUpdated }) {
+export default function SettingsUpgrade({ isPremium, onProfileUpdated, onBack }) {
     const [billingCycle, setBillingCycle] = useState("monthly");
     const [savingPlan, setSavingPlan] = useState(false);
     const [saveMessage, setSaveMessage] = useState("");
@@ -44,6 +44,10 @@ export default function SettingsUpgrade({ isPremium, onProfileUpdated }) {
     return (
         <main className="upgradePage">
             <header className="upgradeHeader">
+                <button className="settingsBack" type="button" aria-label="Terug" onClick={() => onBack?.()}>
+                    <LuArrowLeft />
+                </button>
+
                 <h1 className="upgradeTitle">Upgrade plan</h1>
 
                 <div className="upgradeBillingToggle" role="tablist" aria-label="Facturatieperiode" data-billing-cycle={billingCycle}>
@@ -77,8 +81,8 @@ export default function SettingsUpgrade({ isPremium, onProfileUpdated }) {
                     <ul className="upgradeList" role="list">
                         <li><LuCheck /> Alle basis functies</li>
                         <li><LuCheck /> Onbeperkt favoriete pauzes</li>
-                        <li><LuCheck /> Wekelijks rapport</li>
-                        <li><LuCheck /> Diepere inzichten</li>
+                        <li><LuCheck /> Vorige dagrapporten</li>
+                        <li><LuCheck /> Wekelijkse rapporten</li>
                     </ul>
                     {isPremium ? (
                         <div className="currentPlanLabel">Jouw momentele plan</div>

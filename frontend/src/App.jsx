@@ -1129,7 +1129,7 @@ export default function App() {
           <header className="homeHeader">
             <div>
               <h1 className="homeGreeting">Hallo {displayName},</h1>
-              <h2 className="homeSubtitle">Klaar om je werkdag te starten?</h2>
+              <h2 className="homeSubtitle">Slim pauzeren? = Sterk presteren!</h2>
             </div>
 
             <button
