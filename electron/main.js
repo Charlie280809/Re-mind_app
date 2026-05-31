@@ -5,6 +5,12 @@ const { dialog }=require("electron");
 
 const isDev = !app.isPackaged;
 
+if (isDev) {
+  // Keep dev profile/cache separate from the installed app to avoid lock and
+  // access-denied issues when both versions were run on the same machine.
+  app.setPath("userData", path.join(app.getPath("appData"), "Re-Mind-dev"));
+}
+
 let mainWindow = null;
 let lastNotification = null;
 
@@ -112,7 +118,11 @@ const createWindow = () => {
     mainWindow = null;
   });
 
-  mainWindow.loadURL("https://re-mind-app-tjmo.vercel.app/"); //local vite dev server, will be replaced with production build in the future
+  if (isDev) {
+    mainWindow.loadURL("http://localhost:5173");
+  } else {
+    mainWindow.loadURL("https://re-mind-app-tjmo.vercel.app/");
+  }
   return mainWindow;
 };
 
@@ -121,16 +131,30 @@ const setupAutoUpdates = () => {
     return;
   }
 
-  autoUpdater.on("update-downloaded", async () => {
-    const result = await dialog.showMessageBox({
-      type: "info",
-      title: "Update beschikbaar",
-      message: "Nieuwe versie gedownload",
-      buttons: ["Nu updaten"],
-    });
+  autoUpdater.on("update-downloaded", () => {
+    dialog
+      .showMessageBox({
+        type: "info",
+        title: "Update beschikbaar",
+        message: "Een nieuwe versie van Re:Mind is gedownload.",
+        detail: "De app wordt opnieuw opgestart om de update te installeren.",
+        buttons: ["Nu updaten"],
+      })
+      .then(() => {
+        autoUpdater.quitAndInstall();
+      });
+  });
 
-    if (result.response === 0) {
-      autoUpdater.quitAndInstall();
+  autoUpdater.on("error", (error) => {
+    console.error("Auto-update error:", error);
+  });
+
+  autoUpdater.on("update-available", () => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      showSystemNotification({
+        title: "Update beschikbaar",
+        body: "Er wordt een nieuwe versie van Re:Mind gedownload.",
+      });
     }
   });
 
