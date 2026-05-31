@@ -11,7 +11,7 @@
     },
     "build": {
         "appId": "be.remind.app",
-        "productName": "ReMind",
+        "productName": "Re-Mind",
         "artifactName": "Re-Mind-App.${ext}",
         "publish":[
             {
