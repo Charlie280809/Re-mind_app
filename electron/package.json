@@ -20,20 +20,6 @@
                 "repo": "Re-mind_app"
             }
         ],
-        "extraResources": [
-            {
-                "from": "../frontend/dist",
-                "to": "renderer"
-            },
-            {
-                "from": "../backend",
-                "to": "backend",
-                "filter": [
-                    "**/*",
-                    "!**/node_modules/.cache/**"
-                ]
-            }
-        ],
         "win": {
             "target": "nsis",
             "icon": "assets/favicon.ico"
