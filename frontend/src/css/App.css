@@ -95,10 +95,15 @@
 }
 
 .noteButton {
+    position: relative;
     border: 0;
+    /* border-radius: 16px; */
     background-color: transparent;
-    padding: 0;
+    /* padding: var(--space-4); */
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 
     svg {
         stroke-width: 1.2px;
@@ -111,6 +116,25 @@
         transition: var(--button-default-transition);
         fill: var(--highlight-200);
     }
+}
+
+.noteButtonActive {
+    svg {
+        color: var(--primary-600);
+        fill: var(--highlight-300);
+        transition: var(--button-default-transition);
+    }
+}
+
+.noteButtonBadge {
+    position: absolute;
+    bottom: -3px;
+    right: 5px;
+    width: var(--icon-size-20);
+    height: var(--icon-size-20);
+    border-radius: 50%;
+    /* border: 2px solid var(--highlight-300); */
+    background-color: var(--info-300);
 }
 
 .noteButton svg {
@@ -129,7 +153,7 @@
     font-size: var(--text-heading-3-font-size);
     line-height: var(--text-heading-3-line-height);
     font-weight: var(--text-heading-3-font-weight);
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: var(--text-heading-3-font-family);
 }
 
 .pauseSummaryCard {

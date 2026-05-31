@@ -36,7 +36,14 @@ function normalizeOverview(payload) {
     };
 }
 
-export default function WorkdayTasksOverlay({ isOpen, onClose, apiBaseUrl, accessToken, initialTab = "today" }) {
+export default function WorkdayTasksOverlay({
+    isOpen,
+    onClose,
+    apiBaseUrl,
+    accessToken,
+    initialTab = "today",
+    onOverviewChange,
+}) {
     useModalOpen(isOpen, onClose);
 
     const [activeTab, setActiveTab] = useState("today");
@@ -69,7 +76,9 @@ export default function WorkdayTasksOverlay({ isOpen, onClose, apiBaseUrl, acces
                 const overview = await fetchWorkdayTasksOverview(apiBaseUrl, accessToken);
 
                 if (!isCancelled) {
-                    setItemsByTab(normalizeOverview(overview));
+                    const nextOverview = normalizeOverview(overview);
+                    setItemsByTab(nextOverview);
+                    onOverviewChange?.(nextOverview);
                 }
             } catch (requestError) {
                 if (!isCancelled) {
@@ -119,7 +128,9 @@ export default function WorkdayTasksOverlay({ isOpen, onClose, apiBaseUrl, acces
         }
 
         const overview = await fetchWorkdayTasksOverview(apiBaseUrl, accessToken);
-        setItemsByTab(normalizeOverview(overview));
+        const nextOverview = normalizeOverview(overview);
+        setItemsByTab(nextOverview);
+        onOverviewChange?.(nextOverview);
     };
 
     const handleAddItem = async (event) => {

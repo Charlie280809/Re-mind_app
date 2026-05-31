@@ -196,6 +196,7 @@ export default function App() {
   const [pauseSuggestionsInitialTab, setPauseSuggestionsInitialTab] = useState("all");
   const [workdayTasksOpen, setWorkdayTasksOpen] = useState(false);
   const [workdayTasksInitialTab, setWorkdayTasksInitialTab] = useState("today");
+  const [workdayTasksPendingCount, setWorkdayTasksPendingCount] = useState(0);
   const sessionUserId = session?.user?.id || null;
 
   // Persistent work timer state lifted here so the timer keeps running
@@ -764,6 +765,11 @@ export default function App() {
     setWorkdayTasksOpen(false);
   };
 
+  const handleWorkdayTasksOverviewChange = (overview) => {
+    const pendingCount = [...(overview?.today || []), ...(overview?.tomorrow || [])].filter((task) => !task?.is_done).length;
+    setWorkdayTasksPendingCount(pendingCount);
+  };
+
   const handlePauseReminderDismiss = () => {
     incrementWorkSessionCounterOnServer("breaks_skipped");
   };
@@ -984,6 +990,7 @@ export default function App() {
         apiBaseUrl={apiBaseUrl}
         accessToken={session.access_token}
         initialTab={workdayTasksInitialTab}
+        onOverviewChange={handleWorkdayTasksOverviewChange}
       />
       {favoriteLimitModalOpen ? (
         <PremiumModal
@@ -1126,12 +1133,13 @@ export default function App() {
             </div>
 
             <button
-              className="noteButton"
+              className={`noteButton ${workdayTasksOpen ? "noteButtonActive" : ""}`}
               type="button"
               aria-label="Open takenlijst"
               onClick={openWorkdayTasksModal}
             >
               <LuNotepadText />
+              {workdayTasksPendingCount > 0 ? <span className="noteButtonBadge"></span> : null}
             </button>
           </header>
 
