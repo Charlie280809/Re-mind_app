@@ -1,4 +1,4 @@
-import "../css/Navbar.css";
+import "../css/navbar.css";
 import logo from "../assets/images/logo.svg";
 import loadingSpinner from "../assets/images/loadingSpinner.svg";
 import { useState } from "react";
