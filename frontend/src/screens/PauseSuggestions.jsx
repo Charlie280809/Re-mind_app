@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import PauseCard from "../components/PauseCard";
 import PauseDetailModal from "../components/PauseDetailModal";
 
@@ -108,6 +108,10 @@ export default function PauseSuggestions({ initialTab = "all", favorites = new S
   const [tab, setTab] = useState(initialTab);
   const [selectedPause, setSelectedPause] = useState(null);
 
+  useEffect(() => {
+    setTab(initialTab);
+  }, [initialTab]);
+
   const filtered = useMemo(() => {
     if (tab === "all") return DATA;
     if (tab === "fav") return DATA.filter((x) => favorites.has(x.id));
@@ -131,22 +135,28 @@ export default function PauseSuggestions({ initialTab = "all", favorites = new S
 
   return (
     <main className="pause-page">
-      <div className="pause-tabs">
-        <button
-          className={`pause-tab ${tab === "all" ? "active" : ""}`}
-          onClick={() => setTab("all")}
-          type="button"
-        >
-          Alle pauzes
-        </button>
+      <div className="pause-header">
+        <div className="pause-tabs" role="tablist" aria-label="Pauzes filteren" data-active-tab={tab}>
+          <button
+            className={`pause-tab ${tab === "all" ? "active" : ""}`}
+            role="tab"
+            aria-selected={tab === "all"}
+            onClick={() => setTab("all")}
+            type="button"
+          >
+            Alle pauzes
+          </button>
 
-        <button
-          className={`pause-tab ${tab === "fav" ? "active" : ""}`}
-          onClick={() => setTab("fav")}
-          type="button"
-        >
-          Favorieten
-        </button>
+          <button
+            className={`pause-tab ${tab === "fav" ? "active" : ""}`}
+            role="tab"
+            aria-selected={tab === "fav"}
+            onClick={() => setTab("fav")}
+            type="button"
+          >
+            Favorieten
+          </button>
+        </div>
       </div>
 
       <section className={`pause-grid ${columnsClass}`}>

@@ -49,7 +49,7 @@
     width: calc(50% - var(--space-4));
     border-radius: calc(var(--button-radius) - 4px);
     background-color: var(--primary-400);
-    transition: transform 0.20s ease;
+    transition: transform 0.2s ease;
     will-change: transform;
 }
 
