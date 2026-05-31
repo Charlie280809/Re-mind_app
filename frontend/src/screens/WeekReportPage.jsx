@@ -1,6 +1,6 @@
 import "../css/WeekReportPage.css";
 import { useEffect, useState } from "react";
-import { LuChevronLeft, LuChevronRight, LuSparkles, LuClock3, LuBatteryCharging } from "react-icons/lu";
+import { LuChevronLeft, LuChevronRight, LuBatteryCharging } from "react-icons/lu";
 import { HiOutlineTrendingUp } from "react-icons/hi";
 import { Bar, Line } from "react-chartjs-2";
 import {
@@ -23,30 +23,33 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarEleme
 
 const insights = [
     {
-        day: "Maandag",
-        icon: <LuSparkles />,
+        day: "Ma",
         text: "Je start de week met hoge stress en energie, maar neemt voldoende pauzes om het tempo vol te houden.",
     },
     {
-        day: "Dinsdag",
-        icon: <LuBatteryCharging />,
+        day: "Di",
         text: "Door minder pauzes zakt je energie, terwijl het stressniveau tijdelijk lager blijft.",
     },
     {
-        day: "Woensdag",
-        icon: <LuClock3 />,
+        day: "Wo",
         text: "Drukke vergaderingen zorgen voor een gemiddeld stressniveau en een lichte heropleving van je energie.",
     },
     {
-        day: "Donderdag",
-        icon: <LuSparkles />,
+        day: "Do",
         text: "Extra pauzemomenten, zoals een lunchpauze, helpen om hogere stress onder controle te houden.",
     },
     {
-        day: "Vrijdag",
-        icon: <HiOutlineTrendingUp />,
+        day: "Vr",
         text: "Je stress daalt richting het weekend, maar je energieniveau blijft beperkt door vermoeidheid.",
     },
+    {
+        day: "Za",
+        text: "Je neemt voldoende rust, waardoor je stress laag blijft en je energie herstelt.",
+    },
+    {
+        day: "Zo",
+        text: "Je geniet van een rustige zondag, waardoor je stress laag blijft en je energie volledig hersteld is.",
+    }
 ];
 
 function formatDateKey(date = new Date()) {
@@ -80,41 +83,55 @@ export default function WeekReportPage({ accessToken }) {
             {
                 label: "Stress",
                 data: daily.map((item) => item.averageStress),
-                borderColor: "#CCB783",
+                borderColor: "#E3CB91",
                 backgroundColor: "#E3CB91",
                 pointBackgroundColor: "#E3CB91",
-                pointBorderColor: "#E3CB91",
-                pointBorderWidth: 4,
+                pointBorderWidth: 6,
                 pointRadius: 6,
                 tension: 0.35,
                 spanGaps: true,
+                clip: false,
             },
             {
                 label: "Energie",
                 data: daily.map((item) => item.averageEnergy),
-                borderColor: "#7EA0B4",
+                borderColor: "#8CB2C8",
                 backgroundColor: "#8CB2C8",
                 pointBackgroundColor: "#8CB2C8",
-                pointBorderColor: "#8CB2C8",
-                pointBorderWidth: 4,
+                pointBorderWidth: 6,
                 pointRadius: 6,
                 tension: 0.35,
                 spanGaps: true,
+                clip: false,
             },
         ],
     };
     const lineChartOptions = {
         responsive: true,
         maintainAspectRatio: false,
+        layout: {
+            padding: {
+                top: 8,
+                bottom: 8,
+            },
+        },
         plugins: {
             legend: {
-                usepointStyle: true,
-                pointStyle: "circle",
                 display: true,
                 position: "bottom",
                 ticks: {
                     color: "#414141",
                     font: { family: "nunito, sans-serif", size: 16 },
+                },
+                labels: {
+                    color: "#414141",
+                    font: { family: "nunito, sans-serif", size: 16 },
+                    usePointStyle: true,
+                    pointStyle: "circle",
+                    pointStyleWidth: 16,
+                    pointStyleHeight: 16,
+                    boxWidth: 16,
+                    boxHeight: 16,
                 },
             },
             tooltip: {
@@ -136,7 +153,8 @@ export default function WeekReportPage({ accessToken }) {
                     font: { family: "nunito, sans-serif", size: 16 },
                 },
                 grid: {
-                    color: "#E3E3E3",
+                    color: "#C4C4C4",
+                    font: { family: "nunito, sans-serif", size: 16 },
                 },
             },
             x: {
@@ -161,7 +179,7 @@ export default function WeekReportPage({ accessToken }) {
                 maxBarThickness: 32,
             },
             {
-                label: "Pauzes genegeerd",
+                label: "Pauzes overgeslagen",
                 data: daily.map((item) => Number(item.breaks_skipped ?? 0)),
                 backgroundColor: "#DA8383",
                 borderRadius: 6,
@@ -176,6 +194,13 @@ export default function WeekReportPage({ accessToken }) {
             legend: {
                 display: true,
                 position: "bottom",
+                labels: {
+                    color: "#414141",
+                    font: { family: "nunito, sans-serif", size: 16 },
+                    usePointStyle: true,
+                    pointStyle: "circle",
+                    boxWidth: 16,
+                },
             },
         },
         scales: {
@@ -306,7 +331,7 @@ export default function WeekReportPage({ accessToken }) {
                         <article className="weekReportStatsCard">
                             <div className="weekReportStatItem">
                                 <HiOutlineTrendingUp className="weekReportStatIcon" />
-                                <span className="weekReportStatLabel">Gemiddelde stress</span>
+                                <span className="weekReportStatLabel">Gem. stress</span>
                                 <strong className="weekReportStatValue weekReportStatValueStress">{avgStressLabel}</strong>
                             </div>
 
@@ -314,7 +339,7 @@ export default function WeekReportPage({ accessToken }) {
 
                             <div className="weekReportStatItem">
                                 <LuBatteryCharging className="weekReportStatIcon" />
-                                <span className="weekReportStatLabel">Gemiddelde energie</span>
+                                <span className="weekReportStatLabel">Gem. energie</span>
                                 <strong className="weekReportStatValue weekReportStatValueEnergy">{avgEnergyLabel}</strong>
                             </div>
                         </article>
@@ -345,7 +370,6 @@ export default function WeekReportPage({ accessToken }) {
                         {insights.map((item) => (
                             <div key={item.day} className="weekReportInsightRow">
                                 <div className="weekReportInsightDay">
-                                    <span className="weekReportInsightBadge">{item.icon}</span>
                                     <span>{item.day}</span>
                                 </div>
                                 <p className="weekReportInsightText">{item.text}</p>

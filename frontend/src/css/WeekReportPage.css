@@ -20,7 +20,6 @@
 .weekReportSectionHeadingSplit,
 .weekReportLegend,
 .weekReportStatItem,
-.weekReportInsightDay,
 .weekReportSectionMeta {
     display: flex;
     align-items: center;
@@ -90,6 +89,8 @@
 .weekReportBarChartCard {
     display: flex;
     flex-direction: column;
+    gap: var(--space-12);
+    width: 100%;
 }
 
 .weekReportSectionTitle {
@@ -113,13 +114,6 @@
     font-weight: var(--font-weight-regular);
 }
 
-.weekReportChartBlock,
-.weekReportSection {
-    width: 100%;
-    gap: var(--space-12);
-}
-
-
 .weekReportSectionHeadingSplit {
     justify-content: space-between;
 }
@@ -142,7 +136,6 @@
 .weekReportStatsCard,
 .weekReportBarChartCard,
 .weekReportInsightsCard {
-    width: 100%;
     background-color: var(--background-50);
     border-radius: 20px;
     border: 2px solid var(--border-color-default);
@@ -272,7 +265,7 @@
 }
 
 .weekReportStatLabel {
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-s);
 }
 
 .weekReportStatValue {
@@ -283,7 +276,7 @@
 }
 
 .weekReportStatValueStress {
-    color: var(--warning-300);
+    color: var(--warning-400);
 }
 
 .weekReportStatValueEnergy {
@@ -298,8 +291,7 @@
 
 .weekReportBarChartCard {
     padding: var(--space-16);
-    gap: var(--space-16);
-    background: var(--surface-background);
+    background: var(--surface-card);
 }
 
 .weekReportBarChart {
@@ -363,9 +355,9 @@
     position: absolute;
     top: var(--space-24);
     bottom: var(--space-24);
-    left: 52px;
-    width: 2px;
-    background: rgba(118, 147, 130, 0.45);
+    left: 40px;
+    width: 4px;
+    background: var(--highlight-300);
 }
 
 .weekReportInsightList {
@@ -375,18 +367,26 @@
 }
 
 .weekReportInsightRow {
-    display: grid;
-    grid-template-columns: 132px 1fr;
-    gap: var(--space-16);
+    display: flex;
+    flex-direction: row;
+    gap: var(--space-12);
     align-items: center;
 }
 
 .weekReportInsightDay {
-    gap: var(--space-8);
+    width: 30px;
+    height: 30px;
     font-family: var(--font-family-body);
-    font-size: var(--font-size-xxs);
-    line-height: var(--line-height-xs);
+    font-size: var(--font-size-xs);
     color: var(--text-secondary);
+    padding: var(--space-16);
+    border-radius: 999px;
+    border: 2px solid var(--border-green-300);
+    background-color: var(--background-50);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
 }
 
 .weekReportInsightBadge {
