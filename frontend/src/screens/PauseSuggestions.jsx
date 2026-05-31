@@ -4,7 +4,7 @@ import PauseDetailModal from "../components/PauseDetailModal";
 
 import lungs from "../assets/icons/ademhaling.svg";
 import drink from "../assets/icons/drinkPauze.svg";
-import handStretch from "../assets/icons/handstretch.svg";
+import handStretch from "../assets/icons/handStretch.svg";
 import chest from "../assets/icons/handToChestReset.svg";
 import posture from "../assets/icons/houdingCheck.svg";
 import headphones from "../assets/icons/koptelefoon.svg";
