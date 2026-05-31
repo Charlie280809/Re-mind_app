@@ -1,5 +1,5 @@
 import "./css/App.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import Navbar from "./components/Navbar";
 import WorkTimerCard from "./components/WorkTimerCard";
@@ -44,6 +44,7 @@ import { calculateWorkdayDurationSeconds } from "./lib/workHours";
 
 const NAV_STATE_STORAGE_KEY = "remind-navigation-state";
 const TIMER_STATE_STORAGE_KEY = "remind-worktimer-state";
+const BREAK_START_STORAGE_KEY = "remind-break-start-time";
 const FREE_FAVORITE_LIMIT = 4;
 
 const getSessionElapsedSeconds = (sessionRow) => {
@@ -137,9 +138,41 @@ const getStoredTimerState = () => {
   }
 };
 
+const getStoredBreakStartTime = () => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    const rawValue = window.sessionStorage.getItem(BREAK_START_STORAGE_KEY);
+    if (!rawValue) {
+      return null;
+    }
+
+    const parsedValue = JSON.parse(rawValue);
+    return typeof parsedValue === "string" && parsedValue ? parsedValue : null;
+  } catch {
+    return null;
+  }
+};
+
+const getElapsedSecondsSince = (startedAt) => {
+  if (!startedAt) {
+    return 0;
+  }
+
+  const startTime = new Date(startedAt);
+  if (!Number.isFinite(startTime.getTime())) {
+    return 0;
+  }
+
+  return Math.max(0, Math.floor((Date.now() - startTime.getTime()) / 1000));
+};
+
 export default function App() {
   const apiBaseUrl = getApiBaseUrl();
   const [storedTimerState] = useState(() => getStoredTimerState());
+  const breakStartedAtRef = useRef(getStoredBreakStartTime());
 
   const [session, setSession] = useState(null);
   const [profile, setProfile] = useState(null);
@@ -387,7 +420,25 @@ export default function App() {
 
     if (typeof window !== "undefined") {
       window.sessionStorage.removeItem(TIMER_STATE_STORAGE_KEY);
+      window.sessionStorage.removeItem(BREAK_START_STORAGE_KEY);
     }
+  };
+
+  const syncBreakSecondsFromClock = () => {
+    if (!onBreak || !breakStartedAtRef.current) {
+      return;
+    }
+
+    const nextBreakSeconds = getElapsedSecondsSince(breakStartedAtRef.current);
+    setBreakSeconds(nextBreakSeconds);
+  };
+
+  const getCurrentBreakSeconds = () => {
+    if (onBreak && breakStartedAtRef.current) {
+      return getElapsedSecondsSince(breakStartedAtRef.current);
+    }
+
+    return Math.max(0, Number(breakSeconds) || 0);
   };
 
   const applyWorkSessionState = (workSession) => {
@@ -399,13 +450,22 @@ export default function App() {
       storedTimerState.onBreak &&
       !workSession.eind_tijd;
 
+    const storedBreakStart = shouldRestoreStoredBreak ? breakStartedAtRef.current : null;
+    const restoredBreakSeconds = shouldRestoreStoredBreak ? getElapsedSecondsSince(storedBreakStart) : 0;
+
     setWorkStarted(true);
     setOnBreak(shouldRestoreStoredBreak);
     setFinished(Boolean(workSession.eind_tijd));
     setWorkSeconds(shouldRestoreStoredBreak ? Number(storedTimerState?.workSeconds ?? nextWorkSeconds) : nextWorkSeconds);
     setElapsedSeconds(nextElapsedSeconds);
-    setBreakSeconds(shouldRestoreStoredBreak ? Number(storedTimerState?.breakSeconds ?? 0) : 0);
+    setBreakSeconds(shouldRestoreStoredBreak ? Math.max(Number(storedTimerState?.breakSeconds ?? 0), restoredBreakSeconds) : 0);
     setWorkSessionStartTime(workSession.start_tijd || null);
+
+    if (!shouldRestoreStoredBreak) {
+      breakStartedAtRef.current = null;
+    } else if (storedBreakStart) {
+      breakStartedAtRef.current = storedBreakStart;
+    }
   };
 
   useEffect(() => {
@@ -447,6 +507,12 @@ export default function App() {
       })
     );
 
+    if (onBreak && breakStartedAtRef.current) {
+      window.sessionStorage.setItem(BREAK_START_STORAGE_KEY, JSON.stringify(breakStartedAtRef.current));
+    } else {
+      window.sessionStorage.removeItem(BREAK_START_STORAGE_KEY);
+    }
+
     return undefined;
   }, [breakSeconds, elapsedSeconds, finished, onBreak, session?.user?.id, workSeconds, workSessionStartTime, workStarted]);
 
@@ -458,7 +524,7 @@ export default function App() {
         setElapsedSeconds((currentElapsedSeconds) => currentElapsedSeconds + 1);
 
         if (onBreak) {
-          setBreakSeconds((currentBreakSeconds) => currentBreakSeconds + 1);
+          syncBreakSecondsFromClock();
         } else {
           setWorkSeconds((currentWorkSeconds) => currentWorkSeconds + 1);
         }
@@ -468,7 +534,23 @@ export default function App() {
     return () => {
       if (timer) clearInterval(timer);
     };
-  }, [workStarted, finished, onBreak]);
+  }, [workStarted, finished, onBreak, workSessionStartTime]);
+
+  useEffect(() => {
+    const handleVisibilityOrFocus = () => {
+      syncBreakSecondsFromClock();
+    };
+
+    window.addEventListener("visibilitychange", handleVisibilityOrFocus);
+    window.addEventListener("focus", handleVisibilityOrFocus);
+    window.addEventListener("pageshow", handleVisibilityOrFocus);
+
+    return () => {
+      window.removeEventListener("visibilitychange", handleVisibilityOrFocus);
+      window.removeEventListener("focus", handleVisibilityOrFocus);
+      window.removeEventListener("pageshow", handleVisibilityOrFocus);
+    };
+  }, [onBreak, workSessionStartTime]);
 
   // Load user's favorite pauses from Supabase when session/profile is available
   useEffect(() => {
@@ -592,18 +674,6 @@ export default function App() {
     }
   };
 
-  const persistCurrentBreakDuration = async () => {
-    if (!session?.access_token || !onBreak) {
-      return null;
-    }
-
-    if (breakSeconds <= 0) {
-      return null;
-    }
-
-    return completeWorkSessionBreak(apiBaseUrl, session.access_token, breakSeconds);
-  };
-
   // timer control handlers passed down to WorkTimerCard
   const startDay = async () => {
     const startTime = new Date();
@@ -625,9 +695,14 @@ export default function App() {
   const endDay = async () => {
     try {
       if (onBreak) {
-        await persistCurrentBreakDuration();
+        const currentBreakSeconds = getCurrentBreakSeconds();
         setOnBreak(false);
         setBreakSeconds(0);
+        breakStartedAtRef.current = null;
+
+        void completeWorkSessionBreak(apiBaseUrl, session.access_token, currentBreakSeconds).catch((error) => {
+          console.error("Failed to save break duration:", error);
+        });
       }
 
       const endedSession = await endWorkSession(apiBaseUrl, session.access_token, {
@@ -647,6 +722,9 @@ export default function App() {
       return;
     }
 
+    breakStartedAtRef.current = new Date().toISOString();
+    setBreakSeconds(0);
+    await incrementWorkSessionCounterOnServer("breaks_taken");
     setOnBreak(true);
     setPauseSuggestionsInitialTab(Boolean(workSettings?.favorite_pauses_suggest_on) ? "fav" : "all");
     setCurrentPage("pause");
@@ -659,9 +737,14 @@ export default function App() {
   };
   const endBreak = async () => {
     try {
-      await persistCurrentBreakDuration();
+      const currentBreakSeconds = getCurrentBreakSeconds();
       setOnBreak(false);
       setBreakSeconds(0);
+      breakStartedAtRef.current = null;
+
+      void completeWorkSessionBreak(apiBaseUrl, session.access_token, currentBreakSeconds).catch((error) => {
+        console.error("Failed to save break duration:", error);
+      });
     } catch (error) {
       console.error("Failed to save break duration:", error);
     }
