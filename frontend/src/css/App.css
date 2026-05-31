@@ -251,6 +251,12 @@
     max-width: 100%;
 }
 
+.pause-card:hover {
+    box-shadow: var(--popupcard-box-shadow);
+    transform: translateY(1px);
+    transition: var(--button-default-transition);
+}
+
 .pause-card--upgrade {
     cursor: pointer;
 }
