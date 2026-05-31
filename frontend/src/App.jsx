@@ -673,20 +673,6 @@ export default function App() {
     }
   };
 
-  const persistCurrentBreakDuration = async (currentBreakSeconds = breakSeconds) => {
-    if (!session?.access_token || !onBreak) {
-      return null;
-    }
-
-    const breakSecondsToPersist = Math.max(0, Math.floor(Number(currentBreakSeconds) || 0));
-
-    if (breakSecondsToPersist <= 0) {
-      return null;
-    }
-
-    return completeWorkSessionBreak(apiBaseUrl, session.access_token, breakSecondsToPersist);
-  };
-
   // timer control handlers passed down to WorkTimerCard
   const startDay = async () => {
     const startTime = new Date();
@@ -709,10 +695,13 @@ export default function App() {
     try {
       if (onBreak) {
         const currentBreakSeconds = getCurrentBreakSeconds();
-        await persistCurrentBreakDuration(currentBreakSeconds);
         setOnBreak(false);
         setBreakSeconds(0);
         breakStartedAtRef.current = null;
+
+        void completeWorkSessionBreak(apiBaseUrl, session.access_token, currentBreakSeconds).catch((error) => {
+          console.error("Failed to save break duration:", error);
+        });
       }
 
       const endedSession = await endWorkSession(apiBaseUrl, session.access_token, {
@@ -741,11 +730,13 @@ export default function App() {
   const endBreak = async () => {
     try {
       const currentBreakSeconds = getCurrentBreakSeconds();
-      setBreakSeconds(currentBreakSeconds);
-      await persistCurrentBreakDuration(currentBreakSeconds);
       setOnBreak(false);
       setBreakSeconds(0);
       breakStartedAtRef.current = null;
+
+      void completeWorkSessionBreak(apiBaseUrl, session.access_token, currentBreakSeconds).catch((error) => {
+        console.error("Failed to save break duration:", error);
+      });
     } catch (error) {
       console.error("Failed to save break duration:", error);
     }
