@@ -530,10 +530,10 @@
     min-width: var(--button-min-width);
     min-height: var(--button-min-height);
     width: 200px;
-    border: 2px solid var(--button-neutral-border);
+    border: 2px solid var(--border-color-default);
     border-radius: var(--button-radius);
     padding: var(--button-padding-y) var(--button-padding-x);
-    background-color: var(--button-neutral-bg);
+    background-color: var(--background-card-300);
     color: var(--button-neutral-text);
     font-family: var(--button-default-font-family);
     font-size: var(--button-default-font-size);
@@ -541,8 +541,8 @@
 }
 
 .profile-companyManageBtn:hover {
-    background-color: var(--button-neutral-hover-bg);
-    border-color: var(--button-neutral-hover-border);
+    background-color: var(--highlight-200);
+    border-color: var(--border-green-300);
     box-shadow: var(--button-default-hover-shadow);
     transition: var(--button-default-transition);
 }
