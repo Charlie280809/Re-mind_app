@@ -7,7 +7,7 @@ import { hasPremiumAccess } from "../lib/access";
 
 export default function ProfilePage({ profile, favorites, onToggleFavorite, onNavigateToPause, onNavigateToUpgrade, onNavigateToCompanyManagement, favoriteLimit }) {
     const name = profile?.username || profile?.email || "Gebruiker";
-    const companyName = profile?.bedrijfsnaam || "Geen bedrijfsnaam";
+    const companyName = profile?.bedrijfsnaam || "";
     const isPremium = hasPremiumAccess(profile);
 
     const favoritePauses = useMemo(
@@ -35,7 +35,7 @@ export default function ProfilePage({ profile, favorites, onToggleFavorite, onNa
 
                 <div className="profile-heroCopy">
                     <h1 className="profile-title">{name}</h1>
-                    <p className="profile-jobTitle">{companyName}</p>
+                    <p className="profile-companyTitle">{companyName}</p>
                     {profile?.company_id && profile?.company_role === "admin" ? (
                         <button
                             className="profile-companyManageBtn"

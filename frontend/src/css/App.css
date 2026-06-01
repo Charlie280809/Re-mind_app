@@ -474,7 +474,7 @@
     font-weight: var(--text-heading-1-font-weight);
 }
 
-.profile-jobTitle {
+.profile-companyTitle {
     margin: 0;
     font-family: var(--font-family-body);
     font-size: var(--font-size-s);
@@ -524,6 +524,27 @@
     background-color: var(--highlight-200);
     border-color: var(--border-color-green);
     color: var(--text-primary);
+}
+
+.profile-companyManageBtn{
+    min-width: var(--button-min-width);
+    min-height: var(--button-min-height);
+    width: 200px;
+    border: 2px solid var(--button-neutral-border);
+    border-radius: var(--button-radius);
+    padding: var(--button-padding-y) var(--button-padding-x);
+    background-color: var(--button-neutral-bg);
+    color: var(--button-neutral-text);
+    font-family: var(--button-default-font-family);
+    font-size: var(--button-default-font-size);
+    cursor: pointer;
+}
+
+.profile-companyManageBtn:hover {
+    background-color: var(--button-neutral-hover-bg);
+    border-color: var(--button-neutral-hover-border);
+    box-shadow: var(--button-default-hover-shadow);
+    transition: var(--button-default-transition);
 }
 
 .profile-section {
