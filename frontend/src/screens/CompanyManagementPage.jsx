@@ -354,9 +354,9 @@ export default function CompanyManagementPage({ profile, accessToken, onBack }) 
                 companyPeople.map((member) => (
                     <article
                         key={member.id}
-                        className={`companyManagementMemberCard${member.isPending ? " companyManagementMemberCard--pending" : ""}`}
+                        className={`companyManagementMemberCard${member.isPending ? "companyManagementMemberCard--pending" : ""}`}
                     >
-                        <div className="companyManagementMemberInfo">
+                        <div>
                             <h3>{member.username || member.email}</h3>
                             <p>{member.email}</p>
                         </div>
