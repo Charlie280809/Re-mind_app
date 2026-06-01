@@ -1,39 +1,51 @@
+@import url("./design_tokens/color_tokens.css");
+@import url("./design_tokens/typography_tokens.css");
+@import url("./design_tokens/spacing_tokens.css");
+@import url("./design_tokens/components.css");
+
 .companyManagementPage {
     flex: 1;
     display: flex;
     flex-direction: column;
     gap: var(--space-24);
     padding: var(--layout-container-padding);
-    color: var(--text);
+    font-family: var(--text-body-regular-font-family);
+    color: var(--text-primary);
 }
 
 .companyManagementHeader {
     display: flex;
-    align-items: flex-start;
-    gap: var(--space-16);
+    align-items: center;
+    gap: var(--space-12);
 }
 
 .companyManagementBack {
-    border: 0;
-    background: transparent;
-    color: var(--text);
-    cursor: pointer;
-    font-size: var(--font-size-xl);
     padding: 0;
+    border: 0;
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    font-size: var(--text-heading-2-font-size);
+    color: var(--text-primary);
+    cursor: pointer;
 }
 
 .companyManagementTitle {
     margin: 0;
-    font-family: var(--text-heading-1-font-family);
-    font-size: var(--text-heading-1-font-size);
+    font-family: var(--text-heading-2-font-family);
+    font-size: var(--text-heading-2-font-size);
+    font-weight: var(--text-heading-1-font-weight);
 }
 
-.companyManagementSubtitle,
-.companyManagementCardCopy,
 .companyManagementNotice,
 .companyManagementEmptyState {
+    width: fit-content;
     margin: 0;
+    padding: var(--space-4) var(--space-8);
     color: var(--text-secondary);
+    border-radius: 6px;
+    border: 1px solid var(--info-300);
+    background-color: var(--info-200);
 }
 
 .companyManagementAlert {
@@ -45,19 +57,16 @@
 }
 
 .companyManagementGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: var(--space-20);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-32);
 }
 
 .companyManagementCard {
     display: flex;
     flex-direction: column;
-    gap: var(--space-16);
-    padding: var(--space-24);
-    border-radius: 24px;
-    background: var(--background-card);
-    box-shadow: var(--shadow-md);
+    gap: var(--space-8);
+    font-size: var(--text-body-regular-font-size);
 }
 
 .companyManagementCardHeader {
@@ -72,39 +81,78 @@
     display: flex;
     align-items: center;
     gap: var(--space-8);
+    font-family: var(--text-heading-2-font-family);
     font-size: var(--font-size-lg);
 }
 
-.companyManagementForm,
-.companyManagementInlineForm {
+.companyManagementForm {
     display: flex;
     flex-direction: column;
+    gap: var(--space-20);
+}
+
+.companyManagementContent{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-24);
+}
+
+.companyManagementFields{
+    display: flex;
+    flex-direction: row;
     gap: var(--space-16);
 }
 
 .companyManagementInlineForm {
+    display: flex;
     flex-direction: row;
-    align-items: stretch;
+    gap: var(--space-12);
+    margin: 0 0 var(--space-8) 0;
 }
 
 .companyManagementField {
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: var(--space-8);
+    font-size: var(--font-size-s);
 }
 
 .companyManagementField input,
 .companyManagementInlineForm input {
     width: 100%;
-    border: 1px solid var(--border-color-default);
-    border-radius: 16px;
-    padding: var(--space-12) var(--space-16);
-    background: var(--background-100);
-    color: var(--text);
-    font: inherit;
+    border: 1px solid var(--input-border-color);
+    border-radius: var(--input-border-radius);
+    background-color: var(--background-100);
+    padding: var(--input-padding);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-regular);
+    color: var(--text-primary);
+    outline: var(--input-outline);
+}
+
+.companyManagementField input::placeholder,
+.companyManagementInlineForm input::placeholder {
+    color: var(--text-placeholder);
+}
+
+.companyManagementField input:focus,
+.companyManagementInlineForm input:focus {
+    border-color: var(--border-green-300);
+    box-shadow: var(--input-focus-box-shadow);
+    transition: var(--input-transition);
+}
+
+.companyManagementThemeSelection{
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
 }
 
 .companyManagementThemeList {
+    /* width: 50%; */
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: var(--space-12);
@@ -125,50 +173,79 @@
 
 .companyManagementThemeCard--active {
     outline: 2px solid var(--primary-300);
-}
-
-.companyManagementThemeCard__title {
     font-weight: var(--font-weight-semibold);
 }
 
-.companyManagementThemeCard__copy {
-    color: var(--text-secondary);
+.companyManagementThemeCard__title {
+    font-size: var(--font-size-xs);
 }
 
-.companyManagementThemePreview,
-.companyManagementThemePreviewRow {
+.companyManagementThemePreview {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: var(--space-4);
-}
-
-.companyManagementThemePreview span,
-.companyManagementThemePreviewRow span {
-    height: 14px;
-    border-radius: 999px;
-}
-
-.companyManagementPrimaryBtn,
-.companyManagementDangerBtn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
     gap: var(--space-8);
-    border-radius: 999px;
-    border: 0;
-    padding: var(--space-12) var(--space-16);
-    cursor: pointer;
-    font: inherit;
 }
 
-.companyManagementPrimaryBtn {
-    background: var(--primary-300);
-    color: var(--background-100);
+.companyManagementThemePreview span {
+    /* width: var(--space-48); */
+    height: var(--space-24);
+    border-radius: 6px;
+}
+
+.companyManagementSaveBtn,
+.companyManagementAddBtn,
+.companyManagementDangerBtn {
+    min-width: var(--button-min-width);
+    min-height: var(--button-min-height);
+    width: 140px;
+    border-radius: var(--button-radius);
+    padding: var(--button-padding-y) var(--button-padding-x);
+    cursor: pointer;
+    font-family: var(--button-default-font-family);
+    font-size: var(--button-default-font-size);
+    transition: var(--button-default-transition);
+}
+
+.companyManagementSaveBtn {
+    font-weight: var(--font-weight-regular);
+    color: var(--button-highlight-text);
+    border: 2px solid var(--button-highlight-border);
+    background-color: var(--button-highlight-bg);
+    margin: 0 0 0 auto
+}
+
+.companyManagementSaveBtn:hover {
+    background-color: var(--button-highlight-hover-bg);
+    border-color: var(--button-highlight-hover-border);
+    box-shadow: var(--button-default-hover-shadow);
+}
+
+.companyManagementAddBtn{
+    font-weight: var(--button-primary-font-weight);
+    color: var(--button-primary-text);
+    border: 2px solid var(--button-primary-border);
+    background-color: var(--button-primary-bg);
+}
+
+.companyManagementAddBtn:hover {
+    background-color: var(--button-primary-hover-bg);
+    border-color: var(--button-primary-hover-border);
+    box-shadow: var(--button-default-hover-shadow);
 }
 
 .companyManagementDangerBtn {
-    background: var(--error-300);
-    color: var(--background-100);
+    font-size: var(--font-size-xs);
+    width: fit-content;
+    padding: var(--button-padding-small-y) var(--button-padding-small-x);
+    background: var(--button-red-bg);
+    color: var(--button-red-text);
+    border: 2px solid var(--button-red-border);
+}
+
+.companyManagementDangerBtn:hover {
+    background-color: var(--button-red-hover-bg);
+    border-color: var(--button-red-hover-border);
+    box-shadow: var(--button-default-hover-shadow);
 }
 
 .companyManagementMemberList {
@@ -179,41 +256,39 @@
 
 .companyManagementMemberCard {
     display: flex;
-    align-items: center;
+    flex-direction: row;
     justify-content: space-between;
     gap: var(--space-16);
     padding: var(--space-16);
-    border-radius: 18px;
+    border-radius: var(--button-radius);
     background: var(--background-100);
     border: 1px solid var(--border-color-default);
 }
 
 .companyManagementMemberCard h3 {
     margin: 0;
+    font-size: var(--text-body-regular-font-size);
 }
 
 .companyManagementMemberCard p {
+    font-size: var(--text-body-small-font-size);
     margin: var(--space-4) 0 0;
     color: var(--text-secondary);
 }
 
 .companyManagementBadge {
     display: inline-flex;
-    margin-top: var(--space-8);
-    padding: 4px 10px;
+    height: fit-content;
     border-radius: 999px;
-    background: var(--highlight-100);
+    background: var(--highlight-200);
+    padding: var(--space-4) var(--space-8);
+    font-size: var(--text-body-small-font-size);
 }
 
-.companyManagementCard--footer {
-    align-items: flex-start;
-}
-
-@media (max-width: 720px) {
-
-    .companyManagementInlineForm,
-    .companyManagementMemberCard {
-        flex-direction: column;
-        align-items: stretch;
-    }
+.companyManagementMemberActions{
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-12);
 }
