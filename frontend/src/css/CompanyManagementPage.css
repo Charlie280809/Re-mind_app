@@ -1,0 +1,219 @@
+.companyManagementPage {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-24);
+    padding: var(--layout-container-padding);
+    color: var(--text);
+}
+
+.companyManagementHeader {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-16);
+}
+
+.companyManagementBack {
+    border: 0;
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    font-size: var(--font-size-xl);
+    padding: 0;
+}
+
+.companyManagementTitle {
+    margin: 0;
+    font-family: var(--text-heading-1-font-family);
+    font-size: var(--text-heading-1-font-size);
+}
+
+.companyManagementSubtitle,
+.companyManagementCardCopy,
+.companyManagementNotice,
+.companyManagementEmptyState {
+    margin: 0;
+    color: var(--text-secondary);
+}
+
+.companyManagementAlert {
+    margin: 0;
+    padding: var(--space-12) var(--space-16);
+    border-radius: 16px;
+    background: var(--highlight-100);
+    color: var(--text);
+}
+
+.companyManagementGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: var(--space-20);
+}
+
+.companyManagementCard {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-16);
+    padding: var(--space-24);
+    border-radius: 24px;
+    background: var(--background-card);
+    box-shadow: var(--shadow-md);
+}
+
+.companyManagementCardHeader {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-16);
+}
+
+.companyManagementCardTitle,
+.companyManagementSubheading {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    font-size: var(--font-size-lg);
+}
+
+.companyManagementForm,
+.companyManagementInlineForm {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-16);
+}
+
+.companyManagementInlineForm {
+    flex-direction: row;
+    align-items: stretch;
+}
+
+.companyManagementField {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+}
+
+.companyManagementField input,
+.companyManagementInlineForm input {
+    width: 100%;
+    border: 1px solid var(--border-color-default);
+    border-radius: 16px;
+    padding: var(--space-12) var(--space-16);
+    background: var(--background-100);
+    color: var(--text);
+    font: inherit;
+}
+
+.companyManagementThemeList {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--space-12);
+}
+
+.companyManagementThemeCard {
+    border: 1px solid var(--border-color-default);
+    border-radius: 20px;
+    padding: var(--space-16);
+    background: var(--background-100);
+    color: var(--text);
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+}
+
+.companyManagementThemeCard--active {
+    outline: 2px solid var(--primary-300);
+}
+
+.companyManagementThemeCard__title {
+    font-weight: var(--font-weight-semibold);
+}
+
+.companyManagementThemeCard__copy {
+    color: var(--text-secondary);
+}
+
+.companyManagementThemePreview,
+.companyManagementThemePreviewRow {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-4);
+}
+
+.companyManagementThemePreview span,
+.companyManagementThemePreviewRow span {
+    height: 14px;
+    border-radius: 999px;
+}
+
+.companyManagementPrimaryBtn,
+.companyManagementDangerBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-8);
+    border-radius: 999px;
+    border: 0;
+    padding: var(--space-12) var(--space-16);
+    cursor: pointer;
+    font: inherit;
+}
+
+.companyManagementPrimaryBtn {
+    background: var(--primary-300);
+    color: var(--background-100);
+}
+
+.companyManagementDangerBtn {
+    background: var(--error-300);
+    color: var(--background-100);
+}
+
+.companyManagementMemberList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-12);
+}
+
+.companyManagementMemberCard {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-16);
+    padding: var(--space-16);
+    border-radius: 18px;
+    background: var(--background-100);
+    border: 1px solid var(--border-color-default);
+}
+
+.companyManagementMemberCard h3 {
+    margin: 0;
+}
+
+.companyManagementMemberCard p {
+    margin: var(--space-4) 0 0;
+    color: var(--text-secondary);
+}
+
+.companyManagementBadge {
+    display: inline-flex;
+    margin-top: var(--space-8);
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--highlight-100);
+}
+
+.companyManagementCard--footer {
+    align-items: flex-start;
+}
+
+@media (max-width: 720px) {
+
+    .companyManagementInlineForm,
+    .companyManagementMemberCard {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}

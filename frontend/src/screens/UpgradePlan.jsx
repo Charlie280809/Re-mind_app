@@ -5,11 +5,20 @@ import { TbCrown } from "react-icons/tb";
 import { useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { setPremiumStatus } from "../api/profileApi";
+import { hasPremiumAccess } from "../lib/access";
+import { requestCompany } from "../api/companyApi";
 
-export default function SettingsUpgrade({ isPremium, onProfileUpdated, onBack }) {
+export default function SettingsUpgrade({ profile, isPremium, onProfileUpdated, onNavigateToCompanyManagement, onBack }) {
     const [billingCycle, setBillingCycle] = useState("monthly");
     const [savingPlan, setSavingPlan] = useState(false);
     const [saveMessage, setSaveMessage] = useState("");
+    const [companyRequestOpen, setCompanyRequestOpen] = useState(false);
+    const [companyRequestSaving, setCompanyRequestSaving] = useState(false);
+    const [companyRequestMessage, setCompanyRequestMessage] = useState("");
+    const [companyRequestForm, setCompanyRequestForm] = useState({
+        companyName: "",
+        adminEmail: profile?.email || "",
+    });
 
     const premiumPrice = billingCycle === "monthly" ? "€2,99/maand" : "€33/jaar";
     const companyPrice = billingCycle === "monthly" ? "€2,20/maand" : "€20/jaar";
@@ -38,6 +47,70 @@ export default function SettingsUpgrade({ isPremium, onProfileUpdated, onBack })
             setSaveMessage(error?.message || "Fout bij aanpassen van het plan.");
         } finally {
             setSavingPlan(false);
+        }
+    };
+
+    const openCompanyRequest = () => {
+        setCompanyRequestMessage("");
+        setCompanyRequestForm({
+            companyName: profile?.bedrijfsnaam ? `${profile.bedrijfsnaam} BV` : "",
+            adminEmail: profile?.email || "",
+        });
+        setCompanyRequestOpen(true);
+    };
+
+    const closeCompanyRequest = () => {
+        if (companyRequestSaving) {
+            return;
+        }
+
+        setCompanyRequestOpen(false);
+        setCompanyRequestMessage("");
+    };
+
+    const submitCompanyRequest = async (event) => {
+        event.preventDefault();
+
+        const companyName = companyRequestForm.companyName.trim();
+        const adminEmail = companyRequestForm.adminEmail.trim().toLowerCase();
+
+        if (!companyName || !adminEmail) {
+            setCompanyRequestMessage("Vul bedrijfsnaam en admin e-mail in.");
+            return;
+        }
+
+        setCompanyRequestSaving(true);
+        setCompanyRequestMessage("");
+
+        try {
+            const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+            const session = sessionData?.session;
+
+            if (sessionError || !session) {
+                throw new Error(sessionError?.message || "Geen actieve sessie gevonden.");
+            }
+
+            const payload = await requestCompany(session.access_token, {
+                company_name: companyName,
+                admin_email: adminEmail,
+                theme: { id: "sage" },
+            });
+
+            if (payload?.profile && onProfileUpdated) {
+                onProfileUpdated(payload.profile);
+            }
+
+            setCompanyRequestOpen(false);
+            setCompanyRequestMessage("Bedrijfslicentie aangemaakt.");
+
+            if (onNavigateToCompanyManagement) {
+                onNavigateToCompanyManagement();
+            }
+        } catch (error) {
+            console.error(error);
+            setCompanyRequestMessage(error?.message || "Bedrijfsaanvraag kon niet worden verzonden.");
+        } finally {
+            setCompanyRequestSaving(false);
         }
     };
 
@@ -84,7 +157,7 @@ export default function SettingsUpgrade({ isPremium, onProfileUpdated, onBack })
                         <li><LuCheck /> Vorige dagrapporten</li>
                         <li><LuCheck /> Wekelijkse rapporten</li>
                     </ul>
-                    {isPremium ? (
+                    {hasPremiumAccess({ is_premium: isPremium }) ? (
                         <div className="currentPlanLabel">Jouw momentele plan</div>
                     ) : (
                         <button className="upgradePrimaryBtn" type="button">Upgraden</button>
@@ -102,7 +175,9 @@ export default function SettingsUpgrade({ isPremium, onProfileUpdated, onBack })
                         <li><LuCheck /> Alle premium functies</li>
                         <li><LuCheck /> Bedrijfspersonalisatie</li>
                     </ul>
-                    <button className="upgradePrimaryBtn" type="button">Aanvraag invullen</button>
+                    <button className="upgradePrimaryBtn" type="button" onClick={openCompanyRequest}>
+                        Aanvraag invullen
+                    </button>
                 </article>
 
                 <article className="upgradeCard upgradeCardBottom">
@@ -114,7 +189,7 @@ export default function SettingsUpgrade({ isPremium, onProfileUpdated, onBack })
                         <li><LuCheck /> Afsluitroutine</li>
                         <li><LuCheck /> Dagelijks rapport</li>
                     </ul>
-                    {isPremium ? (
+                    {hasPremiumAccess({ is_premium: isPremium }) ? (
                         <button className="upgradePrimaryBtn" type="button" onClick={handleSelectBasePlan} disabled={savingPlan}>
                             {savingPlan ? "Bezig..." : "Kies dit plan"}
                         </button>
@@ -137,6 +212,51 @@ export default function SettingsUpgrade({ isPremium, onProfileUpdated, onBack })
             </section>
 
             {saveMessage ? <p className="upgradeSupportText">{saveMessage}</p> : null}
+
+            {companyRequestOpen ? (
+                <div className="premiumCardOverlay" role="presentation" onClick={closeCompanyRequest}>
+                    <div className="premiumModal" role="dialog" aria-modal="true" aria-labelledby="company-request-title" onClick={(event) => event.stopPropagation()}>
+                        <header className="premiumModalHeader">
+                            <h2 id="company-request-title" className="premiumModalTitle">Bedrijfsaanvraag</h2>
+                            <button className="premiumModalCloseButton" type="button" onClick={closeCompanyRequest} aria-label="Sluiten">×</button>
+                        </header>
+
+                        <p className="premiumModalMessage">Vul de basisgegevens in. Na bevestiging wordt jouw account de admin van het bedrijf.</p>
+
+                        <form className="companyRequestForm" onSubmit={submitCompanyRequest}>
+                            <label className="companyRequestField">
+                                <span>Bedrijfsnaam</span>
+                                <input
+                                    type="text"
+                                    value={companyRequestForm.companyName}
+                                    onChange={(event) => setCompanyRequestForm((previous) => ({ ...previous, companyName: event.target.value }))}
+                                    placeholder="Bijvoorbeeld: Acme BV"
+                                />
+                            </label>
+
+                            <label className="companyRequestField">
+                                <span>Admin e-mail</span>
+                                <input
+                                    type="email"
+                                    value={companyRequestForm.adminEmail}
+                                    onChange={(event) => setCompanyRequestForm((previous) => ({ ...previous, adminEmail: event.target.value }))}
+                                />
+                            </label>
+
+                            {companyRequestMessage ? <p className="premiumModalMessage">{companyRequestMessage}</p> : null}
+
+                            <div className="companyRequestActions">
+                                <button className="upgradePrimaryBtn" type="submit" disabled={companyRequestSaving}>
+                                    {companyRequestSaving ? "Versturen..." : "Bedrijf aanmaken"}
+                                </button>
+                                <button className="companyRequestSecondaryBtn" type="button" onClick={closeCompanyRequest} disabled={companyRequestSaving}>
+                                    Annuleer
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            ) : null}
         </main>
     );
 }

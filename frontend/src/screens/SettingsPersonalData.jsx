@@ -5,6 +5,7 @@ import { supabase } from "../lib/supabaseClient";
 import PremiumModal from "../components/PremiumModal";
 import DeleteConfirmationModal from "../components/deleteConfirmationModal";
 import { deleteAccount, updateProfile } from "../api/profileApi";
+import { getPlanLabel, hasPremiumAccess } from "../lib/access";
 
 const AVATAR_BUCKET = "profile_avatars";
 
@@ -28,7 +29,7 @@ async function uploadAvatarToStorage(userId, file) {
 
 export default function SettingsPersonalData({ onBack, profile, onProfileUpdated, onNavigateToUpgrade, onLogout }) {
     const fileRef = useRef(null);
-    const isPremium = Boolean(profile?.is_premium);
+    const isPremium = hasPremiumAccess(profile);
     const [passwordModalOpen, setPasswordModalOpen] = useState(false);
     const [premiumModalOpen, setPremiumModalOpen] = useState(false);
     const [passwordForm, setPasswordForm] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
@@ -63,7 +64,7 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
         setActiveField(null);
     }, [profile]);
 
-    const planLabel = profile?.is_premium ? "Premium plan" : "Basis plan";
+    const planLabel = getPlanLabel(profile);
 
     const fields = [
         { key: "email", label: "Email:", type: "email", placeholder: "Nog niet beschikbaar" },

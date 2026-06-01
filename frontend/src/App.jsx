@@ -21,6 +21,7 @@ import SettingsNotifications from "./screens/SettingsNotifications";
 import SettingsPersonalData from "./screens/SettingsPersonalData";
 import SettingsPrivacy from "./screens/SettingsPrivacy";
 import UpgradePlan from "./screens/UpgradePlan";
+import CompanyManagementPage from "./screens/CompanyManagementPage";
 
 import { LuNotepadText } from "react-icons/lu";
 import spinner from "./assets/images/loadingSpinner.svg";
@@ -41,6 +42,7 @@ import {
   saveSignupWorkHours,
 } from "./api/backendApi";
 import { calculateWorkdayDurationSeconds } from "./lib/workHours";
+import { hasPremiumAccess } from "./lib/access";
 
 const NAV_STATE_STORAGE_KEY = "remind-navigation-state";
 const TIMER_STATE_STORAGE_KEY = "remind-worktimer-state";
@@ -57,7 +59,7 @@ const DAILY_ADVICES = [
   "Eet iets met proteïne en gezonde vetten tijdens je pauze, niet alleen snelle suikers. Dat geeft langdurigere energie.",
   "Stel een intentie voor het volgende uur, niet voor de hele dag. Kleine doelen zijn behapbaar.",
   "Drink een glas water en geef je hoofd een korte pauze voordat je aan de volgende taak begint.",
-  "'Make it exist first, you can make it good later'   -Adam Grant. Begin gewoon, perfectionisme is de vijand van productiviteit.",
+  "'Make it exist first, you can make it good later'      -Adam Grant. Begin gewoon, perfectionisme is de vijand van productiviteit.",
   "Zet na 16:00 een blauwlichtfilter op je scherm. Dit helpt je om 's avonds beter te kunnen ontspannen.",
   "Neem een pauze voordat je denkt dat je er één nodig hebt. Wachten tot je uitgeput bent, maakt herstel dubbel zo moeilijk.",
   "Een korte wandeling of zelfs gewoon even rechtstaan kan je focus vaak sneller terugbrengen dan nog langer doorwerken.",
@@ -125,6 +127,7 @@ const getStoredNavigationState = () => {
       "settings-notifications",
       "settings-personal",
       "settings-privacy",
+      "company-management",
       "upgrade",
       "breathing",
       "pause",
@@ -663,7 +666,7 @@ export default function App() {
       return;
     }
 
-    if (!profile?.is_premium && pauseFavorites.size >= FREE_FAVORITE_LIMIT) {
+    if (!hasPremiumAccess(profile) && pauseFavorites.size >= FREE_FAVORITE_LIMIT) {
       setFavoriteLimitModalOpen(true);
       return;
     }
@@ -1057,7 +1060,7 @@ export default function App() {
               : currentPage
         }
         setCurrentPage={setCurrentPage}
-        isPremium={Boolean(profile?.is_premium)}
+        isPremium={hasPremiumAccess(profile)}
         onBreak={onBreak}
         breakSeconds={breakSeconds}
         onEndBreak={endBreak}
@@ -1071,7 +1074,7 @@ export default function App() {
         />
       ) : currentPage === "report" ? (
         <ReportPage
-          isPremium={Boolean(profile?.is_premium)}
+          isPremium={hasPremiumAccess(profile)}
           accessToken={session?.access_token}
           onNavigateToUpgrade={() => setCurrentPage("upgrade")}
         />
@@ -1086,6 +1089,7 @@ export default function App() {
             setPauseSuggestionsInitialTab("all");
             setCurrentPage("pause");
           }}
+          onNavigateToCompanyManagement={() => setCurrentPage("company-management")}
           favoriteLimit={FREE_FAVORITE_LIMIT}
           onNavigateToUpgrade={() => {
             setCurrentPage("upgrade");
@@ -1137,11 +1141,19 @@ export default function App() {
         />
       ) : currentPage === "settings-privacy" ? (
         <SettingsPrivacy onBack={() => setCurrentPage("settings")} />
+      ) : currentPage === "company-management" ? (
+        <CompanyManagementPage
+          profile={profile}
+          accessToken={session?.access_token}
+          onBack={() => setCurrentPage("profile")}
+        />
       ) : currentPage === "upgrade" ? (
         <UpgradePlan
           onBack={() => setCurrentPage("home")}
-          isPremium={Boolean(profile?.is_premium)}
+          profile={profile}
+          isPremium={hasPremiumAccess(profile)}
           onProfileUpdated={handleProfileUpdated}
+          onNavigateToCompanyManagement={() => setCurrentPage("company-management")}
         />
       ) : currentPage === "breathing" ? (
         <BreathingExercise

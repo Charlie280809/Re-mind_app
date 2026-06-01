@@ -3,11 +3,12 @@ import { TbCrown } from "react-icons/tb";
 import PauseCard from "../components/PauseCard";
 import FavoriteLimitCard from "../components/FavoriteLimitCard";
 import { DATA as PAUSE_OPTIONS } from "./PauseSuggestions";
+import { hasPremiumAccess } from "../lib/access";
 
-export default function ProfilePage({ profile, favorites, onToggleFavorite, onNavigateToPause, onNavigateToUpgrade, favoriteLimit }) {
+export default function ProfilePage({ profile, favorites, onToggleFavorite, onNavigateToPause, onNavigateToUpgrade, onNavigateToCompanyManagement, favoriteLimit }) {
     const name = profile?.username || profile?.email || "Gebruiker";
     const companyName = profile?.bedrijfsnaam || "Geen bedrijfsnaam";
-    const isPremium = Boolean(profile?.is_premium);
+    const isPremium = hasPremiumAccess(profile);
 
     const favoritePauses = useMemo(
         () => PAUSE_OPTIONS.filter((item) => favorites.has(item.id)),
@@ -35,6 +36,18 @@ export default function ProfilePage({ profile, favorites, onToggleFavorite, onNa
                 <div className="profile-heroCopy">
                     <h1 className="profile-title">{name}</h1>
                     <p className="profile-jobTitle">{companyName}</p>
+                    {profile?.company_id && profile?.company_role === "admin" ? (
+                        <button
+                            className="profile-companyManageBtn"
+                            type="button"
+                            onClick={() => {
+                                if (onNavigateToCompanyManagement) onNavigateToCompanyManagement();
+                            }}
+                            aria-label="Bedrijfsbeheer openen"
+                        >
+                            <span>Bedrijfsbeheer</span>
+                        </button>
+                    ) : null}
                     {isPremium ? null : (
                         <button
                             className="profile-upgradeBtn"

@@ -18,6 +18,31 @@ const supabase = supabaseUrl && supabaseServiceRoleKey ? createClient(supabaseUr
 const calendarOAuthStates = new Map();
 const calendarStateTtlMs = 10 * 60 * 1000;
 
+function hasPremiumAccess(profile) {
+  return Boolean(profile?.is_premium) || Boolean(profile?.company_id);
+}
+
+function isCompanyAdmin(profile) {
+  return Boolean(profile?.company_id) && profile?.company_role === "admin";
+}
+
+function normalizeCompanyTheme(theme) {
+  return theme && typeof theme === "object" ? theme : {};
+}
+
+async function deletePendingCompanyMembersByEmail(email) {
+  const normalizedEmail = typeof email === "string" ? email.trim().toLowerCase() : "";
+
+  if (!normalizedEmail) {
+    return;
+  }
+
+  await supabase
+    .from("company_pending_members")
+    .delete()
+    .ilike("email", normalizedEmail);
+}
+
 // --- shared request helpers ---
 
 function getBearerToken(req) {
@@ -1704,6 +1729,8 @@ app.post("/signup/create-account", async (req, res) => {
     });
   }
 
+  await deletePendingCompanyMembersByEmail(email);
+
   return res.json({
     ok: true,
     user: {
@@ -1909,7 +1936,7 @@ app.put("/profile/me", async (req, res) => {
     });
   }
 
-  const nextAvatarUrl = existingProfile?.is_premium ? avatarUrl || existingProfile?.avatar_url || null : existingProfile?.avatar_url || null;
+  const nextAvatarUrl = hasPremiumAccess(existingProfile) ? avatarUrl || existingProfile?.avatar_url || null : existingProfile?.avatar_url || null;
 
   const { error: profileError } = await supabase.from("profiles").upsert(
     {
@@ -1930,6 +1957,8 @@ app.put("/profile/me", async (req, res) => {
     });
   }
 
+  await deletePendingCompanyMembersByEmail(email);
+
   return res.json({
     ok: true,
     profile: {
@@ -1938,6 +1967,8 @@ app.put("/profile/me", async (req, res) => {
       username,
       bedrijfsnaam: bedrijfsnaam || null,
       is_premium: existingProfile?.is_premium ?? false,
+      company_id: existingProfile?.company_id ?? null,
+      company_role: existingProfile?.company_role ?? null,
       avatar_url: nextAvatarUrl,
     },
   });
@@ -2008,9 +2039,538 @@ app.put("/profile/me/premium", async (req, res) => {
       username: existingProfile?.username || userData.user.user_metadata?.username || "",
       bedrijfsnaam: existingProfile?.bedrijfsnaam || userData.user.user_metadata?.bedrijfsnaam || null,
       is_premium: isPremium,
+      company_id: existingProfile?.company_id ?? null,
+      company_role: existingProfile?.company_role ?? null,
       avatar_url: existingProfile?.avatar_url || null,
     },
   });
+});
+
+app.get("/company/me", async (req, res) => {
+  if (!supabase) {
+    return res.status(500).json({
+      error: "Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in backend/.env.",
+    });
+  }
+
+  const token = getBearerToken(req);
+
+  if (!token) {
+    return res.status(401).json({
+      error: "Missing Bearer token.",
+    });
+  }
+
+  const { data: userData, error: userError } = await supabase.auth.getUser(token);
+
+  if (userError || !userData?.user) {
+    return res.status(401).json({
+      error: "Invalid or expired session.",
+    });
+  }
+
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("user_id", userData.user.id)
+    .maybeSingle();
+
+  if (profileError) {
+    return res.status(500).json({
+      error: "Failed to load profile.",
+      details: profileError.message,
+    });
+  }
+
+  if (!isCompanyAdmin(profile) || !profile?.company_id) {
+    return res.status(403).json({
+      error: "Je hebt geen toegang tot bedrijfsbeheer.",
+    });
+  }
+
+  const { data: company, error: companyError } = await supabase
+    .from("companies")
+    .select("*")
+    .eq("id", profile.company_id)
+    .maybeSingle();
+
+  if (companyError) {
+    return res.status(500).json({
+      error: "Failed to load company.",
+      details: companyError.message,
+    });
+  }
+
+  if (!company) {
+    return res.status(404).json({
+      error: "Company not found.",
+    });
+  }
+
+  const { data: members, error: membersError } = await supabase
+    .from("profiles")
+    .select("user_id, email, username, bedrijfsnaam, avatar_url, company_id, company_role, is_premium")
+    .eq("company_id", company.id)
+    .order("company_role", { ascending: false })
+    .order("username", { ascending: true });
+
+  if (membersError) {
+    return res.status(500).json({
+      error: "Failed to load company members.",
+      details: membersError.message,
+    });
+  }
+
+  const { data: pendingMembers, error: pendingMembersError } = await supabase
+    .from("company_pending_members")
+    .select("id, email, role, created_at")
+    .eq("company_id", company.id)
+    .order("created_at", { ascending: true });
+
+  if (pendingMembersError) {
+    return res.status(500).json({
+      error: "Failed to load pending members.",
+      details: pendingMembersError.message,
+    });
+  }
+
+  return res.json({
+    ok: true,
+    company: {
+      ...company,
+      theme: normalizeCompanyTheme(company.theme),
+    },
+    members: Array.isArray(members) ? members : [],
+    pending_members: Array.isArray(pendingMembers) ? pendingMembers : [],
+  });
+});
+
+app.post("/company/request", async (req, res) => {
+  if (!supabase) {
+    return res.status(500).json({
+      error: "Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in backend/.env.",
+    });
+  }
+
+  const token = getBearerToken(req);
+
+  if (!token) {
+    return res.status(401).json({
+      error: "Missing Bearer token.",
+    });
+  }
+
+  const companyName = typeof req.body?.company_name === "string" ? req.body.company_name.trim() : "";
+  const adminEmail = typeof req.body?.admin_email === "string" ? req.body.admin_email.trim().toLowerCase() : "";
+  const theme = normalizeCompanyTheme(req.body?.theme);
+
+  if (!companyName || !adminEmail) {
+    return res.status(400).json({
+      error: "Missing company name or admin email.",
+    });
+  }
+
+  const { data: userData, error: userError } = await supabase.auth.getUser(token);
+
+  if (userError || !userData?.user) {
+    return res.status(401).json({
+      error: "Invalid or expired session.",
+    });
+  }
+
+  if ((userData.user.email || "").toLowerCase() !== adminEmail) {
+    return res.status(400).json({
+      error: "Het admin e-mailadres moet overeenkomen met het ingelogde account.",
+    });
+  }
+
+  const { data: existingProfile, error: existingProfileError } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("user_id", userData.user.id)
+    .maybeSingle();
+
+  if (existingProfileError) {
+    return res.status(500).json({
+      error: "Failed to load existing profile state.",
+      details: existingProfileError.message,
+    });
+  }
+
+  if (existingProfile?.company_id) {
+    return res.status(409).json({
+      error: "Je bent al aan een bedrijf gekoppeld.",
+    });
+  }
+
+  const { data: company, error: companyError } = await supabase
+    .from("companies")
+    .insert({
+      name: companyName,
+      admin_user_id: userData.user.id,
+      admin_email: adminEmail,
+      theme,
+    })
+    .select("*")
+    .single();
+
+  if (companyError) {
+    return res.status(500).json({
+      error: "Failed to create company.",
+      details: companyError.message,
+    });
+  }
+
+  const { error: profileError } = await supabase.from("profiles").upsert(
+    {
+      user_id: userData.user.id,
+      email: adminEmail,
+      username: existingProfile?.username || userData.user.user_metadata?.username || "",
+      bedrijfsnaam: existingProfile?.bedrijfsnaam || userData.user.user_metadata?.bedrijfsnaam || null,
+      company_id: company.id,
+      company_role: "admin",
+      is_premium: true,
+      avatar_url: existingProfile?.avatar_url || null,
+    },
+    { onConflict: "user_id" }
+  );
+
+  if (profileError) {
+    await supabase.from("companies").delete().eq("id", company.id);
+    return res.status(500).json({
+      error: "Failed to assign admin profile to company.",
+      details: profileError.message,
+    });
+  }
+
+  await deletePendingCompanyMembersByEmail(adminEmail);
+
+  return res.json({
+    ok: true,
+    company: {
+      ...company,
+      theme: normalizeCompanyTheme(company.theme),
+    },
+    profile: {
+      user_id: userData.user.id,
+      email: adminEmail,
+      username: existingProfile?.username || userData.user.user_metadata?.username || "",
+      bedrijfsnaam: existingProfile?.bedrijfsnaam || userData.user.user_metadata?.bedrijfsnaam || null,
+      company_id: company.id,
+      company_role: "admin",
+      is_premium: true,
+      avatar_url: existingProfile?.avatar_url || null,
+    },
+  });
+});
+
+app.put("/company/me", async (req, res) => {
+  if (!supabase) {
+    return res.status(500).json({
+      error: "Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in backend/.env.",
+    });
+  }
+
+  const token = getBearerToken(req);
+
+  if (!token) {
+    return res.status(401).json({
+      error: "Missing Bearer token.",
+    });
+  }
+
+  const companyName = typeof req.body?.company_name === "string" ? req.body.company_name.trim() : "";
+  const theme = normalizeCompanyTheme(req.body?.theme);
+
+  const { data: userData, error: userError } = await supabase.auth.getUser(token);
+
+  if (userError || !userData?.user) {
+    return res.status(401).json({
+      error: "Invalid or expired session.",
+    });
+  }
+
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("user_id", userData.user.id)
+    .maybeSingle();
+
+  if (profileError) {
+    return res.status(500).json({
+      error: "Failed to load profile.",
+      details: profileError.message,
+    });
+  }
+
+  if (!isCompanyAdmin(profile) || !profile?.company_id) {
+    return res.status(403).json({
+      error: "Je hebt geen toegang tot bedrijfsbeheer.",
+    });
+  }
+
+  const updatePayload = {};
+
+  if (companyName) {
+    updatePayload.name = companyName;
+  }
+
+  if (theme) {
+    updatePayload.theme = theme;
+  }
+
+  if (!Object.keys(updatePayload).length) {
+    return res.status(400).json({
+      error: "Nothing to update.",
+    });
+  }
+
+  const { data: company, error: companyError } = await supabase
+    .from("companies")
+    .update(updatePayload)
+    .eq("id", profile.company_id)
+    .select("*")
+    .single();
+
+  if (companyError) {
+    return res.status(500).json({
+      error: "Failed to update company.",
+      details: companyError.message,
+    });
+  }
+
+  return res.json({
+    ok: true,
+    company: {
+      ...company,
+      theme: normalizeCompanyTheme(company.theme),
+    },
+  });
+});
+
+app.post("/company/members", async (req, res) => {
+  if (!supabase) {
+    return res.status(500).json({
+      error: "Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in backend/.env.",
+    });
+  }
+
+  const token = getBearerToken(req);
+
+  if (!token) {
+    return res.status(401).json({
+      error: "Missing Bearer token.",
+    });
+  }
+
+  const email = typeof req.body?.email === "string" ? req.body.email.trim().toLowerCase() : "";
+
+  if (!email) {
+    return res.status(400).json({
+      error: "Missing email.",
+    });
+  }
+
+  const { data: userData, error: userError } = await supabase.auth.getUser(token);
+
+  if (userError || !userData?.user) {
+    return res.status(401).json({
+      error: "Invalid or expired session.",
+    });
+  }
+
+  const { data: adminProfile, error: adminProfileError } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("user_id", userData.user.id)
+    .maybeSingle();
+
+  if (adminProfileError) {
+    return res.status(500).json({
+      error: "Failed to load profile.",
+      details: adminProfileError.message,
+    });
+  }
+
+  if (!isCompanyAdmin(adminProfile) || !adminProfile?.company_id) {
+    return res.status(403).json({
+      error: "Je hebt geen toegang tot bedrijfsbeheer.",
+    });
+  }
+
+  const { data: targetProfile, error: targetProfileError } = await supabase
+    .from("profiles")
+    .select("*")
+    .ilike("email", email)
+    .maybeSingle();
+
+  if (targetProfileError) {
+    return res.status(500).json({
+      error: "Failed to load target profile.",
+      details: targetProfileError.message,
+    });
+  }
+
+  if (targetProfile?.company_id && targetProfile.company_id !== adminProfile.company_id) {
+    return res.status(409).json({
+      error: "Deze gebruiker hoort al bij een ander bedrijf.",
+    });
+  }
+
+  if (targetProfile?.company_role === "admin" && targetProfile.company_id === adminProfile.company_id) {
+    return res.status(409).json({
+      error: "Gebruik admin-overdracht voordat je deze gebruiker toevoegt of verwijdert.",
+    });
+  }
+
+  if (targetProfile) {
+    const { data: updatedProfile, error: updateError } = await supabase
+      .from("profiles")
+      .update({
+        company_id: adminProfile.company_id,
+        company_role: "member",
+      })
+      .eq("user_id", targetProfile.user_id)
+      .select("*")
+      .single();
+
+    if (updateError) {
+      return res.status(500).json({
+        error: "Failed to add member to company.",
+        details: updateError.message,
+      });
+    }
+
+    await deletePendingCompanyMembersByEmail(email);
+
+    return res.json({
+      ok: true,
+      member: updatedProfile,
+    });
+  }
+
+  const { error: pendingError } = await supabase.from("company_pending_members").upsert(
+    {
+      company_id: adminProfile.company_id,
+      email,
+      role: "member",
+    },
+    { onConflict: "company_id,email" }
+  );
+
+  if (pendingError) {
+    return res.status(500).json({
+      error: "Failed to create pending company member.",
+      details: pendingError.message,
+    });
+  }
+
+  return res.json({
+    ok: true,
+    pending: true,
+  });
+});
+
+app.delete("/company/members", async (req, res) => {
+  if (!supabase) {
+    return res.status(500).json({
+      error: "Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in backend/.env.",
+    });
+  }
+
+  const token = getBearerToken(req);
+
+  if (!token) {
+    return res.status(401).json({
+      error: "Missing Bearer token.",
+    });
+  }
+
+  const email = typeof req.body?.email === "string" ? req.body.email.trim().toLowerCase() : "";
+
+  if (!email) {
+    return res.status(400).json({
+      error: "Missing email.",
+    });
+  }
+
+  const { data: userData, error: userError } = await supabase.auth.getUser(token);
+
+  if (userError || !userData?.user) {
+    return res.status(401).json({
+      error: "Invalid or expired session.",
+    });
+  }
+
+  const { data: adminProfile, error: adminProfileError } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("user_id", userData.user.id)
+    .maybeSingle();
+
+  if (adminProfileError) {
+    return res.status(500).json({
+      error: "Failed to load profile.",
+      details: adminProfileError.message,
+    });
+  }
+
+  if (!isCompanyAdmin(adminProfile) || !adminProfile?.company_id) {
+    return res.status(403).json({
+      error: "Je hebt geen toegang tot bedrijfsbeheer.",
+    });
+  }
+
+  const { data: targetProfile, error: targetProfileError } = await supabase
+    .from("profiles")
+    .select("*")
+    .ilike("email", email)
+    .maybeSingle();
+
+  if (targetProfileError) {
+    return res.status(500).json({
+      error: "Failed to load target profile.",
+      details: targetProfileError.message,
+    });
+  }
+
+  if (targetProfile?.company_role === "admin" && targetProfile.company_id === adminProfile.company_id) {
+    return res.status(409).json({
+      error: "De admin van een bedrijf kan je niet verwijderen zonder admin-overdracht.",
+    });
+  }
+
+  if (targetProfile?.company_id === adminProfile.company_id) {
+    const { error: removeError } = await supabase
+      .from("profiles")
+      .update({
+        company_id: null,
+        company_role: null,
+      })
+      .eq("user_id", targetProfile.user_id);
+
+    if (removeError) {
+      return res.status(500).json({
+        error: "Failed to remove member from company.",
+        details: removeError.message,
+      });
+    }
+  }
+
+  const { error: pendingDeleteError } = await supabase
+    .from("company_pending_members")
+    .delete()
+    .eq("company_id", adminProfile.company_id)
+    .ilike("email", email);
+
+  if (pendingDeleteError) {
+    return res.status(500).json({
+      error: "Failed to remove pending member.",
+      details: pendingDeleteError.message,
+    });
+  }
+
+  return res.json({ ok: true });
 });
 
 app.delete("/account/me", async (req, res) => {
