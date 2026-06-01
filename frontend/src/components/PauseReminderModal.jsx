@@ -3,6 +3,8 @@ import { LuAlarmClock, LuX } from "react-icons/lu";
 import "../css/PauseReminderModal.css";
 import { showNativeNotification } from "../lib/nativeNotification";
 
+import clockIcon from "../assets/icons/alarmClock.svg";
+
 const getPauseReminderOffsetSeconds = (pauseReminderIntervalSeconds) => {
     const safeIntervalSeconds = Math.max(1, Number(pauseReminderIntervalSeconds) || 0);
     return safeIntervalSeconds;
@@ -124,7 +126,7 @@ export default function PauseReminderModal({
                 </button>
 
                 <div className="pauseReminderIconWrap" aria-hidden="true">
-                    <LuAlarmClock />
+                    <img src={clockIcon} alt="Alarmklok" />
                 </div>
 
                 <h2 id="pause-reminder-title" className="pauseReminderTitle">
