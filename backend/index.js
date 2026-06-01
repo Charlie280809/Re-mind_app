@@ -1846,7 +1846,7 @@ app.get("/profile/me", async (req, res) => {
     });
   }
 
-  const { data: profile, error } = await supabase
+  let { data: profile, error } = await supabase
     .from("profiles")
     .select("*")
     .eq("user_id", userData.user.id)
@@ -1863,6 +1863,30 @@ app.get("/profile/me", async (req, res) => {
     return res.status(404).json({
       error: "No profile found for the signed-in user.",
     });
+  }
+
+  if (profile.company_id) {
+    const { data: company, error: companyError } = await supabase
+      .from("companies")
+      .select("name")
+      .eq("id", profile.company_id)
+      .maybeSingle();
+
+    if (!companyError && company?.name && profile.bedrijfsnaam !== company.name) {
+      const { error: syncError } = await supabase
+        .from("profiles")
+        .update({
+          bedrijfsnaam: company.name,
+        })
+        .eq("user_id", profile.user_id);
+
+      if (!syncError) {
+        profile = {
+          ...profile,
+          bedrijfsnaam: company.name,
+        };
+      }
+    }
   }
 
   return res.json({
@@ -2424,11 +2448,25 @@ app.post("/company/members", async (req, res) => {
   }
 
   if (targetProfile) {
+    const { data: company, error: companyError } = await supabase
+      .from("companies")
+      .select("name")
+      .eq("id", adminProfile.company_id)
+      .maybeSingle();
+
+    if (companyError) {
+      return res.status(500).json({
+        error: "Failed to load company.",
+        details: companyError.message,
+      });
+    }
+
     const { data: updatedProfile, error: updateError } = await supabase
       .from("profiles")
       .update({
         company_id: adminProfile.company_id,
         company_role: "member",
+        bedrijfsnaam: company?.name || targetProfile.bedrijfsnaam || null,
       })
       .eq("user_id", targetProfile.user_id)
       .select("*")
