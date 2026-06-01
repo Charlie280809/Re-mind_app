@@ -47,6 +47,40 @@ const TIMER_STATE_STORAGE_KEY = "remind-worktimer-state";
 const BREAK_START_STORAGE_KEY = "remind-break-start-time";
 const FREE_FAVORITE_LIMIT = 4;
 
+const DAILY_ADVICES = [
+  "Als je bewust ademt door je neus en voelt hoe je buik uitzet, dan activeert je ontspanningsreflex.",
+  "Drink een glas water tijdens je pauze. Uitdroging vermoeit je brein sneller dan je denkt.",
+  "Vergeet niet om diep in en uit te ademen als je stress voelt opkomen. Voldoende zuurstof helpt je om te ontspannen en helder te denken.",
+  "Wissel af tussen zitten en staan tijdens je werk. Je lichaam heeft beweging nodig, ook al voel je dat niet.",
+  "Denk eraan om niet alles in één keer aan te pakken, maar focus op één taak tegelijk. Dat helpt je om gefocust te blijven en vermindert stress.",
+  "Verlaag de helderheid van je scherm in de namiddag. Je ogen en je circadiaanse ritme (je interne biologische klok) worden er beter van.",
+  "Eet iets met proteïne en gezonde vetten tijdens je pauze, niet alleen snelle suikers. Dat geeft langdurigere energie.",
+  "Stel een intentie voor het volgende uur, niet voor de hele dag. Kleine doelen zijn behapbaar.",
+  "Drink een glas water en geef je hoofd een korte pauze voordat je aan de volgende taak begint.",
+  "'Make it exist first, you can make it good later'   -Adam Grant. Begin gewoon, perfectionisme is de vijand van productiviteit.",
+  "Zet na 16:00 een blauwlichtfilter op je scherm. Dit helpt je om 's avonds beter te kunnen ontspannen.",
+  "Neem een pauze voordat je denkt dat je er één nodig hebt. Wachten tot je uitgeput bent, maakt herstel dubbel zo moeilijk.",
+  "Een korte wandeling of zelfs gewoon even rechtstaan kan je focus vaak sneller terugbrengen dan nog langer doorwerken.",
+  "Onthoud: je bent een mens, geen machine. Machines hebben af en toe onderhoud nodig, mensen hebben af en toe rust nodig.",
+  "Drink een kop kruidenthee tijdens je pauze. De warmte van de thee en het nemen van een pauze werken dubbel zo goed in combinatie.",
+  "Neem vandaag even de tijd om je gedachten op papier te zetten. Dit ruimt je mentale werkgeheugen op.",
+];
+
+const getDailyAdvice = (adviceList, date = new Date()) => {
+  if (!Array.isArray(adviceList) || adviceList.length === 0) {
+    return "";
+  }
+
+  const dayKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  let hash = 0;
+
+  for (const character of dayKey) {
+    hash = (hash * 31 + character.charCodeAt(0)) >>> 0;
+  }
+
+  return adviceList[hash % adviceList.length];
+};
+
 const getSessionElapsedSeconds = (sessionRow) => {
   if (!sessionRow?.start_tijd) {
     return 0;
@@ -171,6 +205,7 @@ const getElapsedSecondsSince = (startedAt) => {
 
 export default function App() {
   const apiBaseUrl = getApiBaseUrl();
+  const dailyAdvice = getDailyAdvice(DAILY_ADVICES);
   const [storedTimerState] = useState(() => getStoredTimerState());
   const breakStartedAtRef = useRef(getStoredBreakStartTime());
 
@@ -1187,8 +1222,7 @@ export default function App() {
           <section className="homeSection">
             <h3 className="homeSectionTitle">Advies van de dag</h3>
             <article className="adviceCard">
-              Vergeet niet om diep in en uit te ademen als je stress voelt opkomen. Voldoende zuurstof in je lichaam
-              helpt je om te ontspannen en helder te denken.
+              {dailyAdvice}
             </article>
           </section>
         </main>
