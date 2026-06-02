@@ -131,14 +131,27 @@ const setupAutoUpdates = () => {
     return;
   }
 
+  // autoUpdater.on("update-downloaded", () => {
+  //   dialog
+  //     .showMessageBox({
+  //       type: "info",
+  //       title: "Update beschikbaar",
+  //       message: "Een nieuwe versie van Re:Mind is gedownload.",
+  //       detail: "De app wordt opnieuw opgestart om de update te installeren.",
+  //       buttons: ["Nu updaten"],
+  //     })
+  //     .then(() => {
+  //       autoUpdater.quitAndInstall();
+  //     });
+  // });
+
   autoUpdater.on("update-downloaded", () => {
     dialog
       .showMessageBox({
         type: "info",
-        title: "Update beschikbaar",
+        title: "Update gedownload",
         message: "Een nieuwe versie van Re:Mind is gedownload.",
-        detail: "De app wordt opnieuw opgestart om de update te installeren.",
-        buttons: ["Nu updaten"],
+        buttons: ["OK"],
       })
       .then(() => {
         autoUpdater.quitAndInstall();
@@ -149,11 +162,24 @@ const setupAutoUpdates = () => {
     console.error("Auto-update error:", error);
   });
 
+  // autoUpdater.on("update-available", () => {
+  //   if (mainWindow && !mainWindow.isDestroyed()) {
+  //     showSystemNotification({
+  //       title: "Update beschikbaar",
+  //       body: "Er wordt een nieuwe versie van Re:Mind gedownload.",
+  //     });
+  //   }
+  // });
+
   autoUpdater.on("update-available", () => {
     if (mainWindow && !mainWindow.isDestroyed()) {
-      showSystemNotification({
+      showMessageBox({
+        type: "info",
         title: "Update beschikbaar",
-        body: "Er wordt een nieuwe versie van Re:Mind gedownload.",
+        message: "Klik op 'Nu updaten' om Re:Mind bij te werken naar de nieuwste versie.",
+        buttons: ["Nu updaten"],
+      }).then(() => {
+        autoUpdater.quitAndInstall();
       });
     }
   });
