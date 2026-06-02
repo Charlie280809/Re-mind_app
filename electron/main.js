@@ -10,6 +10,9 @@ if (isDev) {
   app.setPath("userData", path.join(app.getPath("appData"), "Re-Mind-dev"));
 }
 
+let mainWindow = null;
+let lastNotification = null;
+
 const gotTheLock = app.requestSingleInstanceLock();
 
 if (!gotTheLock) {
@@ -23,27 +26,21 @@ app.on("second-instance", () => {
 let mainWindow = null;
 let lastNotification = null;
 
-const focusMainWindow = () => {
-  if (!mainWindow || mainWindow.isDestroyed()) {
-    return;
-  }
+function focusMainWindow() {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
 
-  if (mainWindow.isMinimized()) {
-    mainWindow.restore();
-  }
-
-  if (!mainWindow.isMaximized()) {
-    mainWindow.maximize();
-  }
+  if (mainWindow.isMinimized()) mainWindow.restore();
+  if (!mainWindow.isMaximized()) mainWindow.maximize();
 
   mainWindow.show();
   mainWindow.focus();
 };
 
-const showSystemNotification = ({ title, body }) => {
+function showSystemNotification({ title, body }) {
   const notification = new Notification({
     title,
     body,
+    icon: path.join(__dirname, "assets/icon.ico"),
   });
 
   notification.on("click", () => {
@@ -52,40 +49,30 @@ const showSystemNotification = ({ title, body }) => {
       mainWindow.webContents.send("re-mind:notification-clicked", { title, body });
     }
   });
+
   lastNotification = notification;
+
   notification.on("close", () => {
-    if (lastNotification === notification) {
-      lastNotification = null;
-    }
+    if (lastNotification === notification) lastNotification = null;
   });
   notification.show();
 };
 
 ipcMain.handle("re-mind:show-notification", (_event, payload) => {
-  if (!payload?.title || !payload?.body) {
-    return false;
-  }
-
+  if (!payload?.title || !payload?.body) return false;
   showSystemNotification(payload);
   return true;
 });
 
 ipcMain.handle("re-mind:close-notification", () => {
-  try {
-    if (lastNotification) {
-      try {
-        lastNotification.close();
-      } catch (e) {
-        // ignore
-      }
-      lastNotification = null;
-      return true;
-    }
+  if (!lastNotification) return false;
 
-    return false;
-  } catch (e) {
-    return false;
-  }
+  try {
+    lastNotification.close();
+  } catch { }
+
+  lastNotification = null;
+  return true;
 });
 
 ipcMain.handle("re-mind:open-external", async (_event, url) => {
@@ -98,7 +85,7 @@ ipcMain.handle("re-mind:open-external", async (_event, url) => {
   }
 });
 
-const createWindow = () => {
+function createWindow() {
   if (mainWindow && !mainWindow.isDestroyed()) {
     focusMainWindow();
     return mainWindow;
@@ -135,10 +122,8 @@ const createWindow = () => {
   return mainWindow;
 };
 
-const setupAutoUpdates = () => {
-  if (isDev) {
-    return;
-  }
+function setupAutoUpdates() {
+  if (isDev) return;
 
   autoUpdater.on("update-available", () => {
     if (mainWindow && !mainWindow.isDestroyed()) {
@@ -157,23 +142,13 @@ const setupAutoUpdates = () => {
       detail: "Start de app opnieuw om de nieuwste versie van Re:Mind te gebruiken.",
       buttons: ["Opnieuw starten"],
     })
-      .then(() => {
-        autoUpdater.quitAndInstall();
-      });
+      .then(() => autoUpdater.quitAndInstall());
   });
 
-  autoUpdater.on("error", (error) => {
-    console.error("Auto-update error:", error);
-  });
+  autoUpdater.on("error", console.error);
 
   autoUpdater.checkForUpdatesAndNotify();
 };
-
-app.on("window-all-closed", (event) => {
-  if (!app.isQuitting) {
-    event.preventDefault();
-  }
-});
 
 app.on("before-quit", () => {
   app.isQuitting = true;
@@ -184,15 +159,19 @@ app.on("activate", () => {
 });
 
 app.whenReady().then(() => {
-  // Set a stable app identity for Windows notifications. The installer will
-  // create a Start Menu shortcut that ties this AppUserModelID to the app,
-  // which makes Action Center show the correct app name and icon.
   try {
     app.setName("Re:Mind");
     app.setAppUserModelId("be.remind.app");
   } catch (e) {
+    console.error(e);
   }
 
   createWindow();
   setupAutoUpdates();
+});
+
+app.on("window-all-closed", (event) => {
+  if (process.platform !== "darwin") {
+    app.quit();
+  }
 });
