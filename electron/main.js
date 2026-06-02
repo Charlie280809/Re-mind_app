@@ -38,6 +38,8 @@ const showSystemNotification = ({ title, body }) => {
   });
 
   notification.on("click", () => {
+    console.log("Notification clicked");
+
     focusMainWindow();
     if (mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.webContents.send("re-mind:notification-clicked", { title, body });
