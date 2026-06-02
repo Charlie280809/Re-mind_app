@@ -4,6 +4,14 @@ const { autoUpdater } = require("electron-updater");
 
 const isDev = !app.isPackaged;
 
+// Set the Windows app identity before any notifications or single-instance
+// checks so toast activation resolves to the packaged app instead of Electron.
+try {
+  app.setName("Re:Mind");
+  app.setAppUserModelId("be.remind.app");
+} catch (e) {
+}
+
 if (isDev) {
   // Keep dev profile/cache separate from the installed app to avoid lock and
   // access-denied issues when both versions were run on the same machine.
@@ -44,6 +52,7 @@ const showSystemNotification = ({ title, body }) => {
   const notification = new Notification({
     title,
     body,
+    icon: path.join(__dirname, "assets/icon.ico"),
   });
 
   notification.on("click", () => {
@@ -169,12 +178,6 @@ const setupAutoUpdates = () => {
   autoUpdater.checkForUpdatesAndNotify();
 };
 
-app.on("window-all-closed", (event) => {
-  if (!app.isQuitting) {
-    event.preventDefault();
-  }
-});
-
 app.on("before-quit", () => {
   app.isQuitting = true;
 });
@@ -184,15 +187,12 @@ app.on("activate", () => {
 });
 
 app.whenReady().then(() => {
-  // Set a stable app identity for Windows notifications. The installer will
-  // create a Start Menu shortcut that ties this AppUserModelID to the app,
-  // which makes Action Center show the correct app name and icon.
-  try {
-    app.setName("Re:Mind");
-    app.setAppUserModelId("be.remind.app");
-  } catch (e) {
-  }
-
   createWindow();
   setupAutoUpdates();
+});
+
+app.on("window-all-closed", (event) => {
+  if(process.platform !== "darwin") {
+    app.quit();
+  }
 });
