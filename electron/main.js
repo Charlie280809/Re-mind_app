@@ -139,48 +139,60 @@ const setupAutoUpdates = () => {
     return;
   }
 
-  autoUpdater.autoDownload = false;
+  // autoUpdater.on("update-downloaded", () => {
+  //   dialog
+  //     .showMessageBox({
+  //       type: "info",
+  //       title: "Update beschikbaar",
+  //       message: "Een nieuwe versie van Re:Mind is gedownload.",
+  //       detail: "De app wordt opnieuw opgestart om de update te installeren.",
+  //       buttons: ["Nu updaten"],
+  //     })
+  //     .then(() => {
+  //       autoUpdater.quitAndInstall();
+  //     });
+  // });
 
   autoUpdater.on("update-downloaded", () => {
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      showSystemNotification({
+    dialog
+      .showMessageBox({
+        type: "info",
         title: "Update gedownload",
-        body: "Re:Mind is bijgewerkt naar de nieuwste versie en klaar voor gebruik.",
+        message: "Een nieuwe versie van Re:Mind is gedownload.",
+        buttons: ["OK"],
+      })
+      .then(() => {
+        autoUpdater.quitAndInstall();
       });
-    }
-
-    setTimeout(() => {
-      autoUpdater.quitAndInstall();
-    }, 4000);
   });
 
   autoUpdater.on("error", (error) => {
     console.error("Auto-update error:", error);
   });
 
+  // autoUpdater.on("update-available", () => {
+  //   if (mainWindow && !mainWindow.isDestroyed()) {
+  //     showSystemNotification({
+  //       title: "Update beschikbaar",
+  //       body: "Er wordt een nieuwe versie van Re:Mind gedownload.",
+  //     });
+  //   }
+  // });
+
   autoUpdater.on("update-available", () => {
     if (mainWindow && !mainWindow.isDestroyed()) {
-      dialog.showMessageBox(mainWindow, {
+      showMessageBox({
         type: "info",
         title: "Update beschikbaar",
         message: "Klik op 'Nu updaten' om Re:Mind bij te werken naar de nieuwste versie.",
         buttons: ["Nu updaten"],
-        defaultId: 0,
-        cancelId: 0,
-        noLink: true,
-      }).then(({ response }) => {
-        if (response === 0) {
-          autoUpdater.downloadUpdate().catch((error) => {
-            console.error("Failed to download update:", error);
-          });
-        }
+      }).then(() => {
+        autoUpdater.quitAndInstall();
       });
     }
   });
 
-  autoUpdater.checkForUpdates().catch((error) => {
-    console.error("Failed to check for updates:", error);
-  });
+  autoUpdater.checkForUpdatesAndNotify();
 };
 
 app.on("window-all-closed", (event) => {
