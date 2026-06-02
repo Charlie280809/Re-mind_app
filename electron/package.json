@@ -22,7 +22,7 @@
         ],
         "extraResources": [
             {
-                "from": "assets/icon.ico",
+                "from": "build/icon.ico",
                 "to": "icon.ico"
             }
         ],
