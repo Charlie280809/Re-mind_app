@@ -3,6 +3,7 @@ import { LuArrowLeft, LuCheck, LuPlus } from "react-icons/lu";
 import "../css/CompanyManagementPage.css";
 import { addCompanyMember, loadCompanyManagement, removeCompanyMember, updateCompany } from "../api/companyApi";
 import SmallLoader from "../components/SmallLoader";
+import { applyCompanyTheme, clearCompanyTheme } from "../lib/companyTheme";
 
 const COMPANY_THEME_OPTIONS = [
     {
@@ -12,6 +13,7 @@ const COMPANY_THEME_OPTIONS = [
         vars: {
             background: "#fffcf5",
             backgroundCard: "#f4edd9",
+            backgroundSection: "#e9dec8",
             text: "#1a1a1a",
             border: "#c0c3b8",
             primary: "#769382",
@@ -30,6 +32,7 @@ const COMPANY_THEME_OPTIONS = [
         vars: {
             background: "#f7f8fb",
             backgroundCard: "#d6dbeb",
+            backgroundSection: "#c5cfdf",
             text: "#162033",
             border: "#c5cfdf",
             primary: "#5f7398",
@@ -44,15 +47,16 @@ const COMPANY_THEME_OPTIONS = [
     {
         id: "soft",
         name: "Soft",
-        preview: ["#FCF0EE", "#B3D0BE", "#F1EAD8", "#CDE0EA"],
+        preview: ["#f6fcf2", "#B3D0BE", "#F1EAD8", "#c3eccd"],
         vars: {
-            background: "#FCF0EE",
-            backgroundCard: "#CDE0EA",
+            background: "#f6fcf2",
+            backgroundCard: "#c3eccd",
+            backgroundSection: "#fff6e1",
             text: "#151819",
             border: "#AFA792",
             primary: "#B3D0BE",
             highlight: "#F1EAD8",
-            highlightHover: "#DCD7C7",
+            highlightHover: "#f9f5e9",
             success: "#89D289",
             warning: "#E4C47D",
             error: "#D0666F",
@@ -67,7 +71,7 @@ function getThemeById(themeId) {
     return COMPANY_THEME_OPTIONS.find((theme) => theme.id === themeId) || COMPANY_THEME_OPTIONS[0];
 }
 
-export default function CompanyManagementPage({ profile, accessToken, onBack }) {
+export default function CompanyManagementPage({ profile, accessToken, onProfileUpdated, onBack }) {
     const [company, setCompany] = useState(null);
     const [members, setMembers] = useState([]);
     const [pendingMembers, setPendingMembers] = useState([]);
@@ -106,6 +110,23 @@ export default function CompanyManagementPage({ profile, accessToken, onBack }) 
         const timer = setTimeout(() => setMemberMessage(""), 5000);
         return () => clearTimeout(timer);
     }, [memberMessage]);
+
+    useEffect(() => {
+        if (!isAdmin || loading) {
+            return undefined;
+        }
+
+        applyCompanyTheme(currentTheme);
+
+        return () => {
+            if (profile?.company_theme?.vars) {
+                applyCompanyTheme(profile.company_theme);
+                return;
+            }
+
+            clearCompanyTheme();
+        };
+    }, [currentTheme, isAdmin, loading, profile?.company_theme]);
 
     useEffect(() => {
         let cancelled = false;
@@ -169,7 +190,12 @@ export default function CompanyManagementPage({ profile, accessToken, onBack }) 
             theme: currentTheme,
         });
 
-        setCompany(payload.company || company);
+        const nextCompany = payload.company || company;
+        setCompany(nextCompany);
+
+        if (nextCompany?.theme && onProfileUpdated) {
+            onProfileUpdated({ company_theme: nextCompany.theme });
+        }
         } catch (err) {
         setErrorMessage(err?.message || "Bedrijfsgegevens konden niet opgeslagen worden.");
         } finally {
