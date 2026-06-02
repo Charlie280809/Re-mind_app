@@ -10,6 +10,16 @@ if (isDev) {
   app.setPath("userData", path.join(app.getPath("appData"), "Re-Mind-dev"));
 }
 
+const gotTheLock = app.requestSingleInstanceLock();
+
+if (!gotTheLock) {
+  app.quit();
+}
+
+app.on("second-instance", () => {
+  focusMainWindow();
+});
+
 let mainWindow = null;
 let lastNotification = null;
 
