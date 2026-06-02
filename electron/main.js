@@ -23,9 +23,6 @@ app.on("second-instance", () => {
   focusMainWindow();
 });
 
-let mainWindow = null;
-let lastNotification = null;
-
 function focusMainWindow() {
   if (!mainWindow || mainWindow.isDestroyed()) return;
 
