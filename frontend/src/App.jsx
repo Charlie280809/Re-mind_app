@@ -43,13 +43,6 @@ import {
 } from "./api/backendApi";
 import { calculateWorkdayDurationSeconds } from "./lib/workHours";
 import { hasPremiumAccess } from "./lib/access";
-import {
-  applyCompanyTheme,
-  clearCompanyTheme,
-  persistCompanyTheme,
-  getPersistedCompanyTheme,
-  clearPersistedCompanyTheme,
-} from "./lib/companyTheme";
 
 const NAV_STATE_STORAGE_KEY = "remind-navigation-state";
 const TIMER_STATE_STORAGE_KEY = "remind-worktimer-state";
@@ -453,33 +446,6 @@ export default function App() {
       ...nextProfile,
     }));
   };
-
-  useEffect(() => {
-    if (!profile?.company_id) {
-      clearCompanyTheme();
-      return;
-    }
-
-    if (profile?.company_theme?.vars) {
-      applyCompanyTheme(profile.company_theme);
-      persistCompanyTheme(profile.company_id, profile.company_theme);
-      return;
-    }
-
-    const cachedTheme = getPersistedCompanyTheme(profile.company_id);
-    if (cachedTheme?.vars) {
-      applyCompanyTheme(cachedTheme);
-      return;
-    }
-
-    clearCompanyTheme();
-  }, [profile?.company_id, profile?.company_theme]);
-
-  useEffect(() => {
-    if (!sessionUserId && !profile?.company_id) {
-      clearPersistedCompanyTheme(profile?.company_id);
-    }
-  }, [sessionUserId, profile?.company_id]);
 
   const resetTimerState = () => {
     setWorkStarted(false);
@@ -1186,7 +1152,6 @@ export default function App() {
         <CompanyManagementPage
           profile={profile}
           accessToken={session?.access_token}
-          onProfileUpdated={handleProfileUpdated}
           onBack={() => setCurrentPage("profile")}
         />
       ) : currentPage === "upgrade" ? (
