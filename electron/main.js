@@ -5,12 +5,6 @@ const { dialog }=require("electron");
 
 const isDev = !app.isPackaged;
 
-const gotSingleInstanceLock = app.requestSingleInstanceLock();
-
-if (!gotSingleInstanceLock) {
-  app.quit();
-}
-
 if (isDev) {
   // Keep dev profile/cache separate from the installed app to avoid lock and
   // access-denied issues when both versions were run on the same machine.
@@ -209,15 +203,7 @@ app.on("activate", () => {
   createWindow();
 });
 
-app.on("second-instance", () => {
-  focusMainWindow();
-});
-
 app.whenReady().then(() => {
-  if (!gotSingleInstanceLock) {
-    return;
-  }
-
   // Set a stable app identity for Windows notifications. The installer will
   // create a Start Menu shortcut that ties this AppUserModelID to the app,
   // which makes Action Center show the correct app name and icon.
