@@ -1,6 +1,6 @@
 {
     "name": "electron",
-    "version": "1.0.5",
+    "version": "1.0.8",
     "description": "",
     "main": "main.js",
     "scripts": {
@@ -22,7 +22,7 @@
         ],
         "win": {
             "target": "nsis",
-            "icon": "assets/favicon.ico"
+            "icon": "assets/icon.ico"
         },
         "nsis": {
             "oneClick": true,

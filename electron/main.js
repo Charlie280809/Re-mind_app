@@ -1,7 +1,6 @@
-const { app, BrowserWindow, Notification, ipcMain, shell } = require("electron");
+const { app, BrowserWindow, Notification, ipcMain, shell, dialog } = require("electron");
 const path = require("path");
-const { autoUpdater }=require("electron-updater");
-const { dialog }=require("electron");
+const { autoUpdater } = require("electron-updater");
 
 const isDev = !app.isPackaged;
 
@@ -98,7 +97,7 @@ const createWindow = () => {
   mainWindow = new BrowserWindow({
     width: 1078,
     height: 700,
-    icon: path.join(__dirname, "assets/favicon.ico"),
+    icon: path.join(__dirname, "assets/icon.ico"),
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
@@ -131,15 +130,23 @@ const setupAutoUpdates = () => {
     return;
   }
 
-  autoUpdater.on("update-downloaded", () => {
-    dialog
-      .showMessageBox({
-        type: "info",
+  autoUpdater.on("update-available", () => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      showSystemNotification({
         title: "Update beschikbaar",
-        message: "Een nieuwe versie van Re:Mind is gedownload.",
-        detail: "De app wordt opnieuw opgestart om de update te installeren.",
-        buttons: ["Nu updaten"],
-      })
+        body: "Een nieuwe versie van Re:Mind wordt gedownload.",
+      });
+    }
+  });
+
+  autoUpdater.on("update-downloaded", () => {
+    dialog.showMessageBox({
+      type: "info",
+      title: "Update klaar om te installeren",
+      message: "Een nieuwe versie van Re:Mind is klaar om te installeren.",
+      detail: "Start de app opnieuw om de nieuwste versie van Re:Mind te gebruiken.",
+      buttons: ["Opnieuw starten"],
+    })
       .then(() => {
         autoUpdater.quitAndInstall();
       });
@@ -147,15 +154,6 @@ const setupAutoUpdates = () => {
 
   autoUpdater.on("error", (error) => {
     console.error("Auto-update error:", error);
-  });
-
-  autoUpdater.on("update-available", () => {
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      showSystemNotification({
-        title: "Update beschikbaar",
-        body: "Er wordt een nieuwe versie van Re:Mind gedownload.",
-      });
-    }
   });
 
   autoUpdater.checkForUpdatesAndNotify();
