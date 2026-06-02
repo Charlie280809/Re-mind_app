@@ -763,9 +763,8 @@ export default function App() {
 
     breakStartedAtRef.current = new Date().toISOString();
     setBreakSeconds(0);
-    await incrementWorkSessionCounterOnServer("breaks_taken");
     setOnBreak(true);
-    setPauseSuggestionsInitialTab(Boolean(workSettings?.favorite_pauses_suggest_on) ? "fav" : "all");
+    setPauseSuggestionsInitialTab(workSettings?.favorite_pauses_suggest_on ? "fav" : "all");
     setCurrentPage("pause");
 
     try {
