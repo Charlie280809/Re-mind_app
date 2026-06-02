@@ -932,6 +932,14 @@ export default function App() {
 
   const handleLogout = async () => {
     setAuthError("");
+    if (workStarted && !finished) {
+      try {
+        await endDay();
+      } catch (error) {
+        console.error("Failed to end work session during logout:", error);
+      }
+    }
+
     setCurrentPage("home");
     setProfile(null);
     setAuthView("login");
