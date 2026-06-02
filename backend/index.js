@@ -1837,7 +1837,7 @@ app.get("/profile/me", async (req, res) => {
   }
 
   const { data: userData, error: userError } = await supabase.auth.getUser(token);
-    // --- account deletion ---
+  // --- account deletion ---
 
 
   if (userError || !userData?.user) {
@@ -1865,12 +1865,18 @@ app.get("/profile/me", async (req, res) => {
     });
   }
 
+  let companyTheme = null;
+
   if (profile.company_id) {
     const { data: company, error: companyError } = await supabase
       .from("companies")
-      .select("name")
+      .select("name, theme")
       .eq("id", profile.company_id)
       .maybeSingle();
+
+    if (!companyError) {
+      companyTheme = normalizeCompanyTheme(company?.theme);
+    }
 
     if (!companyError && company?.name && profile.bedrijfsnaam !== company.name) {
       const { error: syncError } = await supabase
@@ -1888,6 +1894,11 @@ app.get("/profile/me", async (req, res) => {
       }
     }
   }
+
+  profile = {
+    ...profile,
+    company_theme: companyTheme,
+  };
 
   return res.json({
     user: {
@@ -2286,6 +2297,7 @@ app.post("/company/request", async (req, res) => {
       company_role: "admin",
       is_premium: true,
       avatar_url: existingProfile?.avatar_url || null,
+      company_theme: normalizeCompanyTheme(company.theme),
     },
   });
 });
