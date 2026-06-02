@@ -135,10 +135,10 @@ const setupAutoUpdates = () => {
     dialog
       .showMessageBox({
         type: "info",
-        title: "Update geïnstalleerd",
-        message: "Een nieuwe versie van Re:Mind is geïnstalleerd.",
-        // detail: "De app wordt opnieuw opgestart om de update te installeren.",
-        buttons: ["OK"],
+        title: "Update beschikbaar",
+        message: "Een nieuwe versie van Re:Mind is gedownload.",
+        detail: "De app wordt opnieuw opgestart om de update te installeren.",
+        buttons: ["Nu updaten"],
       })
       .then(() => {
         autoUpdater.quitAndInstall();
