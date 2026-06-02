@@ -22,7 +22,6 @@ export default function SettingsUpgrade({ profile, isPremium, onProfileUpdated, 
 
     const premiumPrice = billingCycle === "monthly" ? "€2,99/maand" : "€33/jaar";
     const companyPrice = billingCycle === "monthly" ? "€2,20/maand" : "€20/jaar";
-    const hasCompanyLicense = Boolean(profile?.company_id);
 
     const handleSelectBasePlan = async () => {
         setSavingPlan(true);
@@ -158,11 +157,11 @@ export default function SettingsUpgrade({ profile, isPremium, onProfileUpdated, 
                         <li><LuCheck /> Vorige dagrapporten</li>
                         <li><LuCheck /> Wekelijkse rapporten</li>
                     </ul>
-                    {hasPremiumAccess({ is_premium: isPremium }) && !hasCompanyLicense ? (
+                    {hasPremiumAccess({ is_premium: isPremium }) ? (
                         <div className="currentPlanLabel">Jouw momentele plan</div>
-                    ) : !hasPremiumAccess({ is_premium: isPremium }) && !hasCompanyLicense ? (
+                    ) : (
                         <button className="upgradePrimaryBtn" type="button">Upgraden</button>
-                    ) : null}
+                    )}
                 </article>
 
                 <article className="upgradeCard upgradeCardTop">
@@ -176,13 +175,9 @@ export default function SettingsUpgrade({ profile, isPremium, onProfileUpdated, 
                         <li><LuCheck /> Alle premium functies</li>
                         <li><LuCheck /> Bedrijfspersonalisatie</li>
                     </ul>
-                    {hasCompanyLicense ? (
-                        <div className="currentPlanLabel">Jouw momentele plan</div>
-                    ) : (
-                        <button className="upgradePrimaryBtn" type="button" onClick={openCompanyRequest}>
-                            Aanvraag invullen
-                        </button>
-                    )}
+                    <button className="upgradePrimaryBtn" type="button" onClick={openCompanyRequest}>
+                        Aanvraag invullen
+                    </button>
                 </article>
 
                 <article className="upgradeCard upgradeCardBottom">
@@ -194,7 +189,7 @@ export default function SettingsUpgrade({ profile, isPremium, onProfileUpdated, 
                         <li><LuCheck /> Afsluitroutine</li>
                         <li><LuCheck /> Dagelijks rapport</li>
                     </ul>
-                    {hasCompanyLicense ? null : hasPremiumAccess({ is_premium: isPremium }) ? (
+                    {hasPremiumAccess({ is_premium: isPremium }) ? (
                         <button className="upgradePrimaryBtn" type="button" onClick={handleSelectBasePlan} disabled={savingPlan}>
                             {savingPlan ? "Bezig..." : "Kies dit plan"}
                         </button>
