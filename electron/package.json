@@ -1,6 +1,6 @@
 {
     "name": "electron",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "description": "",
     "main": "main.js",
     "scripts": {
@@ -13,11 +13,17 @@
         "appId": "be.remind.app",
         "productName": "Re-Mind",
         "artifactName": "Re-Mind-App.${ext}",
-        "publish":[
+        "publish": [
             {
                 "provider": "github",
                 "owner": "Charlie280809",
                 "repo": "Re-mind_app"
+            }
+        ],
+        "extraResources": [
+            {
+                "from": "assets/icon.ico",
+                "to": "icon.ico"
             }
         ],
         "win": {
@@ -30,7 +36,7 @@
         }
     },
     "keywords": [],
-    "author": "",
+    "author": "Charlie Van Belle",
     "license": "ISC",
     "type": "commonjs",
     "devDependencies": {

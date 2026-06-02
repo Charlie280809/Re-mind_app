@@ -1,20 +1,22 @@
-const { app, BrowserWindow, Notification, ipcMain, shell } = require("electron");
+const { app, BrowserWindow, Notification, ipcMain, shell, dialog } = require("electron");
 const path = require("path");
-const { autoUpdater }=require("electron-updater");
-const { dialog }=require("electron");
+const { autoUpdater } = require("electron-updater");
 
 const isDev = !app.isPackaged;
 
-if (isDev) {
-  // Keep dev profile/cache separate from the installed app to avoid lock and
-  // access-denied issues when both versions were run on the same machine.
-  app.setPath("userData", path.join(app.getPath("appData"), "Re-Mind-dev"));
+app.setName("Re:Mind");
+app.setAppUserModelId("be.remind.app");
+
+const gotSingleInstanceLock = app.requestSingleInstanceLock();
+if (!gotSingleInstanceLock) {
+  app.quit();
 }
+
 
 let mainWindow = null;
 let lastNotification = null;
 
-const focusMainWindow = () => {
+function focusMainWindow() {
   if (!mainWindow || mainWindow.isDestroyed()) {
     return;
   }
@@ -33,6 +35,7 @@ const focusMainWindow = () => {
 
 const showSystemNotification = ({ title, body }) => {
   const notification = new Notification({
+    icon: path.join(__dirname, "assets/icon.ico"),
     title,
     body,
   });
@@ -89,7 +92,7 @@ ipcMain.handle("re-mind:open-external", async (_event, url) => {
   }
 });
 
-const createWindow = () => {
+function createWindow() {
   if (mainWindow && !mainWindow.isDestroyed()) {
     focusMainWindow();
     return mainWindow;
@@ -126,7 +129,7 @@ const createWindow = () => {
   return mainWindow;
 };
 
-const setupAutoUpdates = () => {
+function setupAutoUpdates() {
   if (isDev) {
     return;
   }
@@ -153,7 +156,7 @@ const setupAutoUpdates = () => {
     if (mainWindow && !mainWindow.isDestroyed()) {
       showSystemNotification({
         title: "Update beschikbaar",
-        body: "Er wordt een nieuwe versie van Re:Mind gedownload.",
+        body: "Er is een nieuwe versie van Re:Mind beschikbaar.",
       });
     }
   });
@@ -161,30 +164,33 @@ const setupAutoUpdates = () => {
   autoUpdater.checkForUpdatesAndNotify();
 };
 
-app.on("window-all-closed", (event) => {
-  if (!app.isQuitting) {
-    event.preventDefault();
-  }
-});
-
 app.on("before-quit", () => {
   app.isQuitting = true;
 });
 
-app.on("activate", () => {
-  createWindow();
+autoUpdater.on("error", (error) => {
+  console.error("Auto-update error:", error);
+});
+
+app.on("second-instance", () => {
+  focusMainWindow();
 });
 
 app.whenReady().then(() => {
-  // Set a stable app identity for Windows notifications. The installer will
-  // create a Start Menu shortcut that ties this AppUserModelID to the app,
-  // which makes Action Center show the correct app name and icon.
-  try {
-    app.setName("Re:Mind");
-    app.setAppUserModelId("be.remind.app");
-  } catch (e) {
-  }
-
   createWindow();
   setupAutoUpdates();
+
+  app.on("activate", () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createWindow();
+    } else {
+      focusMainWindow();
+    }
+  });
+});
+
+app.on("window-all-closed", (event) => {
+  if (process.platform !== "darwin") {
+    app.quit();
+  }
 });
