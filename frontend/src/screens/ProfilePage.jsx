@@ -4,6 +4,7 @@ import PauseCard from "../components/PauseCard";
 import FavoriteLimitCard from "../components/FavoriteLimitCard";
 import { DATA as PAUSE_OPTIONS } from "./PauseSuggestions";
 import { hasPremiumAccess } from "../lib/access";
+import crown from "../assets/icons/crown_filled.svg";
 
 export default function ProfilePage({ profile, favorites, onToggleFavorite, onNavigateToPause, onNavigateToUpgrade, onNavigateToCompanyManagement, favoriteLimit }) {
     const name = profile?.username || profile?.email || "Gebruiker";
@@ -34,7 +35,7 @@ export default function ProfilePage({ profile, favorites, onToggleFavorite, onNa
                 </div>
 
                 <div className="profile-heroCopy">
-                    <h1 className="profile-title">{name}</h1>
+                    <h1 className="profile-title">{name} {isPremium && <img src={crown} alt="Premium" className="profile-crown" />}</h1>
                     <p className="profile-companyTitle">{companyName}</p>
                     {profile?.company_id && profile?.company_role === "admin" ? (
                         <button
