@@ -1,14 +1,9 @@
 const { app, BrowserWindow, Notification, ipcMain, shell } = require("electron");
 const path = require("path");
-const { autoUpdater } = require("electron-updater");
-const { dialog } = require("electron");
+const { autoUpdater }=require("electron-updater");
+const { dialog }=require("electron");
 
 const isDev = !app.isPackaged;
-
-// Set the Windows app identity as early as possible so taskbar grouping and
-// notification/icon behavior stay stable across launches.
-app.setName("Re:Mind");
-app.setAppUserModelId("be.remind.app");
 
 const gotSingleInstanceLock = app.requestSingleInstanceLock();
 
@@ -111,7 +106,7 @@ const createWindow = () => {
   mainWindow = new BrowserWindow({
     width: 1078,
     height: 700,
-    icon: path.join(__dirname, "assets/icon.ico"),
+    icon: path.join(__dirname, "assets/favicon.ico"),
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
@@ -209,6 +204,15 @@ app.on("second-instance", () => {
 app.whenReady().then(() => {
   if (!gotSingleInstanceLock) {
     return;
+  }
+
+  // Set a stable app identity for Windows notifications. The installer will
+  // create a Start Menu shortcut that ties this AppUserModelID to the app,
+  // which makes Action Center show the correct app name and icon.
+  try {
+    app.setName("Re:Mind");
+    app.setAppUserModelId("be.remind.app");
+  } catch (e) {
   }
 
   createWindow();
