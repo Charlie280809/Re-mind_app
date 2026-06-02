@@ -1949,7 +1949,7 @@ app.put("/profile/me", async (req, res) => {
 
   const { data: existingProfile, error: existingProfileError } = await supabase
     .from("profiles")
-    .select("is_premium, avatar_url")
+    .select("is_premium, avatar_url, company_id, company_role")
     .eq("user_id", userData.user.id)
     .maybeSingle();
 
@@ -1969,6 +1969,8 @@ app.put("/profile/me", async (req, res) => {
       username,
       bedrijfsnaam: bedrijfsnaam || null,
       is_premium: existingProfile?.is_premium ?? false,
+      company_id: existingProfile?.company_id ?? null,
+      company_role: existingProfile?.company_role ?? null,
       avatar_url: nextAvatarUrl,
     },
     { onConflict: "user_id" }
