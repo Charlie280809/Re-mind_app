@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { LuAlarmClock, LuX } from "react-icons/lu";
+import { LuX } from "react-icons/lu";
 import "../css/PauseReminderModal.css";
 import { showNativeNotification } from "../lib/nativeNotification";
 
@@ -90,6 +90,20 @@ export default function PauseReminderModal({
 
         return () => {
             document.body.classList.remove("modalOpen");
+        };
+    }, [showPauseReminderModal]);
+
+    useEffect(() => {
+        if (!showPauseReminderModal) {
+            return undefined;
+        }
+
+        const autoDismissTimeoutId = window.setTimeout(() => {
+            handleDismiss();
+        }, 2 * 60 * 1000);
+
+        return () => {
+            window.clearTimeout(autoDismissTimeoutId);
         };
     }, [showPauseReminderModal]);
 
