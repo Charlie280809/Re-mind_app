@@ -15,6 +15,7 @@ import PremiumModal from "./components/PremiumModal";
 import WorkdayTasksOverlay from "./components/WorkdayTasksOverlay";
 import LoginPage from "./screens/LoginPage";
 import SignupPage from "./screens/SignupPage";
+import ResetPasswordPage from "./screens/ResetPasswordPage";
 import Settings from "./screens/Settings";
 import SettingsWorkHours from "./screens/SettingsWorkHours";
 import SettingsNotifications from "./screens/SettingsNotifications";
@@ -205,6 +206,20 @@ const getStoredBreakStartTime = () => {
   }
 };
 
+const getInitialAuthView = () => {
+  if (typeof window === "undefined") {
+    return "login";
+  }
+
+  const searchParams = new URLSearchParams(window.location.search);
+
+  if (searchParams.get("auth") === "recovery") {
+    return "reset-password";
+  }
+
+  return "login";
+};
+
 const getElapsedSecondsSince = (startedAt) => {
   if (!startedAt) {
     return 0;
@@ -233,7 +248,7 @@ export default function App() {
   const [signupCompleted, setSignupCompleted] = useState(false);
   const [profileLoading, setProfileLoading] = useState(false);
   const [authError, setAuthError] = useState("");
-  const [authView, setAuthView] = useState("login");
+  const [authView, setAuthView] = useState(() => getInitialAuthView());
   const [workSettings, setWorkSettings] = useState(null);
 
   const storedNavigationState = getStoredNavigationState();
@@ -290,17 +305,25 @@ export default function App() {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+    } = supabase.auth.onAuthStateChange((event, nextSession) => {
       if (!isMounted) {
         return;
       }
 
       setSession(nextSession ?? null);
 
+      if (event === "PASSWORD_RECOVERY") {
+        setAuthView("reset-password");
+      }
+
       if (!nextSession) {
         setProfile(null);
         setProfileLoading(false);
         setCurrentPage("home");
+
+        if (event !== "PASSWORD_RECOVERY") {
+          setAuthView("login");
+        }
       }
     });
 
@@ -1048,6 +1071,15 @@ export default function App() {
   }
 
   const isSignupFlowActive = authView === "signup" && !signupCompleted;
+
+  if (authView === "reset-password") {
+    return (
+      <ResetPasswordPage
+        onNavigateToLogin={() => setAuthView("login")}
+        isConfigured={Boolean(supabase)}
+      />
+    );
+  }
 
   if (!session || isSignupFlowActive) {
     return authView === "signup" ? (

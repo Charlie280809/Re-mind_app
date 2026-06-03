@@ -67,9 +67,9 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
     const planLabel = getPlanLabel(profile);
 
     const fields = [
-        { key: "email", label: "Email:", type: "email", placeholder: "Nog niet beschikbaar" },
-        { key: "username", label: "Naam:", type: "text", placeholder: "Nog niet beschikbaar" },
-        { key: "bedrijfsnaam", label: "Bedrijf:", type: "text", placeholder: "Nog niet beschikbaar" },
+        { key: "email", label: "Email:", type: "email", placeholder: "Vul je email in" },
+        { key: "username", label: "Naam:", type: "text", placeholder: "Vul je naam in" },
+        { key: "bedrijfsnaam", label: "Bedrijf:", type: "text", placeholder: "Vul je bedrijfsnaam in" },
         { key: "plan", label: "Abonnement:", value: planLabel, readOnly: true },
     ];
 
@@ -170,7 +170,6 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
             };
         });
         setAvatarFile(nextFile);
-        // setSavedMessage("Profielfoto bijgewerkt.");
         event.target.value = "";
     }
 
@@ -197,6 +196,37 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
             newPassword: false,
             confirmPassword: false,
         });
+    }
+
+    async function handleSendResetEmail(event) {
+        event && event.preventDefault();
+
+        if (!profile?.email) {
+            setPasswordMessage("E-mailadres ontbreekt. Vul je e-mailadres in om een resetlink te ontvangen.");
+            return;
+        }
+
+        setPasswordMessage("");
+
+        try {
+            const redirectUrl = typeof window !== "undefined" ? new URL(window.location.href) : null;
+
+            if (redirectUrl) {
+                redirectUrl.searchParams.set("auth", "recovery");
+                redirectUrl.hash = "";
+            }
+
+            const { error } = await supabase.auth.resetPasswordForEmail(profile.email, {
+                redirectTo: redirectUrl?.toString() || (typeof window !== "undefined" ? window.location.origin : ""),
+            });
+
+            if (error) throw error;
+
+            setPasswordMessage("Een e-mail om je wachtwoord te resetten is verzonden.");
+        } catch (err) {
+            console.error(err);
+            setPasswordMessage(err?.message || "Fout bij verzenden van reset e-mail.");
+        }
     }
 
     async function handleProfileSave() {
@@ -430,7 +460,11 @@ export default function SettingsPersonalData({ onBack, profile, onProfileUpdated
                                         {passwordVisibility.currentPassword ? <LuEye /> : <LuEyeOff />}
                                     </button>
                                 </div>
-                                <a className="passwordForgotLink" href="#">
+                                <a
+                                    className="passwordForgotLink"
+                                    href="#"
+                                    onClick={handleSendResetEmail}
+                                >
                                     Wachtwoord vergeten?
                                 </a>
                             </label>

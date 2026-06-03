@@ -139,6 +139,7 @@
 }
 
 .loginSubmit {
+    min-width: var(--button-min-width);
     width: 140px;
     margin-top: var(--space-12);
     border: 2px solid var(--button-primary-border);
