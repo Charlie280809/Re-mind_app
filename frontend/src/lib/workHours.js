@@ -27,10 +27,8 @@ export function createDefaultWorkHoursDraft() {
         breakMinutes: 50,
         startTime: "09:00",
         endTime: "17:00",
-        autoStartWorkTimer: true,
         lunchPauseEnabled: false,
         lunchStart: "12:00",
-        lunchEnd: "13:00",
     };
 }
 
@@ -91,12 +89,31 @@ export function isValidWorkdayTimeRange(startTime, endTime) {
     return Number.isFinite(startMinutes) && Number.isFinite(endMinutes) && startMinutes < endMinutes;
 }
 
+export function isValidOptionalTimeWithinWorkday(startTime, endTime, optionalTime) {
+    if (!optionalTime) {
+        return true;
+    }
+
+    const startMinutes = parseTimeToMinutes(startTime);
+    const endMinutes = parseTimeToMinutes(endTime);
+    const valueMinutes = parseTimeToMinutes(optionalTime);
+
+    return (
+        Number.isFinite(startMinutes) &&
+        Number.isFinite(endMinutes) &&
+        Number.isFinite(valueMinutes) &&
+        startMinutes <= valueMinutes &&
+        valueMinutes <= endMinutes
+    );
+}
+
 export function buildWorkDays(selectedWorkdays) {
     return WEEKDAY_OPTIONS.filter((day) => selectedWorkdays?.[day.key]).map((day) => day.key);
 }
 
 export function buildWorkHoursFields(draft) {
     const normalizedDuration = normalizeDuration(draft.breakHours, draft.breakMinutes);
+    const lunchStart = typeof draft.lunchStart === "string" && draft.lunchStart.trim() ? draft.lunchStart.trim() : null;
 
     return {
         workdays: buildWorkDays(draft.selectedWorkdays),
@@ -105,9 +122,7 @@ export function buildWorkHoursFields(draft) {
         break_frequency_hours: normalizedDuration.hours,
         break_frequency_minutes_part: normalizedDuration.minutes,
         break_frequency_minutes: normalizedDuration.totalMinutes,
-        auto_start_work_timer: Boolean(draft.autoStartWorkTimer),
-        lunch_start: draft.lunchPauseEnabled ? draft.lunchStart : null,
-        lunch_end: draft.lunchPauseEnabled ? draft.lunchEnd : null,
+        lunch_start: draft.lunchPauseEnabled ? lunchStart : null,
     };
 }
 
@@ -127,14 +142,14 @@ export function buildSignupNotificationPayload(userId, checkinNotificationsOn) {
 
 export function buildSignupWorkHoursPayload(userId, draft) {
     const normalizedDuration = normalizeDuration(draft.breakHours, draft.breakMinutes);
+    const lunchStart = typeof draft.lunchStart === "string" && draft.lunchStart.trim() ? draft.lunchStart.trim() : null;
 
     return {
         user_id: userId,
         pause_reminder: normalizedDuration.totalMinutes,
         werk_startuur: draft.startTime,
         werk_einduur: draft.endTime,
-        middag_startuur: draft.lunchPauseEnabled ? draft.lunchStart : null,
-        middag_einduur: draft.lunchPauseEnabled ? draft.lunchEnd : null,
+        middag_startuur: draft.lunchPauseEnabled ? lunchStart : null,
         mon_isworkday: Boolean(draft.selectedWorkdays?.mon),
         tue_isworkday: Boolean(draft.selectedWorkdays?.tue),
         wed_isworkday: Boolean(draft.selectedWorkdays?.wed),
@@ -169,9 +184,7 @@ export function draftFromWorkHoursRow(row) {
         breakMinutes: minutes,
         startTime: row.start_time || "09:00",
         endTime: row.end_time || "17:00",
-        autoStartWorkTimer: row.auto_start_work_timer ?? true,
-        lunchPauseEnabled: Boolean(row.lunch_start || row.lunch_end),
-        lunchStart: row.lunch_start || "12:00",
-        lunchEnd: row.lunch_end || "13:00",
+        lunchPauseEnabled: Boolean(row.lunch_start),
+        lunchStart: row.lunch_start || "",
     };
 }

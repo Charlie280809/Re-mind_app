@@ -1797,7 +1797,6 @@ app.post("/signup/work-hours", async (req, res) => {
       werk_startuur: workHoursSetup.werk_startuur || null,
       werk_einduur: workHoursSetup.werk_einduur || null,
       middag_startuur: workHoursSetup.middag_startuur || null,
-      middag_einduur: workHoursSetup.middag_einduur || null,
       mon_isworkday: Boolean(workHoursSetup.mon_isworkday),
       tue_isworkday: Boolean(workHoursSetup.tue_isworkday),
       wed_isworkday: Boolean(workHoursSetup.wed_isworkday),

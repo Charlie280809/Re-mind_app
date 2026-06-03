@@ -3,7 +3,7 @@ import "../css/settings.css";
 import { useState } from "react";
 import { LuEye, LuEyeOff  } from "react-icons/lu";
 import logo from "../assets/images/logo.svg";
-import { WEEKDAY_OPTIONS, buildSignupWorkHoursPayload, createDefaultWorkHoursDraft, isValidWorkdayTimeRange, normalizeDuration } from "../lib/workHours";
+import { WEEKDAY_OPTIONS, buildSignupWorkHoursPayload, createDefaultWorkHoursDraft, isValidOptionalTimeWithinWorkday, isValidWorkdayTimeRange, normalizeDuration } from "../lib/workHours";
 
 const SOURCE_OPTIONS = [
     { key: "friends", label: "Door vrienden/collega's" },
@@ -179,6 +179,11 @@ export default function SignupPage({ onCreateAccount, onSaveNotifications, onSav
                 return;
             }
 
+            if (!isValidOptionalTimeWithinWorkday(workHours.startTime, workHours.endTime, workHours.lunchStart)) {
+                setFormError("❗Het startuur van je middagpauze moet binnen de werkuren vallen.");
+                return;
+            }
+
             const saved = await onSaveWorkHours({
                 userId: createdUserId,
                 workHoursSetup: buildSignupWorkHoursPayload(createdUserId, workHours),
@@ -302,19 +307,6 @@ export default function SignupPage({ onCreateAccount, onSaveNotifications, onSav
                                         value={workHours.lunchStart}
                                         disabled={!workHours.lunchPauseEnabled}
                                         onChange={(event) => updateWorkHours("lunchStart", event.target.value)}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className={`row ${!workHours.lunchPauseEnabled ? "rowDisabled" : ""}`}>
-                                <div className="label">Officieel einde middagpauze op werkdagen:</div>
-                                <div className="value">
-                                    <input
-                                        aria-label="Einde middagpauze"
-                                        type="time"
-                                        value={workHours.lunchEnd}
-                                        disabled={!workHours.lunchPauseEnabled}
-                                        onChange={(event) => updateWorkHours("lunchEnd", event.target.value)}
                                     />
                                 </div>
                             </div>

@@ -3,7 +3,7 @@ import { LuArrowLeft, LuPencil } from "react-icons/lu";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import SmallLoader from "../components/SmallLoader";
-import { createDefaultWorkdaySelection, normalizeDuration, parseIntegerValue } from "../lib/workHours";
+import { createDefaultWorkdaySelection, isValidOptionalTimeWithinWorkday, normalizeDuration, parseIntegerValue } from "../lib/workHours";
 
 function settingsStateFromRow(row) {
     if (!row) {
@@ -36,11 +36,8 @@ function settingsStateFromRow(row) {
         checkinMinutes: hasTotalMinutes ? totalMinutes % 60 : 50,
         startTime: row.werk_startuur || "09:00",
         endTime: row.werk_einduur || "17:00",
-        autoStartWorkTimer: typeof row.werktimer_autostart === "boolean" ? row.werktimer_autostart : true,
-        lunchPauseEnabled:
-            typeof row.lunch_enabled === "boolean" ? row.lunch_enabled : Boolean(row.middag_startuur || row.middag_einduur),
+        lunchPauseEnabled: typeof row.lunch_enabled === "boolean" ? row.lunch_enabled : Boolean(row.middag_startuur),
         lunchStart: row.middag_startuur || "12:00",
-        lunchEnd: row.middag_einduur || "13:00",
     };
 }
 
@@ -52,10 +49,8 @@ function buildSettingsPayload(userId, settings) {
         pause_reminder: normalizedDuration.totalMinutes,
         werk_startuur: settings.startTime,
         werk_einduur: settings.endTime,
-        werktimer_autostart: Boolean(settings.autoStartWorkTimer),
         lunch_enabled: Boolean(settings.lunchPauseEnabled),
         middag_startuur: settings.lunchPauseEnabled ? settings.lunchStart : null,
-        middag_einduur: settings.lunchPauseEnabled ? settings.lunchEnd : null,
         mon_isworkday: Boolean(settings.selectedWorkdays?.mon),
         tue_isworkday: Boolean(settings.selectedWorkdays?.tue),
         wed_isworkday: Boolean(settings.selectedWorkdays?.wed),
@@ -72,10 +67,8 @@ function createEmptySettingsState() {
         checkinMinutes: null,
         startTime: "",
         endTime: "",
-        autoStartWorkTimer: null,
         checkinHours: null,
         lunchStart: "",
-        lunchEnd: "",
         lunchPauseEnabled: null,
     };
 }
@@ -267,20 +260,6 @@ export default function SettingsWorkHours({ onBack, userId, onSaved }) {
                 </div>
 
                 <div className="row toggleRow">
-                    <div className="label">Werktimer automatisch starten op startuur:</div>
-                    <div className="value">
-                        <button
-                            className="toggle"
-                            type="button"
-                            aria-pressed={Boolean(settings.autoStartWorkTimer)}
-                            onClick={() => updateSetting("autoStartWorkTimer", (currentValue) => !Boolean(currentValue))}
-                        >
-                            <span className="knob" />
-                        </button>
-                    </div>
-                </div>
-
-                <div className="row toggleRow">
                     <div className="label">Middagpauze instellen:</div>
                     <div className="value">
                         <button
@@ -303,20 +282,6 @@ export default function SettingsWorkHours({ onBack, userId, onSaved }) {
                             value={settings.lunchStart ?? ""}
                             disabled={!settings.lunchPauseEnabled}
                             onChange={(e) => updateSetting("lunchStart", e.target.value)}
-                        />
-                        <LuPencil className="iconEdit" />
-                    </div>
-                </div>
-
-                <div className={`row timeRow ${!settings.lunchPauseEnabled ? "rowDisabled" : ""}`}>
-                    <div className="label">Officieel einde middagpauze op werkdagen:</div>
-                    <div className="value">
-                        <input
-                            aria-label="Einde middagpauze"
-                            type="time"
-                            value={settings.lunchEnd ?? ""}
-                            disabled={!settings.lunchPauseEnabled}
-                            onChange={(e) => updateSetting("lunchEnd", e.target.value)}
                         />
                         <LuPencil className="iconEdit" />
                     </div>
@@ -367,16 +332,20 @@ export default function SettingsWorkHours({ onBack, userId, onSaved }) {
             return;
         }
 
+        if (!isValidOptionalTimeWithinWorkday(settings.startTime, settings.endTime, settings.lunchStart)) {
+            setMessage("❗Het startuur van je middagpauze moet binnen de werkuren vallen.");
+            setSaving(false);
+            return;
+        }
+
         const payload = buildSettingsPayload(uid, {
             selectedWorkdays: settings.selectedWorkdays || createDefaultWorkdaySelection(),
             checkinHours: normalizedDuration.hours,
             checkinMinutes: normalizedDuration.minutes,
             startTime: settings.startTime,
             endTime: settings.endTime,
-            autoStartWorkTimer: Boolean(settings.autoStartWorkTimer),
             lunchPauseEnabled: Boolean(settings.lunchPauseEnabled),
             lunchStart: settings.lunchStart,
-            lunchEnd: settings.lunchEnd,
         });
 
         try {
