@@ -67,7 +67,7 @@ function createEmptySettingsState() {
         startTime: "",
         endTime: "",
         checkinHours: null,
-        lunchStart: "",
+        lunchStart: "12:00",
         lunchPauseEnabled: null,
     };
 }
@@ -332,7 +332,7 @@ export default function SettingsWorkHours({ onBack, userId, onSaved }) {
             return;
         }
 
-        if (!isValidOptionalTimeWithinWorkday(settings.startTime, settings.endTime, settings.lunchStart)) {
+        if (settings.lunchPauseEnabled && !isValidOptionalTimeWithinWorkday(settings.startTime, settings.endTime, settings.lunchStart)) {
             setMessage("❗Het startuur van je middagpauze moet binnen de werkuren vallen.");
             setSaving(false);
             return;

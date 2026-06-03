@@ -179,7 +179,7 @@ export default function SignupPage({ onCreateAccount, onSaveNotifications, onSav
                 return;
             }
 
-            if (!isValidOptionalTimeWithinWorkday(workHours.startTime, workHours.endTime, workHours.lunchStart)) {
+            if (workHours.lunchPauseEnabled && !isValidOptionalTimeWithinWorkday(workHours.startTime, workHours.endTime, workHours.lunchStart)) {
                 setFormError("❗Het startuur van je middagpauze moet binnen de werkuren vallen.");
                 return;
             }
