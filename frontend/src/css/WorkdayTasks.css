@@ -39,6 +39,9 @@
 }
 
 .workdayTasksTitle {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
     margin: 0;
     font-family: var(--text-heading-2-font-family);
     font-size: var(--text-heading-2-font-size);

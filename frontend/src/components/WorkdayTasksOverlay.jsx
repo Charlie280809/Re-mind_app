@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { LuTrash2, LuX } from "react-icons/lu";
+import { LuTrash2, LuX, LuNotepadText } from "react-icons/lu";
 import {
     createWorkdayTask,
     deleteWorkdayTask,
@@ -111,7 +111,7 @@ export default function WorkdayTasksOverlay({
                     </button>
 
                     <h2 id="workday-tasks-title" className="workdayTasksTitle">
-                        Takenlijst
+                        Takenlijst <LuNotepadText />
                     </h2>
 
                     <SmallLoader message="Takenlijst wordt geladen..." />
@@ -204,7 +204,7 @@ export default function WorkdayTasksOverlay({
                 </button>
 
                 <h2 id="workday-tasks-title" className="workdayTasksTitle">
-                    Takenlijst
+                    Takenlijst <LuNotepadText />
                 </h2>
 
                 <div className="workdayTasksTabs" role="tablist" aria-label="Taken per dag" data-active-tab={activeTab}>

@@ -35,6 +35,7 @@ import {
   endWorkSession,
   fetchLatestWorkSessionBreaks,
   fetchLatestWorkSession,
+  fetchWorkdayTasksOverview,
   fetchProfile,
   incrementWorkSessionCounter,
   startWorkSession,
@@ -110,6 +111,10 @@ const getSessionWorkedSeconds = (sessionRow) => {
   const pauseSeconds = Math.max(0, Number(sessionRow?.total_pausetime ?? 0));
 
   return Math.max(0, elapsedSeconds - pauseSeconds);
+};
+
+const getPendingTaskCount = (overview) => {
+  return [...(overview?.today || []), ...(overview?.tomorrow || [])].filter((task) => !task?.is_done).length;
 };
 
 const getStoredNavigationState = () => {
@@ -439,6 +444,37 @@ export default function App() {
     };
 
     loadLatestBreakCounts();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [apiBaseUrl, sessionUserId]);
+
+  useEffect(() => {
+    if (!session?.access_token) {
+      setWorkdayTasksPendingCount(0);
+      return undefined;
+    }
+
+    let isCancelled = false;
+
+    const loadWorkdayTasksOverview = async () => {
+      try {
+        const overview = await fetchWorkdayTasksOverview(apiBaseUrl, session.access_token);
+
+        if (isCancelled) {
+          return;
+        }
+
+        setWorkdayTasksPendingCount(getPendingTaskCount(overview));
+      } catch (error) {
+        if (!isCancelled) {
+          console.error("Failed to load workday tasks overview:", error);
+        }
+      }
+    };
+
+    loadWorkdayTasksOverview();
 
     return () => {
       isCancelled = true;
@@ -837,8 +873,7 @@ export default function App() {
   };
 
   const handleWorkdayTasksOverviewChange = (overview) => {
-    const pendingCount = [...(overview?.today || []), ...(overview?.tomorrow || [])].filter((task) => !task?.is_done).length;
-    setWorkdayTasksPendingCount(pendingCount);
+    setWorkdayTasksPendingCount(getPendingTaskCount(overview));
   };
 
   const handlePauseReminderDismiss = () => {
@@ -1228,7 +1263,7 @@ export default function App() {
               onClick={openWorkdayTasksModal}
             >
               <LuNotepadText />
-              {workdayTasksPendingCount > 0 ? <span className="noteButtonBadge"></span> : null}
+              {workdayTasksPendingCount > 0 && <span className="noteButtonBadge" />}
             </button>
           </header>
 
