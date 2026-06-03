@@ -73,6 +73,48 @@ function waitFor(milliseconds) {
     });
 }
 
+function getAdviceMessage({ breaksTaken, breaksSkipped, averageStress, averageEnergy }) {
+    const hasReportData = breaksTaken > 0 || breaksSkipped > 0 || averageStress != null || averageEnergy != null;
+
+    if (!hasReportData) {
+        return "Er is nog te weinig data om een advies op maat te tonen.";
+    }
+
+    if (breaksSkipped > breaksTaken && Number(averageStress) >= 4 && Number(averageEnergy) <= 2) {
+        return "Je slaat vaker pauzes over terwijl je stress hoog en je energie laag is. Een pauze hoeft niet lang te zijn, zelfs een kort rustmoment kan een groot verschil maken.";
+    }
+
+    if (breaksSkipped > breaksTaken) {
+        return "Je slaat vaker pauzes over dan je neemt. Probeer een vast pauzemoment te kiezen zodat je ritme stabieler wordt.";
+    }
+
+    if (Number(averageStress) >= 4 && Number(averageEnergy) <= 2) {
+        return "Je stress ligt hoog en je energie laag. Het is belangrijk om regelmatig pauzes te nemen, zelfs korte momenten van ontspanning kunnen helpen om je stress te verlagen en je energie te herstellen.";
+    }
+
+    if (Number(averageStress) >= 4) {
+        return "Je stress lag vandaag hoog. Zorg dat je genoeg pauze neemt en dat deze ook effectief zijn (zie onze pauzesuggesties).";
+    }
+
+    if(Number(averageEnergy) <= 2 ) {
+        return "Je energie lag vandaag laag. Rustmomenten inplannen is een must!";
+    }
+
+    if (breaksTaken >= 4 && Number(averageStress) <= 2 && Number(averageEnergy) >= 4) {
+        return "Je pauzeritme ziet er sterk uit en je stress blijft laag. Zo kan je dit ritme verder aanhouden.";
+    }
+
+    if (breaksTaken > breaksSkipped) {
+        return "Je pauzeritme zit in de goede richting. Blijf korte pauzes nemen om je focus en energie stabiel te houden.";
+    }
+
+    if (breaksTaken === breaksSkipped) {
+        return "Je hebt vandaag net zoveel pauzes genomen als overgeslagen. Kleine aanpassingen in je pauzemomenten kunnen je stress merkbaar helpen verlagen.";
+    }
+
+    return "Blijf je pauzes en energie opvolgen: kleine aanpassingen in je pauzemomenten kunnen je stress merkbaar helpen verlagen.";
+}
+
 function renderBreakRow(label, count, dotClass, countClass, keyPrefix) {
     return (
         <div className="reportBreakRow">
@@ -103,8 +145,11 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
 
     const breaksTaken = Number(report?.breaks_taken ?? 0);
     const breaksSkipped = Number(report?.breaks_skipped ?? 0);
+    const averageStress = report?.averageStress;
+    const averageEnergy = report?.averageEnergy;
     const todayDateKey = formatDateKey(new Date());
     const isCurrentDayReport = selectedReportDate >= todayDateKey;
+    const adviceMessage = getAdviceMessage({ breaksTaken, breaksSkipped, averageStress, averageEnergy });
 
     useEffect(() => {
         async function loadReport() {
@@ -426,8 +471,7 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
                 <h3 className="reportSectionTitle reportSectionTitleLarge">Advies</h3>
 
                 <article className="reportAdviceCard">
-                    Er wordt aangeraden om minstens elk uur (maximum elke 2 uur) een korte pauze te nemen om je geest tot rust te
-                    brengen en je brein terug op te laden.
+                    {adviceMessage}
                 </article>
             </section>
 
