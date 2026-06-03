@@ -13,33 +13,49 @@ function formatTime(totalSeconds) {
 }
 
 function CircleProgress({ progress = 0 }) {
-  // progress: 0..1
   const size = 140;
   const stroke = 70;
-  const r = (size - stroke) / 2; // radius van de cirkel, rekening houdend met stroke
-  const c = 2 * Math.PI * r; // omtrek van de cirkel
-  const dash = c * (1 - Math.max(0, Math.min(1, progress)));
+  const r = (size - stroke) / 2;
+  const c = 2 * Math.PI * r;
+  const safeProgress = Math.max(0, progress);
+  const regularProgress = Math.min(1, safeProgress);
+  const overtimeProgress = Math.min(1, Math.max(0, safeProgress - 1));
+  const regularDash = c * (1 - regularProgress);
+  const overtimeDash = c * (1 - overtimeProgress);
+  const circleCenter = size / 2;
 
   return (
     <svg width={size} height={size} aria-label="Timer progress">
-      <circle // dikke grijze cirkel
-        cx={size / 2}
-        cy={size / 2}
+      <circle
+        cx={circleCenter}
+        cy={circleCenter}
         r={r}
         stroke="#e6e3dd"
         strokeWidth={stroke}
         fill="#eaecef"
       />
-      <circle // dunne groene cirkel die de voortgang toont
-        cx={size / 2}
-        cy={size / 2}
+      <circle
+        cx={circleCenter}
+        cy={circleCenter}
         r={r}
         stroke="#769382"
         strokeWidth={stroke}
         fill="transparent"
         strokeDasharray={c}
-        strokeDashoffset={dash}
-        transform={`rotate(-90 ${size / 2} ${size / 2})`}
+        strokeDashoffset={c * (1 - regularProgress)}
+        transform={`rotate(-90 ${circleCenter} ${circleCenter})`}
+      />
+      <circle
+        cx={circleCenter}
+        cy={circleCenter}
+        r={r}
+        stroke="#35423A"
+        strokeWidth={stroke}
+        fill="transparent"
+        strokeDasharray={c}
+        strokeDashoffset={overtimeDash}
+        opacity={safeProgress > 1 ? 1 : 0}
+        transform={`rotate(-90 ${circleCenter} ${circleCenter})`}
       />
     </svg>
   );
@@ -59,7 +75,7 @@ export default function WorkTimerCard({
   dayTargetSeconds = 8 * 60,
 }) {
   const mainTime = formatTime(workSeconds);
-  const progress = Math.min(1, Math.max(0, elapsedSeconds / dayTargetSeconds));
+  const progress = Math.max(0, elapsedSeconds / dayTargetSeconds);
 
   return (
     <div className="card">
