@@ -1,9 +1,19 @@
 export function showNativeNotification({ title, body, onClick }) {
+    const log = (message, details = {}) => {
+        if (typeof window !== "undefined" && window.reMindDiagnostics?.log) {
+            void window.reMindDiagnostics.log(message, details);
+        }
+    };
+
+    log("renderer-show-native-notification", { title, body, hasOnClick: typeof onClick === "function" });
+
     if (typeof window !== "undefined" && window.reMindNotifications?.show) {
         if (typeof window.reMindNotifications.setClickHandler === "function") {
             window.reMindNotifications.setClickHandler(
                 typeof onClick === "function"
                     ? () => {
+                        log("renderer-notification-click-handler", { title, body });
+
                         if (typeof window.focus === "function") {
                             window.focus();
                         }
@@ -37,6 +47,8 @@ export function showNativeNotification({ title, body, onClick }) {
 
         if (typeof onClick === "function") {
             notification.onclick = () => {
+                log("browser-notification-click-handler", { title, body });
+
                 if (typeof window.focus === "function") {
                     window.focus();
                 }

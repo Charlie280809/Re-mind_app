@@ -1,5 +1,6 @@
 const { app, BrowserWindow, Notification, ipcMain, shell, dialog } = require("electron");
 const path = require("path");
+const fs = require("fs");
 const { autoUpdater } = require("electron-updater");
 
 const isDev = !app.isPackaged;
@@ -18,31 +19,72 @@ if (isDev) {
 let mainWindow = null;
 let lastNotification = null;
 
+function getLogFilePath() {
+  return path.join(app.getPath("userData"), "notification-debug.log");
+}
+
+function logDebug(message, details = {}) {
+  const line = `${new Date().toISOString()} ${message}${Object.keys(details).length ? ` ${JSON.stringify(details)}` : ""}\n`;
+
+  try {
+    fs.appendFileSync(getLogFilePath(), line, "utf8");
+  } catch (error) {
+    console.error("Failed to write debug log:", error);
+  }
+
+  console.log(`[Re:Mind debug] ${message}`, details);
+}
+
 const gotTheLock = app.requestSingleInstanceLock();
 
+logDebug("app-start", {
+  pid: process.pid,
+  isPackaged: app.isPackaged,
+  isDev,
+  appId: APP_USER_MODEL_ID,
+  argv: process.argv,
+});
+
 if (!gotTheLock) {
+  logDebug("single-instance-lock-failed");
   app.quit();
 }
 
-app.on("second-instance", () => {
+app.on("second-instance", (_event, argv, workingDirectory) => {
+  logDebug("second-instance", { argv, workingDirectory });
+
   if (!mainWindow || mainWindow.isDestroyed()) {
+    logDebug("second-instance-create-window");
     createWindow();
     return;
   }
+
   focusMainWindow();
 });
 
 function focusMainWindow() {
-  if (!mainWindow || mainWindow.isDestroyed()) return;
+  if (!mainWindow || mainWindow.isDestroyed()) {
+    logDebug("focus-main-window-skipped", { reason: "missing-window" });
+    return;
+  }
+
+  logDebug("focus-main-window", {
+    minimized: mainWindow.isMinimized(),
+    maximized: mainWindow.isMaximized(),
+    visible: mainWindow.isVisible(),
+  });
 
   if (mainWindow.isMinimized()) mainWindow.restore();
   if (!mainWindow.isMaximized()) mainWindow.maximize();
 
+  mainWindow.showInactive();
   mainWindow.show();
   mainWindow.focus();
 };
 
 function showSystemNotification({ title, body }) {
+  logDebug("show-notification", { title, body });
+
   const notification = new Notification({
     title,
     body,
@@ -50,6 +92,12 @@ function showSystemNotification({ title, body }) {
   });
 
   notification.on("click", () => {
+    logDebug("notification-click", {
+      title,
+      body,
+      hasWindow: Boolean(mainWindow && !mainWindow.isDestroyed()),
+    });
+
     focusMainWindow();
     if (mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.webContents.send("re-mind:notification-clicked", { title, body });
@@ -81,6 +129,13 @@ ipcMain.handle("re-mind:close-notification", () => {
   return true;
 });
 
+ipcMain.handle("re-mind:log", (_event, payload) => {
+  if (!payload?.message) return false;
+
+  logDebug(payload.message, payload.details ?? {});
+  return true;
+});
+
 ipcMain.handle("re-mind:open-external", async (_event, url) => {
   try {
     if (!url) return false;
@@ -93,9 +148,12 @@ ipcMain.handle("re-mind:open-external", async (_event, url) => {
 
 function createWindow() {
   if (mainWindow && !mainWindow.isDestroyed()) {
+    logDebug("create-window-reuse-existing");
     focusMainWindow();
     return mainWindow;
   }
+
+  logDebug("create-window-new");
 
   mainWindow = new BrowserWindow({
     width: 1078,
@@ -110,18 +168,34 @@ function createWindow() {
   });
 
   mainWindow.on("close", (event) => {
+    logDebug("window-close", { isQuitting: Boolean(app.isQuitting) });
     if (!app.isQuitting) {
       app.quit();
     }
   });
 
   mainWindow.on("closed", () => {
+    logDebug("window-closed");
     mainWindow = null;
   });
 
+  mainWindow.webContents.on("did-start-loading", () => {
+    logDebug("window-did-start-loading");
+  });
+
+  mainWindow.webContents.on("did-finish-load", () => {
+    logDebug("window-did-finish-load", { url: mainWindow.webContents.getURL() });
+  });
+
+  mainWindow.webContents.on("did-fail-load", (_event, errorCode, errorDescription, validatedURL) => {
+    logDebug("window-did-fail-load", { errorCode, errorDescription, validatedURL });
+  });
+
   if (isDev) {
+    logDebug("load-dev-url", { url: "http://localhost:5173" });
     mainWindow.loadURL("http://localhost:5173");
   } else {
+    logDebug("load-prod-url", { url: "https://re-mind-app-tjmo.vercel.app/" });
     mainWindow.loadURL("https://re-mind-app-tjmo.vercel.app/");
   }
   return mainWindow;
@@ -156,18 +230,23 @@ function setupAutoUpdates() {
 };
 
 app.on("before-quit", () => {
+  logDebug("before-quit");
   app.isQuitting = true;
 });
 
 app.on("activate", () => {
+  logDebug("activate");
   createWindow();
 });
 
 app.whenReady().then(() => {
+  logDebug("app-ready");
+
   try {
     app.setName("Re:Mind");
   } catch (e) {
     console.error(e);
+    logDebug("set-name-failed", { message: e.message });
   }
 
   createWindow();
@@ -175,6 +254,7 @@ app.whenReady().then(() => {
 });
 
 app.on("window-all-closed", (event) => {
+  logDebug("window-all-closed", { platform: process.platform });
   if (process.platform !== "darwin") {
     app.quit();
   }
