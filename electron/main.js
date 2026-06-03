@@ -33,6 +33,14 @@ function logDebug(message, details = {}) {
   }
 
   console.log(`[Re:Mind debug] ${message}`, details);
+
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    try {
+      mainWindow.webContents.send("re-mind:debug", { message, details, timestamp: new Date().toISOString() });
+    } catch (error) {
+      console.error("Failed to forward debug event to renderer:", error);
+    }
+  }
 }
 
 const gotTheLock = app.requestSingleInstanceLock();

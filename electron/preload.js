@@ -2,6 +2,10 @@ const { contextBridge, ipcRenderer } = require("electron");
 
 let pendingNotificationClickHandler = null;
 
+ipcRenderer.on("re-mind:debug", (_event, payload) => {
+    console.log("[Re:Mind debug][main]", payload?.message, payload?.details || {});
+});
+
 ipcRenderer.on("re-mind:notification-clicked", (_event, payload) => {
     console.log("[Re:Mind debug] notification-clicked payload received in renderer", payload);
 
