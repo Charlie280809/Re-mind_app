@@ -54,6 +54,33 @@ export default function SettingsUpgrade({ profile, isPremium, onProfileUpdated, 
         }
     };
 
+    const handleUpgradeToPremium = async () => {
+        setSavingPlan(true);
+        setSaveMessage("");
+
+        try {
+            const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+            const session = sessionData?.session;
+
+            if (sessionError || !session) {
+                throw new Error(sessionError?.message || "Geen actieve sessie gevonden.");
+            }
+
+            const payload = await setPremiumStatus(session.access_token, true);
+
+            if (payload?.profile && onProfileUpdated) {
+                onProfileUpdated(payload.profile);
+            }
+
+            setSaveMessage("Premium plan geactiveerd.");
+        } catch (error) {
+            console.error(error);
+            setSaveMessage(error?.message || "Fout bij upgraden naar premium.");
+        } finally {
+            setSavingPlan(false);
+        }
+    };
+
     const openCompanyRequest = () => {
         setCompanyRequestMessage("");
         setCompanyRequestForm({
@@ -170,7 +197,9 @@ export default function SettingsUpgrade({ profile, isPremium, onProfileUpdated, 
                     {hasPremiumAccess({ is_premium: isPremium }) && !hasCompanyLicense ? (
                         <div className="currentPlanLabel">Jouw momentele plan</div>
                     ) : !hasPremiumAccess({ is_premium: isPremium }) && !hasCompanyLicense ? (
-                        <button className="upgradePrimaryBtn" type="button">Upgraden</button>
+                        <button className="upgradePrimaryBtn" type="button" onClick={handleUpgradeToPremium} disabled={savingPlan}>
+                            {savingPlan ? "Bezig..." : "Upgraden"}
+                        </button>
                     ) : null}
                 </article>
 
