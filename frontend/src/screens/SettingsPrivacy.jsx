@@ -301,7 +301,7 @@ export default function SettingsPrivacy({ onBack }) {
                 ) : null}
                 <div className={`savedMessage ${message ? "visible" : ""}`}>{message}</div>
 
-                <p>Re:Mind v1.0.11</p>
+                <p>Re:Mind v1.0.12</p>
             </section>
         </main>
     );
