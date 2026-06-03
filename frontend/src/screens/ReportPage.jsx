@@ -115,6 +115,26 @@ function getAdviceMessage({ breaksTaken, breaksSkipped, averageStress, averageEn
     return "Blijf je pauzes en energie opvolgen: kleine aanpassingen in je pauzemomenten kunnen je stress merkbaar helpen verlagen.";
 }
 
+function formatWorkDuration(totalSeconds) {
+    const safeSeconds = Math.max(0, Math.floor(Number(totalSeconds) || 0));
+    const hours = Math.floor(safeSeconds / 3600);
+    const minutes = Math.floor((safeSeconds % 3600) / 60);
+
+    if (hours > 0 && minutes > 0) {
+        return `${hours} ${hours === 1 ? "uur" : "uren"} en ${minutes} ${minutes === 1 ? "minuut" : "minuten"}`;
+    }
+
+    if (hours > 0) {
+        return `${hours} ${hours === 1 ? "uur" : "uren"}`;
+    }
+
+    if (minutes > 0) {
+        return `${minutes} ${minutes === 1 ? "minuut" : "minuten"}`;
+    }
+
+    return "0 minuten";
+}
+
 function renderBreakRow(label, count, dotClass, countClass, keyPrefix) {
     return (
         <div className="reportBreakRow">
@@ -129,7 +149,7 @@ function renderBreakRow(label, count, dotClass, countClass, keyPrefix) {
     );
 }
 
-export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken }) {
+export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken, liveWorkSeconds = 0, isWorkSessionActive = false }) {
     const apiBaseUrl = getApiBaseUrl();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -150,6 +170,8 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
     const todayDateKey = formatDateKey(new Date());
     const isCurrentDayReport = selectedReportDate >= todayDateKey;
     const adviceMessage = getAdviceMessage({ breaksTaken, breaksSkipped, averageStress, averageEnergy });
+    const totalWorkSeconds = Number(report?.totalWorkSeconds ?? 0) + (isCurrentDayReport && isWorkSessionActive ? Number(liveWorkSeconds || 0) : 0);
+    const totalWorkTimeLabel = formatWorkDuration(totalWorkSeconds);
 
     useEffect(() => {
         async function loadReport() {
@@ -427,7 +449,7 @@ export default function ReportPage({ isPremium, onNavigateToUpgrade, accessToken
             <section className="reportMetricsRow" aria-label="Samenvatting">
                 <article className="reportMetricCard reportMetricCardWorktime">
                     <h3 className="reportSectionTitle">Totale werktijd</h3>
-                    <p className="reportBigValue">{report?.totalWorkTime || "0 uur en 0 minuten"}</p>
+                    <p className="reportBigValue">{totalWorkTimeLabel}</p>
                 </article>
 
                 <article className="reportMetricCard reportMetricCardStats">

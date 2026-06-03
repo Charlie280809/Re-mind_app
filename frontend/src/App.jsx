@@ -1152,6 +1152,8 @@ export default function App() {
         <ReportPage
           isPremium={hasPremiumAccess(profile)}
           accessToken={session?.access_token}
+          liveWorkSeconds={workStarted && !finished && !onBreak ? workSeconds : workStarted ? workSeconds : 0}
+          isWorkSessionActive={workStarted && !finished}
           onNavigateToUpgrade={() => setCurrentPage("upgrade")}
         />
       ) : currentPage === "weekreport" ? (
