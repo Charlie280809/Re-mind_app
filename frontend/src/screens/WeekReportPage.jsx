@@ -21,42 +21,80 @@ import { fetchWeekReport } from "../api/reportApi";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, Filler);
 
-const insights = [
-    {
-        day: "Ma",
-        text: "Je start de week met hoge stress en energie, maar neemt voldoende pauzes om het tempo vol te houden.",
-    },
-    {
-        day: "Di",
-        text: "Door minder pauzes zakt je energie, terwijl het stressniveau tijdelijk lager blijft.",
-    },
-    {
-        day: "Wo",
-        text: "Drukke vergaderingen zorgen voor een gemiddeld stressniveau en een lichte heropleving van je energie.",
-    },
-    {
-        day: "Do",
-        text: "Extra pauzemomenten, zoals een lunchpauze, helpen om hogere stress onder controle te houden.",
-    },
-    {
-        day: "Vr",
-        text: "Je stress daalt richting het weekend, maar je energieniveau blijft beperkt door vermoeidheid.",
-    },
-    {
-        day: "Za",
-        text: "Je neemt voldoende rust, waardoor je stress laag blijft en je energie herstelt.",
-    },
-    {
-        day: "Zo",
-        text: "Je geniet van een rustige zondag, waardoor je stress laag blijft en je energie volledig hersteld is.",
-    }
-];
-
 function formatDateKey(date = new Date()) {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
+}
+
+function getFullDayName(dayLabel) {
+    const dayNames = {
+        Ma: "maandag",
+        Di: "dinsdag",
+        Wo: "woensdag",
+        Do: "donderdag",
+        Vr: "vrijdag",
+        Za: "zaterdag",
+        Zo: "zondag",
+    };
+
+    return dayNames[dayLabel] || "deze dag";
+}
+
+function getDayInsight(day) {
+    const breaksTaken = Number(day?.breaks_taken ?? 0);
+    const breaksSkipped = Number(day?.breaks_skipped ?? 0);
+    const averageStress = Number(day?.averageStress);
+    const averageEnergy = Number(day?.averageEnergy);
+    const fullDayName = getFullDayName(day?.label);
+    const hasData = Number(day?.totalCheckins ?? 0) > 0 || breaksTaken > 0 || breaksSkipped > 0 || day?.averageStress != null || day?.averageEnergy != null;
+
+    if (!hasData) {
+        return ``;
+    }
+
+    if(averageStress >= 4.3 && breaksTaken >= 5) {
+        return `Op ${fullDayName} ervaarde je hoge stress, hoewel je pauzes nam. Zorg ervoor dat je pauzes echt rustmomenten zijn die herstellend werken (zie onze pauzesuggesties).`;
+    }
+
+    if (breaksSkipped > breaksTaken && averageStress >= 4 && averageEnergy <= 2) {
+        return `Je slaat op ${fullDayName} vaker pauzes over terwijl stress hoog en energie laag is. Korte herstelpauzes zouden hier het meeste verschil maken.`;
+    }
+
+    if (breaksSkipped > breaksTaken && breaksSkipped >= 3) {
+        return `Op ${fullDayName} heb je meer pauzes overgeslagen dan genomen. Een vast pauzemoment kan helpen om je ritme stabieler te houden.`;
+    }
+
+    if (averageStress >= 4 && averageEnergy <= 2) {
+        return `Op ${fullDayName} lag je stress hoog en je energie laag. Regelmatige pauzes kunnen je helpen om sneller te herstellen.`;
+    }
+
+    if (averageStress >= 4) {
+        return `Je stress lag op ${fullDayName} hoog. Zorg dat je pauzes voldoende rust geven en niet enkel onderbreken.`;
+    }
+
+    if (averageEnergy <= 2 && breaksTaken >= 2) {
+        return `Je had weinig energie op ${fullDayName}. Overweeg om een paar rustmomenten extra te nemen, dat kan hier nuttig zijn.`;
+    }
+
+    if (breaksTaken >= 4 && breaksTaken > breaksSkipped && averageStress <= 2 && averageEnergy >= 3) {
+        return `Op ${fullDayName} zat je pauzeritme sterk en bleef je stress laag. Dat is een goed patroon om aan te houden.`;
+    }
+
+    if (breaksTaken > 0 && breaksTaken === breaksSkipped) {
+        return `Op ${fullDayName} nam je evenveel pauzes als je oversloeg. Probeer om minder pauzes over te slaan.`;
+    }
+
+    if (breaksSkipped < 1 && breaksTaken > 0) {
+        return `Op ${fullDayName} sloeg je geen enkele pauze over. Doe zo verder!`;
+    }
+
+    if (breaksTaken === 0 && breaksSkipped === 0 && averageStress > 0 && averageEnergy > 0) {
+        return `Op ${fullDayName} heb je geen pauzes genomen. Probeer te onthouden dat pauzes belangrijk zijn voor je welzijn.`;
+    }
+
+    return `Blijf op ${fullDayName} je pauzes en energie opvolgen; kleine aanpassingen kunnen je stress merkbaar helpen verlagen.`;
 }
 
 export default function WeekReportPage({ accessToken }) {
@@ -67,14 +105,18 @@ export default function WeekReportPage({ accessToken }) {
     const daily = Array.isArray(report?.daily) && report.daily.length > 0
         ? report.daily
         : [
-            { label: "Ma", averageStress: null, averageEnergy: null, breaks_taken: 0, breaks_skipped: 0 },
-            { label: "Di", averageStress: null, averageEnergy: null, breaks_taken: 0, breaks_skipped: 0 },
-            { label: "Wo", averageStress: null, averageEnergy: null, breaks_taken: 0, breaks_skipped: 0 },
-            { label: "Do", averageStress: null, averageEnergy: null, breaks_taken: 0, breaks_skipped: 0 },
-            { label: "Vr", averageStress: null, averageEnergy: null, breaks_taken: 0, breaks_skipped: 0 },
-            { label: "Za", averageStress: null, averageEnergy: null, breaks_taken: 0, breaks_skipped: 0 },
-            { label: "Zo", averageStress: null, averageEnergy: null, breaks_taken: 0, breaks_skipped: 0 },
+            { label: "Ma", averageStress: null, averageEnergy: null, breaks_taken: 0, breaks_skipped: 0, totalCheckins: 0 },
+            { label: "Di", averageStress: null, averageEnergy: null, breaks_taken: 0, breaks_skipped: 0, totalCheckins: 0 },
+            { label: "Wo", averageStress: null, averageEnergy: null, breaks_taken: 0, breaks_skipped: 0, totalCheckins: 0 },
+            { label: "Do", averageStress: null, averageEnergy: null, breaks_taken: 0, breaks_skipped: 0, totalCheckins: 0 },
+            { label: "Vr", averageStress: null, averageEnergy: null, breaks_taken: 0, breaks_skipped: 0, totalCheckins: 0 },
+            { label: "Za", averageStress: null, averageEnergy: null, breaks_taken: 0, breaks_skipped: 0, totalCheckins: 0 },
+            { label: "Zo", averageStress: null, averageEnergy: null, breaks_taken: 0, breaks_skipped: 0, totalCheckins: 0 },
         ];
+    const dailyInsights = daily.map((item) => ({
+        day: item.label,
+        text: getDayInsight(item),
+    }));
     const avgStressLabel = report?.averageStress == null ? "-" : `${report.averageStress}/5`;
     const avgEnergyLabel = report?.averageEnergy == null ? "-" : `${report.averageEnergy}/5`;
     const lineChartData = {
@@ -367,7 +409,7 @@ export default function WeekReportPage({ accessToken }) {
                     <div className="weekReportTimeline" aria-hidden="true" />
 
                     <div className="weekReportInsightList">
-                        {insights.map((item) => (
+                        {dailyInsights.map((item) => (
                             <div key={item.day} className="weekReportInsightRow">
                                 <div className="weekReportInsightDay">
                                     <span>{item.day}</span>
