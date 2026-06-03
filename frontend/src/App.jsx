@@ -386,7 +386,7 @@ export default function App() {
     const loadWorkSettings = async () => {
       const { data, error } = await supabase
         .from("settings")
-        .select("werk_startuur, werk_einduur, pause_reminder, checkin_notifications_on, favorite_pauses_suggest_on")
+        .select("werk_startuur, werk_einduur, pause_reminder, middag_startuur, checkin_notifications_on, favorite_pauses_suggest_on")
         .eq("user_id", session.user.id)
         .maybeSingle();
 
@@ -1127,6 +1127,7 @@ export default function App() {
         finished={finished}
         workSeconds={workSeconds}
         pauseReminderIntervalSeconds={pauseReminderIntervalSeconds}
+        lunchStartTime={workSettings?.middag_startuur || null}
         onDismiss={handlePauseReminderDismiss}
         onTakeBreak={handlePauseReminderTakeBreak}
       />

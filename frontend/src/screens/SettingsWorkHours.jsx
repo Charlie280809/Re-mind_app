@@ -36,7 +36,7 @@ function settingsStateFromRow(row) {
         checkinMinutes: hasTotalMinutes ? totalMinutes % 60 : 50,
         startTime: row.werk_startuur || "09:00",
         endTime: row.werk_einduur || "17:00",
-        lunchPauseEnabled: typeof row.lunch_enabled === "boolean" ? row.lunch_enabled : Boolean(row.middag_startuur),
+        lunchPauseEnabled: Boolean(row.middag_startuur),
         lunchStart: row.middag_startuur || "12:00",
     };
 }
@@ -49,7 +49,6 @@ function buildSettingsPayload(userId, settings) {
         pause_reminder: normalizedDuration.totalMinutes,
         werk_startuur: settings.startTime,
         werk_einduur: settings.endTime,
-        lunch_enabled: Boolean(settings.lunchPauseEnabled),
         middag_startuur: settings.lunchPauseEnabled ? settings.lunchStart : null,
         mon_isworkday: Boolean(settings.selectedWorkdays?.mon),
         tue_isworkday: Boolean(settings.selectedWorkdays?.tue),
