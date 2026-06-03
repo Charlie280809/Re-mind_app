@@ -220,7 +220,7 @@ export default function SignupPage({ onCreateAccount, onSaveNotifications, onSav
                                     <input
                                         aria-label="Frequentie uren"
                                         type="number"
-                                        min={0}
+                                        min={1}
                                         max={59}
                                         step={1}
                                         value={workHours.breakHours}

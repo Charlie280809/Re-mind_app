@@ -202,7 +202,8 @@ export default function SettingsWorkHours({ onBack, userId, onSaved }) {
                         <input
                             aria-label="Frequentie minuten"
                             type="number"
-                            min={0}
+                            min={1}
+                            max={59}
                             step={1}
                             value={settings.checkinMinutes ?? ""}
                             onChange={(e) => handleCheckinMinutesChange(e.target.value)}
