@@ -18,6 +18,9 @@ export default function SettingsUpgrade({ profile, isPremium, onProfileUpdated, 
     const [companyRequestForm, setCompanyRequestForm] = useState({
         companyName: "",
         adminEmail: profile?.email || "",
+        btwNumber: "",
+        invoiceAddress: "",
+        teamSize: "",
     });
 
     const premiumPrice = billingCycle === "monthly" ? "€2,99/maand" : "€33/jaar";
@@ -56,6 +59,9 @@ export default function SettingsUpgrade({ profile, isPremium, onProfileUpdated, 
         setCompanyRequestForm({
             companyName: profile?.bedrijfsnaam ? `${profile.bedrijfsnaam} BV` : "",
             adminEmail: profile?.email || "",
+            btwNumber: "",
+            invoiceAddress: "",
+            teamSize: "",
         });
         setCompanyRequestOpen(true);
     };
@@ -74,9 +80,12 @@ export default function SettingsUpgrade({ profile, isPremium, onProfileUpdated, 
 
         const companyName = companyRequestForm.companyName.trim();
         const adminEmail = companyRequestForm.adminEmail.trim().toLowerCase();
+        const teamSize = companyRequestForm.teamSize;
+        const btwNumber = companyRequestForm.btwNumber;
+        const invoiceAddress = companyRequestForm.invoiceAddress;
 
-        if (!companyName || !adminEmail) {
-            setCompanyRequestMessage("Vul bedrijfsnaam en admin e-mail in.");
+        if (!companyName || !adminEmail || !teamSize || !btwNumber || !invoiceAddress) {
+            setCompanyRequestMessage("Gelieve alle verplichte velden in te vullen.");
             return;
         }
 
@@ -219,28 +228,36 @@ export default function SettingsUpgrade({ profile, isPremium, onProfileUpdated, 
             {saveMessage ? <p className="upgradeSupportText">{saveMessage}</p> : null}
 
             {companyRequestOpen ? (
-                <div className="premiumCardOverlay" role="presentation" onClick={closeCompanyRequest}>
-                    <div className="premiumModal" role="dialog" aria-modal="true" aria-labelledby="company-request-title" onClick={(event) => event.stopPropagation()}>
-                        <header className="premiumModalHeader">
-                            <h2 id="company-request-title" className="premiumModalTitle">Bedrijfsaanvraag</h2>
-                            <button className="premiumModalCloseButton" type="button" onClick={closeCompanyRequest} aria-label="Sluiten">×</button>
+                <div className="requestOverlay" role="presentation" onClick={closeCompanyRequest}>
+                    <div className="requestModal" role="dialog" aria-modal="true" aria-labelledby="company-request-title" onClick={(event) => event.stopPropagation()}>
+                        <header className="requestHeader">
+                            <h2 id="company-request-title" className="premiumModalTitle">Aanvraagformulier</h2>
+                            <button className="requestCloseButton" type="button" onClick={closeCompanyRequest} aria-label="Sluiten">×</button>
                         </header>
-
-                        <p className="premiumModalMessage">Vul de basisgegevens in. Na bevestiging wordt jouw account de admin van het bedrijf.</p>
 
                         <form className="companyRequestForm" onSubmit={submitCompanyRequest}>
                             <label className="companyRequestField">
-                                <span>Bedrijfsnaam</span>
+                                <span>Bedrijfsnaam*</span>
                                 <input
                                     type="text"
                                     value={companyRequestForm.companyName}
                                     onChange={(event) => setCompanyRequestForm((previous) => ({ ...previous, companyName: event.target.value }))}
-                                    placeholder="Bijvoorbeeld: Acme BV"
+                                    placeholder="Bv: Acme BV"
                                 />
                             </label>
 
                             <label className="companyRequestField">
-                                <span>Admin e-mail</span>
+                                <span>BTW nummer*</span>
+                                <input
+                                    type="text"
+                                    value={companyRequestForm.btwNumber}
+                                    onChange={(event) => setCompanyRequestForm((previous) => ({ ...previous, btwNumber: event.target.value }))}
+                                    placeholder="Bv: NL123456789B01"
+                                />
+                            </label>
+
+                            <label className="companyRequestField">
+                                <span>E-mail contactpersoon*</span>
                                 <input
                                     type="email"
                                     value={companyRequestForm.adminEmail}
@@ -248,16 +265,40 @@ export default function SettingsUpgrade({ profile, isPremium, onProfileUpdated, 
                                 />
                             </label>
 
-                            {companyRequestMessage ? <p className="premiumModalMessage">{companyRequestMessage}</p> : null}
+                            <label className="companyRequestField">
+                                <span>Factuur adres*</span>
+                                <input
+                                    type="text"
+                                    value={companyRequestForm.invoiceAddress}
+                                    onChange={(event) => setCompanyRequestForm((previous) => ({ ...previous, invoiceAddress: event.target.value }))}
+                                    placeholder="Bv: Straatnaam 1, 1234 Gemeente"
+                                />
+                            </label>
 
-                            <div className="companyRequestActions">
-                                <button className="upgradePrimaryBtn" type="submit" disabled={companyRequestSaving}>
-                                    {companyRequestSaving ? "Versturen..." : "Bedrijf aanmaken"}
-                                </button>
-                                <button className="companyRequestSecondaryBtn" type="button" onClick={closeCompanyRequest} disabled={companyRequestSaving}>
-                                    Annuleer
-                                </button>
-                            </div>
+                            <label className="companyRequestField">
+                                <span>Teamgrootte*</span>
+                                <input
+                                    type="text"
+                                    value={companyRequestForm.teamSize}
+                                    onChange={(event) => setCompanyRequestForm((previous) => ({ ...previous, teamSize: event.target.value }))}
+                                    placeholder="Bv: 5-10 personen"
+                                />
+                            </label>
+
+                            <label className="companyRequestField">
+                                <span>Bericht</span>
+                                <input
+                                    type="text"
+                                    className="companyMessageInput"
+                                    placeholder="Vertel ons meer over je behoeften"
+                                />
+                            </label>
+
+                            {companyRequestMessage ? <p className="requestMessage">{companyRequestMessage}</p> : null}
+
+                            <button className="requestSubmitButton" type="submit" disabled={companyRequestSaving}>
+                                {companyRequestSaving ? "Versturen..." : "Aanvraag verzenden"}
+                            </button>
                         </form>
                     </div>
                 </div>
