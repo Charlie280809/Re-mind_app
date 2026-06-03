@@ -28,14 +28,7 @@ contextBridge.exposeInMainWorld("reMindNotifications", {
 
 contextBridge.exposeInMainWorld("reMindDiagnostics", {
     log(message, details = {}) {
-        console.log(`[Re:Mind debug] ${message}`, details);
         return ipcRenderer.invoke("re-mind:log", { message, details });
-    },
-    getLogPath() {
-        return ipcRenderer.invoke("re-mind:get-debug-log-path");
-    },
-    openLogFolder() {
-        return ipcRenderer.invoke("re-mind:open-debug-log-folder");
     },
 });
 

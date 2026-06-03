@@ -136,20 +136,6 @@ ipcMain.handle("re-mind:log", (_event, payload) => {
   return true;
 });
 
-ipcMain.handle("re-mind:get-debug-log-path", () => {
-  return getLogFilePath();
-});
-
-ipcMain.handle("re-mind:open-debug-log-folder", async () => {
-  try {
-    await shell.showItemInFolder(getLogFilePath());
-    return true;
-  } catch (error) {
-    logDebug("open-debug-log-folder-failed", { message: error.message });
-    return false;
-  }
-});
-
 ipcMain.handle("re-mind:open-external", async (_event, url) => {
   try {
     if (!url) return false;

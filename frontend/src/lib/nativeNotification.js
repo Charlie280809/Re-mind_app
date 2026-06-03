@@ -1,7 +1,5 @@
 export function showNativeNotification({ title, body, onClick }) {
     const log = (message, details = {}) => {
-        console.log(`[Re:Mind debug] ${message}`, details);
-
         if (typeof window !== "undefined" && window.reMindDiagnostics?.log) {
             void window.reMindDiagnostics.log(message, details);
         }
