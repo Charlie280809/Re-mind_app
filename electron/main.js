@@ -4,9 +4,13 @@ const { autoUpdater } = require("electron-updater");
 
 const isDev = !app.isPackaged;
 
+try {
+  app.setAppUserModelId("be.remind.app");
+} catch (e) {
+  console.error(e);
+}
+
 if (isDev) {
-  // Keep dev profile/cache separate from the installed app to avoid lock and
-  // access-denied issues when both versions were run on the same machine.
   app.setPath("userData", path.join(app.getPath("appData"), "Re-Mind-dev"));
 }
 
@@ -102,8 +106,7 @@ function createWindow() {
 
   mainWindow.on("close", (event) => {
     if (!app.isQuitting) {
-      event.preventDefault();
-      mainWindow.hide();
+      app.quit();
     }
   });
 
@@ -158,7 +161,6 @@ app.on("activate", () => {
 app.whenReady().then(() => {
   try {
     app.setName("Re:Mind");
-    app.setAppUserModelId("be.remind.app");
   } catch (e) {
     console.error(e);
   }
