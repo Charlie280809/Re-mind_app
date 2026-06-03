@@ -220,7 +220,7 @@ export default function SignupPage({ onCreateAccount, onSaveNotifications, onSav
                                     <input
                                         aria-label="Frequentie uren"
                                         type="number"
-                                        min={1}
+                                        min={0}
                                         max={59}
                                         step={1}
                                         value={workHours.breakHours}
@@ -317,7 +317,7 @@ export default function SignupPage({ onCreateAccount, onSaveNotifications, onSav
                     {!isConfigured ? <p className="errorMessage" role="alert">Supabase is nog niet geconfigureerd.</p> : null}
 
                     <button className="signupPrimaryAction" type="submit" disabled={isSubmitting || !isConfigured}>
-                        Start
+                        {isSubmitting ? "Bezig..." : "Start"}
                     </button>
                 </form>
             ) : (
@@ -477,7 +477,7 @@ export default function SignupPage({ onCreateAccount, onSaveNotifications, onSav
                         {!isConfigured ? <p className="errorMessage" role="alert">Supabase is nog niet geconfigureerd.</p> : null}
 
                         <button className="signupPrimaryAction" type="submit" disabled={isSubmitting || !isConfigured}>
-                            {step === 1 ? "Account aanmaken" : step === 5 ? "Start" : "Volgende"}
+                            {isSubmitting ? "Bezig..." : (step === 1 ? "Account aanmaken" : step === 5 ? "Start" : "Volgende")}
                         </button>
                     </form>
                 </section>

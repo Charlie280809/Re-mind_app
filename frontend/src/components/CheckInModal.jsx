@@ -7,11 +7,8 @@ import { showNativeNotification } from "../lib/nativeNotification";
 
 const CHECK_IN_STATE_STORAGE_KEY = "remind-checkin-state";
 
-// const CHECK_IN_MIN_INTERVAL_SECONDS = 30 * 60; // 30 minuten
-// const CHECK_IN_MAX_INTERVAL_SECONDS = 90 * 60; // 90 minuten
-// Voor demo doeleinden kortere intervallen:
-const CHECK_IN_MIN_INTERVAL_SECONDS = 15; // 15 seconden
-const CHECK_IN_MAX_INTERVAL_SECONDS = 90; // 1,5 minuten
+const CHECK_IN_MIN_INTERVAL_SECONDS = 30 * 60; // 30 minuten
+const CHECK_IN_MAX_INTERVAL_SECONDS = 90 * 60; // 90 minuten
 
 const getRandomCheckInIntervalSeconds = () => {
     const range = CHECK_IN_MAX_INTERVAL_SECONDS - CHECK_IN_MIN_INTERVAL_SECONDS;
