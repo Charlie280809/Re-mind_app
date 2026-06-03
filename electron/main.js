@@ -3,9 +3,10 @@ const path = require("path");
 const { autoUpdater } = require("electron-updater");
 
 const isDev = !app.isPackaged;
+const APP_USER_MODEL_ID = isDev ? "be.remind.app.dev" : "be.remind.app";
 
 try {
-  app.setAppUserModelId("be.remind.app");
+  app.setAppUserModelId(APP_USER_MODEL_ID);
 } catch (e) {
   console.error(e);
 }
@@ -24,6 +25,10 @@ if (!gotTheLock) {
 }
 
 app.on("second-instance", () => {
+  if (!mainWindow || mainWindow.isDestroyed()) {
+    createWindow();
+    return;
+  }
   focusMainWindow();
 });
 
