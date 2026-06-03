@@ -2674,6 +2674,54 @@ app.delete("/account/me", async (req, res) => {
   return res.json({ ok: true });
 });
 
+app.delete("/account/me/data", async (req, res) => {
+  if (!supabase) {
+    return res.status(500).json({
+      error: "Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in backend/.env.",
+    });
+  }
+
+  const token = getBearerToken(req);
+
+  if (!token) {
+    return res.status(401).json({
+      error: "Missing Bearer token.",
+    });
+  }
+
+  const { data: userData, error: userError } = await supabase.auth.getUser(token);
+
+  if (userError || !userData?.user) {
+    return res.status(401).json({
+      error: "Invalid or expired session.",
+    });
+  }
+
+  const userId = userData.user.id;
+  const tablesToDelete = [
+    "favorite_pauses",
+    "workday_tasks",
+    "checkins",
+    "work_sessions",
+    "work_hours",
+    "settings",
+    "calendar_connections",
+  ];
+
+  for (const tableName of tablesToDelete) {
+    const { error } = await supabase.from(tableName).delete().eq("user_id", userId);
+
+    if (error) {
+      return res.status(500).json({
+        error: `Failed to delete data from ${tableName}.`,
+        details: error.message,
+      });
+    }
+  }
+
+  return res.json({ ok: true });
+});
+
 app.listen(PORT, () => {
   console.log(`Backend running on port ${PORT}`);
 });

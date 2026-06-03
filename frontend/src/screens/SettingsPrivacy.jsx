@@ -3,6 +3,7 @@ import { LuArrowLeft, LuChevronRight } from "react-icons/lu";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import DeleteConfirmationModal from "../components/deleteConfirmationModal";
+import { resetPersonalData } from "../api/profileApi";
 
 export default function SettingsPrivacy({ onBack }) {
     const [syncCalendar, setSyncCalendar] = useState(false);
@@ -107,9 +108,31 @@ export default function SettingsPrivacy({ onBack }) {
         setDeleteConfirmationOpen(false);
     }
 
-    function handleDeleteConfirmation() {
+    async function handleDeleteConfirmation() {
         setDeleteConfirmationOpen(false);
-        setMessage("Verwijderen bevestigd. Koppeling volgt later.");
+        setSaving(true);
+        setMessage("");
+
+        try {
+            const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+            const session = sessionData?.session;
+
+            if (sessionError || !session) {
+                throw new Error(sessionError?.message || "Geen actieve sessie gevonden.");
+            }
+
+            await resetPersonalData(session.access_token);
+            setMessage("Je voorgaande gegevens zijn verwijderd en overige instellingen zijn teruggezet naar de standaardwaarden.");
+
+            window.setTimeout(() => {
+                window.location.reload();
+            }, 600);
+        } catch (error) {
+            console.error(error);
+            setMessage(error?.message || "Fout bij het verwijderen van je gegevens.");
+        } finally {
+            setSaving(false);
+        }
     }
 
     useEffect(() => {
@@ -285,9 +308,9 @@ export default function SettingsPrivacy({ onBack }) {
                     </button>
                     <p className="privacyHint">Exporteer al je gegevens met één klik (JSON)</p>
 
-                    <button className="deletePersonalDataButton" type="button" onClick={handleDelete}>
-                        Verwijder data
-                    </button> {/* zal alle data (op profiles tabel na, moeten verwijderen/resetten naar default states) */}
+                    <button className="deletePersonalDataButton" type="button" onClick={handleDelete} disabled={saving}>
+                        {saving ? "Bezig met verwijderen..." : "Verwijder data"}
+                    </button>
                     <p className="privacyHint">Verwijder je persoonlijke gegevens uit de database</p>
                 </div>
                 {deleteConfirmationOpen ? (
@@ -301,7 +324,7 @@ export default function SettingsPrivacy({ onBack }) {
                 ) : null}
                 <div className={`savedMessage ${message ? "visible" : ""}`}>{message}</div>
 
-                <p>Re:Mind v1.0.12</p>
+                <p>Re:Mind v1.0.13</p>
             </section>
         </main>
     );

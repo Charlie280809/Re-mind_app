@@ -74,3 +74,21 @@ export async function deleteAccount(accessToken) {
 
     return payload;
 }
+
+export async function resetPersonalData(accessToken) {
+    const apiBaseUrl = getApiBaseUrl();
+    const response = await fetch(`${apiBaseUrl}/account/me/data`, {
+        method: "DELETE",
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+        },
+    });
+
+    const payload = await readJsonResponse(response, (snippet) => snippet || "Kon je persoonlijke data niet verwijderen.");
+
+    if (!response.ok) {
+        throw new Error(payload?.error || "Kon je persoonlijke data niet verwijderen.");
+    }
+
+    return payload;
+}
