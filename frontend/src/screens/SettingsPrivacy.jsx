@@ -40,7 +40,6 @@ export default function SettingsPrivacy({ onBack }) {
 
             if (supabase && user?.id) {
                 const [{ data: workData, error: workError }, { data: favoriteData, error: favoriteError }] = await Promise.all([
-                    supabase.from("work_hours").select("*").eq("user_id", user.id).maybeSingle(),
                     supabase.from("favorite_pauses").select("*").eq("user_id", user.id),
                 ]);
 
