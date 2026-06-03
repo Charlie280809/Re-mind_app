@@ -2703,7 +2703,6 @@ app.delete("/account/me/data", async (req, res) => {
     "workday_tasks",
     "checkins",
     "work_sessions",
-    "work_hours",
     "settings",
     "calendar_connections",
   ];
